@@ -11,7 +11,7 @@ install using [Pathogen](https://github.com/tpope/vim-pathogen).
 
 You can also use a modeline like this in every ledger file:
 
-    vim:filetype-ledger
+    vim:filetype=ledger
 
 Tips and useful commands
 ------------------------
