@@ -96,9 +96,9 @@ insert the closing bracket after calling the completion, too.
 License
 -------
 
-Copyright 2011-2009 by Johann Klähn  
-Copyright 2009 by Stefan Karrmann  
-Copyright 2005 by Wolfgang Oertl
+Copyright 2009-2011 Johann Klähn  
+Copyright 2009 Stefan Karrmann  
+Copyright 2005 Wolfgang Oertl
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
