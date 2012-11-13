@@ -16,23 +16,23 @@ You can also use a modeline like this in every ledger file:
 Tips and useful commands
 ------------------------
 
-Try account-completion (as explained below)
+* Try account-completion (as explained below)
 
--   `:call LedgerSetDate(line('.'), 'effective')`
+* `:call LedgerSetDate(line('.'), 'effective')`
 
-    will set today's date as the effective date of the current transaction. You
-    can use also 'actual' in place of 'effective' or pass in a different date
-    measured as seconds since 1st Jan 1970.
+  will set today's date as the effective date of the current transaction. You
+  can use also 'actual' in place of 'effective' or pass in a different date
+  measured as seconds since 1st Jan 1970.
 
--   `:call LedgerSetTransactionState(line('.'), '*')`
+* `:call LedgerSetTransactionState(line('.'), '*')`
 
-    sets the state of the current transaction to '*'. You can use this in
-    custom mappings.
+  sets the state of the current transaction to '*'. You can use this in custom
+  mappings.
 
--   `:call LedgerToggleTransactionState(line('.'), ' *?!')`
+* `:call LedgerToggleTransactionState(line('.'), ' *?!')`
 
-    will toggle through the provided transaction states. You can map this to
-    double-clicking for example:
+  will toggle through the provided transaction states. You can map this to
+  double-clicking for example:
 
         noremap <silent><buffer> <2-LeftMouse>\
         :call LedgerToggleTransactionState(line('.'), ' *?!')<CR>
@@ -43,30 +43,29 @@ Configuration
 Include the following let-statements somewhere in your `.vimrc` to modify the
 behaviour of the ledger filetype.
 
--   Number of colums that will be used to display the foldtext. Set this
-    when you think that the amount is too far off to the right.
+* Number of colums that will be used to display the foldtext. Set this when you
+  think that the amount is too far off to the right.
 
         let g:ledger_maxwidth = 80
 
--   String that will be used to fill the space between account name and
-    amount in the foldtext. Set this to get some kind of lines or visual
-    aid.
+* String that will be used to fill the space between account name and amount in
+  the foldtext. Set this to get some kind of lines or visual aid.
 
         let g:ledger_fillstring = '    -'
 
-    My special tip is to use so-called digraphs: Press <C-K> followed by the
-    two-characters key sequence below. (in insert-mode)
+  My special tip is to use so-called digraphs: Press <C-K> followed by the
+  two-characters key sequence below. (in insert-mode)
 
         '. = ˙ or ': = ¨ --> ˙˙˙˙˙˙ or ¨¨¨¨¨¨
         ', = ¸           --> ¸¸¸¸¸¸
         .M = ·           --> ······
         >> = »           --> »»»»»»
 
-    All those look rather unobstrusive and provide a good visual aid to find
-    the correct amount.
+  All those look rather unobstrusive and provide a good visual aid to find the
+  correct amount.
 
--   If you want the account completion to be sorted by level of
-    detail/depth instead of alphabetical, include the following line:
+* If you want the account completion to be sorted by level of detail/depth
+  instead of alphabetical, include the following line:
 
         let g:ledger_detailed_first = 1
 
