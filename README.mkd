@@ -9,6 +9,9 @@ Usage
 Copy each file to the corresponding directory in your `~/.vim` directory or
 install using [Pathogen](https://github.com/tpope/vim-pathogen).
 
+Then include the following line in your .vimrc  or in ~/.vim/filetype.vim
+    au BufNewFile,BufRead *.ldg,*.ledger setf ledger | comp ledger
+
 You can also use a modeline like this in every ledger file:
 
     vim:filetype=ledger
