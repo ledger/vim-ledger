@@ -1,23 +1,35 @@
-vim-ledger
-==========
+*ledger.txt* Plugin for the ledger filetype.
 
-This is the ledger filetype for Vim.
 
-Usage
------
+                                                  *ledger* *ledger-plugin*
 
-Copy each file to the corresponding directory in your `~/.vim` directory or
-install using [Pathogen](https://github.com/tpope/vim-pathogen).
+Contents:
 
-Then include the following line in your .vimrc  or in ~/.vim/filetype.vim
+        Commands............|ledger-invoking|
+        Source................|ledger-source|
+        Usage..................|ledger-usage|
+        Tips....................|ledger-tips|
+        Settings............|ledger-settings|
+        Completion........|ledger-completion|
+        License..............|ledger-license|
+
+
+==============================================================================
+USAGE                                                           *ledger-usage*
+
+After it is installed, include the following line in
+your .vimrc  or in ~/.vim/filetype.vim
+
     au BufNewFile,BufRead *.ldg,*.ledger setf ledger | comp ledger
 
 You can also use a modeline like this in every ledger file:
 
     vim:filetype=ledger
 
+==============================================================================
+TIPS                                                             *ledger-tips*
+
 Tips and useful commands
-------------------------
 
 * Try account-completion (as explained below)
 
@@ -40,8 +52,10 @@ Tips and useful commands
         noremap <silent><buffer> <2-LeftMouse>\
         :call LedgerToggleTransactionState(line('.'), ' *?!')<CR>
 
+==============================================================================
+SETTINGS                                                     *ledger-settings*
+
 Configuration
--------------
 
 Include the following let-statements somewhere in your `.vimrc` to modify the
 behaviour of the ledger filetype.
@@ -72,8 +86,8 @@ behaviour of the ledger filetype.
 
         let g:ledger_detailed_first = 1
 
-Completion
-----------
+==============================================================================
+COMPLETION                                                 *ledger-completion*
 
 Omni completion is currently implemented for account names only.
 
@@ -96,8 +110,10 @@ When you want to complete on a virtual transaction, it's currently best
 to keep the cursor in front of the closing bracket. Of course you can
 insert the closing bracket after calling the completion, too.
 
-License
--------
+==============================================================================
+LICENSE                                                       *ledger-license*
+
+https://github.com/ledger/vim-ledger
 
 Copyright 2009-2011 Johann Klähn  
 Copyright 2009 Stefan Karrmann  
@@ -115,3 +131,7 @@ Public License for more details.
 
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
+
