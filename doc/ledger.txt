@@ -17,10 +17,8 @@ Contents:
 ==============================================================================
 USAGE                                                           *ledger-usage*
 
-After it is installed, include the following line in
-your .vimrc  or in ~/.vim/filetype.vim
-
-    au BufNewFile,BufRead *.ldg,*.ledger setf ledger | comp ledger
+Copy each file to the corresponding directory in your ~/.vim directory or
+install using Pathogen.
 
 You can also use a modeline like this in every ledger file:
 
@@ -115,8 +113,8 @@ LICENSE                                                       *ledger-license*
 
 https://github.com/ledger/vim-ledger
 
-Copyright 2009-2011 Johann Klähn  
-Copyright 2009 Stefan Karrmann  
+Copyright 2009-2011 Johann Klähn
+Copyright 2009 Stefan Karrmann
 Copyright 2005 Wolfgang Oertl
 
 This program is free software: you can redistribute it and/or modify it
