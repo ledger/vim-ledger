@@ -39,7 +39,7 @@ syn match ledgerComment /^;.*$/
 " comments at eol must be preceeded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTag,ledgerTypedTag
-syn match ledgerTag /:[^:]\+:/hs=s+1,he=e-1 contained
+syn match ledgerTag /\(^\s\+;\s*\)\@<=[^:]\+:/hs=s,he=e-1 contained
 syn match ledgerTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze[^:]\+$/ contained
 syn match ledgerTypedTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze[^:]\+$/ contained
 
