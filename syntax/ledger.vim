@@ -42,8 +42,8 @@ syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
 syn match ledgerTags /\%(\%(;\s*\|^tag\s\+\)\)\@<=:[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/
     \ contained contains=ledgerTag
 syn match ledgerTag /:\zs[^:]\+\ze:/ contained
-syn match ledgerValueTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze[^:]\+$/ contained
-syn match ledgerTypedTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze[^:]\+$/ contained
+syn match ledgerValueTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained
+syn match ledgerTypedTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained
 
 syn region ledgerApply
     \ matchgroup=ledgerStartApply start=/^apply\>/
