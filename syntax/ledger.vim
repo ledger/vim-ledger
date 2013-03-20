@@ -38,9 +38,11 @@ syn match ledgerPreDeclarationDirective /^\s\+\zs\S\+/ contained
 syn match ledgerComment /^;.*$/
 " comments at eol must be preceeded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
-    \ keepend contained contains=ledgerTag,ledgerTypedTag
-syn match ledgerTag /\(^\s\+;\s*\)\@<=[^:]\+:/hs=s,he=e-1 contained
-syn match ledgerTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze[^:]\+$/ contained
+    \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+syn match ledgerTags /\%(\%(;\s*\|^tag\s\+\)\)\@<=:[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/
+    \ contained contains=ledgerTag
+syn match ledgerTag /:\zs[^:]\+\ze:/ contained
+syn match ledgerValueTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze[^:]\+$/ contained
 syn match ledgerTypedTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze[^:]\+$/ contained
 
 syn region ledgerApply
@@ -49,10 +51,12 @@ syn region ledgerApply
     \ contains=ledgerApplyHead,ledgerApply,ledgerTransaction,ledgerComment
 syn match ledgerApplyHead /\%(^apply\s\+\)\@<=\S.*$/ contained
 
+highlight default link ledgerComment Comment
 highlight default link ledgerTransactionDate Constant
 highlight default link ledgerTransactionExpression Statement
 highlight default link ledgerMetadata Tag
 highlight default link ledgerTypedTag Keyword
+highlight default link ledgerValueTag Type
 highlight default link ledgerTag Type
 highlight default link ledgerStartApply Tag
 highlight default link ledgerEndApply Tag
