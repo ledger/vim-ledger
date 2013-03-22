@@ -27,9 +27,11 @@ if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(split(g:ledge
   if executable('ledger')
     let g:ledger_bin = 'ledger'
   else
-    unlet g:ledger_bin
-    echoerr "ledger command not found. Set g:ledger_bin or extend $PATH ".
+    unlet! g:ledger_bin
+    echohl WarningMsg
+    echomsg "ledger command not found. Set g:ledger_bin or extend $PATH ".
           \ "to enable error checking and auto-formatting."
+    echohl None
   endif
 endif
 
