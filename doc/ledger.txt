@@ -31,11 +31,14 @@ Tips and useful commands
 
 * Try account-completion (as explained below)
 
-* `:call LedgerSetDate(line('.'), 'effective')`
+* `:call LedgerSetDate(line('.'), "auxiliary")`
 
-  will set today's date as the effective date of the current transaction. You
-  can use also 'actual' in place of 'effective' or pass in a different date
-  measured as seconds since 1st Jan 1970.
+  will set today's date as the auxiliary date of the current transaction. You
+  can use also "primary" or "unshift" in place of "auxiliary". When you pass
+  "unshift" the old primary date will be set as the auxiliary date and today's
+  date will be set as the new primary date.
+  To use a different date pass a date measured in seconds since 1st Jan 1970
+  as the third argument.
 
 * `:call LedgerSetTransactionState(line('.'), '*')`
 
@@ -113,7 +116,7 @@ LICENSE                                                       *ledger-license*
 
 https://github.com/ledger/vim-ledger
 
-Copyright 2009-2011 Johann Klähn
+Copyright 2009-2013 Johann Klähn
 Copyright 2009 Stefan Karrmann
 Copyright 2005 Wolfgang Oertl
 

@@ -21,8 +21,11 @@ Tips and useful commands
 * `:call LedgerSetDate(line('.'), 'auxiliary')`
 
   will set today's date as the auxiliary date of the current transaction. You
-  can use also 'primary' in place of 'auxiliary' or pass in a different date
-  measured as seconds since 1st Jan 1970.
+  can use also `primary` or `unshift` in place of `auxiliary`. When you pass
+  "unshift" the old primary date will be set as the auxiliary date and today's
+  date will be set as the new primary date.
+  To use a different date pass a date measured in seconds since 1st Jan 1970
+  as the third argument.
 
 * `:call LedgerSetTransactionState(line('.'), '*')`
 
