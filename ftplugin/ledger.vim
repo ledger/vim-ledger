@@ -295,14 +295,19 @@ function! LedgerSetDate(lnum, type, ...) "{{{1
     let date = [formatted]
   endif
 
-  if a:type ==? 'actual'
+  if a:type =~? 'effective\|actual'
+    echoerr "actual/effective arguments were replaced by primary/auxiliary"
+    return
+  endif
+
+  if a:type ==? 'primary'
     let date[0] = formatted
-  elseif a:type ==? 'effective'
+  elseif a:type ==? 'auxiliary'
     if time < 0
-      " remove effective date
+      " remove auxiliary date
       let date = [date[0]]
     else
-      " set effective date
+      " set auxiliary date
       if len(date) >= 2
         let date[1] = formatted
       else
