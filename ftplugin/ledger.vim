@@ -314,6 +314,8 @@ function! LedgerSetDate(lnum, type, ...) "{{{1
         call add(date, formatted)
       endif
     endif
+  elseif a:type ==? 'unshift'
+    let date = [formatted, date[0]]
   endif
 
   let trans['date'] = join(date, '=')
