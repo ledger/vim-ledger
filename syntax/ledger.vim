@@ -23,10 +23,11 @@ syn region ledgerTransaction start=/^[[:digit:]~=]/ skip=/^\s/ end=/^/
 syn match ledgerTransactionDate /^\d\S\+/ contained
 syn match ledgerTransactionExpression /^[=~]\s\+\zs.*/ contained
 syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
-    \ contained transparent contains=ledgerAccount,ledgerMetadata
+    \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerMetadata
 " every space in an account name shall be surrounded by two non-spaces
 " every account name ends with a tab, two spaces or the end of the line
 syn match ledgerAccount /^\s\+\zs\%(\S\@<= \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained
+syn match ledgerAmount /\S\@<=\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contained
 
 syn region ledgerPreDeclaration start=/^\(account\|payee\|commodity\|tag\)/ skip=/^\s/ end=/^/
     \ keepend transparent
@@ -61,6 +62,7 @@ highlight default link ledgerStartApply Tag
 highlight default link ledgerEndApply Tag
 highlight default link ledgerApplyHead Type
 highlight default link ledgerAccount Identifier
+highlight default link ledgerAmount Number
 highlight default link ledgerPreDeclarationType Type
 highlight default link ledgerPreDeclarationName Identifier
 highlight default link ledgerPreDeclarationDirective Type
