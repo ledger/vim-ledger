@@ -36,8 +36,7 @@ syn match ledgerPreDeclarationName /^\S\+\s\+\zs.*/ contained
 syn match ledgerPreDeclarationDirective /^\s\+\zs\S\+/ contained
 
 syn match ledgerComment /^;.*$/
-" comments at eol must be preceeded by at least 2 spaces / 1 tab
-syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
+syn region ledgerMetadata start=/;/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 syn match ledgerTags /\%(\%(;\s*\|^tag\s\+\)\)\@<=:[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/
     \ contained contains=ledgerTag
