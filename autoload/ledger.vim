@@ -253,8 +253,8 @@ function! s:transaction.format_head() dict "{{{2
 
   let parts = []
   if has_key(self, 'date') | call add(parts, self['date']) | endif
-  if has_key(self, 'code') | call add(parts, '('.self['code'].')') | endif
   if has_key(self, 'state') | call add(parts, self['state']) | endif
+  if has_key(self, 'code') | call add(parts, '('.self['code'].')') | endif
   if has_key(self, 'description') | call add(parts, self['description']) | endif
 
   let line = join(parts)
