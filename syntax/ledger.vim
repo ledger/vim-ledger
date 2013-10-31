@@ -11,6 +11,9 @@ elseif exists("b:current_sytax")
   finish
 endif
 
+" Force old regex engine (:help two-engines)
+let s:oe = v:version < 704 ? '' : '\%#=1'
+
 " for debugging
 syntax clear
 
@@ -26,8 +29,10 @@ syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
     \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerMetadata
 " every space in an account name shall be surrounded by two non-spaces
 " every account name ends with a tab, two spaces or the end of the line
-syn match ledgerAccount /^\s\+\zs\%(\S\@<= \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained
-syn match ledgerAmount /\S\@<=\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contained
+exe 'syn match ledgerAccount '.
+  \ '/'.s:oe.'^\s\+\zs\%(\S\@1<= \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained'
+exe 'syn match ledgerAmount '.
+  \ '/'.s:oe.'\S\@1<=\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contained'
 
 syn region ledgerPreDeclaration start=/^\(account\|payee\|commodity\|tag\)/ skip=/^\s/ end=/^/
     \ keepend transparent
@@ -40,17 +45,22 @@ syn match ledgerComment /^;.*$/
 " comments at eol must be preceeded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
-syn match ledgerTags /\%(\%(;\s*\|^tag\s\+\)\)\@<=:[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/
-    \ contained contains=ledgerTag
+exe 'syn match ledgerTags '.
+    \ '/'s:oe.'\%#=1\%(\%(;\s*\|^tag\s\+\)\)\@<='.
+    \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
+    \ 'contained contains=ledgerTag'
 syn match ledgerTag /:\zs[^:]\+\ze:/ contained
-syn match ledgerValueTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained
-syn match ledgerTypedTag /\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained
+exe 'syn match ledgerValueTag '.
+  \ '/\%#=1\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
+exe 'syn match ledgerTypedTag '.
+  \ '/\%#=1\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
 
 syn region ledgerApply
     \ matchgroup=ledgerStartApply start=/^apply\>/
     \ matchgroup=ledgerEndApply end=/^end\s\+apply\>/
     \ contains=ledgerApplyHead,ledgerApply,ledgerTransaction,ledgerComment
-syn match ledgerApplyHead /\%(^apply\s\+\)\@<=\S.*$/ contained
+exe 'syn match ledgerApplyHead '.
+  \ '/\%#=1\%(^apply\s\+\)\@<=\S.*$/ contained'
 
 highlight default link ledgerComment Comment
 highlight default link ledgerTransactionDate Constant
