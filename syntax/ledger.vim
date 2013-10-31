@@ -46,21 +46,21 @@ syn match ledgerComment /^;.*$/
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 exe 'syn match ledgerTags '.
-    \ '/'s:oe.'\%#=1\%(\%(;\s*\|^tag\s\+\)\)\@<='.
+    \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
     \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
     \ 'contained contains=ledgerTag'
 syn match ledgerTag /:\zs[^:]\+\ze:/ contained
 exe 'syn match ledgerValueTag '.
-  \ '/\%#=1\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
+  \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
 exe 'syn match ledgerTypedTag '.
-  \ '/\%#=1\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
+  \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
 
 syn region ledgerApply
     \ matchgroup=ledgerStartApply start=/^apply\>/
     \ matchgroup=ledgerEndApply end=/^end\s\+apply\>/
     \ contains=ledgerApplyHead,ledgerApply,ledgerTransaction,ledgerComment
 exe 'syn match ledgerApplyHead '.
-  \ '/\%#=1\%(^apply\s\+\)\@<=\S.*$/ contained'
+  \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
 
 highlight default link ledgerComment Comment
 highlight default link ledgerTransactionDate Constant
