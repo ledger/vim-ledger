@@ -31,7 +31,7 @@ Tips and useful commands
 
 * Try account-completion (as explained below)
 
-* `:call LedgerSetDate(line('.'), "auxiliary")`
+* `:call ledger#transaction_date_set('.'), "auxiliary")`
 
   will set today's date as the auxiliary date of the current transaction. You
   can use also "primary" or "unshift" in place of "auxiliary". When you pass
@@ -40,18 +40,18 @@ Tips and useful commands
   To use a different date pass a date measured in seconds since 1st Jan 1970
   as the third argument.
 
-* `:call LedgerSetTransactionState(line('.'), '*')`
+* `:call ledger#transaction_state_set(line('.'), '*')`
 
   sets the state of the current transaction to '*'. You can use this in custom
   mappings.
 
-* `:call LedgerToggleTransactionState(line('.'), ' *?!')`
+* `:call ledger#transaction_state_toggle(line('.'), ' *?!')`
 
   will toggle through the provided transaction states. You can map this to
   double-clicking for example:
 
         noremap <silent><buffer> <2-LeftMouse>\
-        :call LedgerToggleTransactionState(line('.'), ' *?!')<CR>
+        :call ledger#transaction_state_toggle(line('.'), ' *?!')<CR>
 
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
