@@ -56,21 +56,24 @@ behaviour of the ledger filetype.
 
         let g:ledger_fillstring = '    -'
 
-  My special tip is to use so-called digraphs: Press <C-K> followed by the
-  two-characters key sequence below. (in insert-mode)
-
-        '. = ˙ or ': = ¨ --> ˙˙˙˙˙˙ or ¨¨¨¨¨¨
-        ', = ¸           --> ¸¸¸¸¸¸
-        .M = ·           --> ······
-        >> = »           --> »»»»»»
-
-  All those look rather unobtrusive and provide a good visual aid to find the
-  correct amount.
-
 * If you want the account completion to be sorted by level of detail/depth
   instead of alphabetical, include the following line:
 
         let g:ledger_detailed_first = 1
+
+* By default vim will fold ledger transactions, leaving surrounding blank lines
+  unfolded. You can use `g:ledger_fold_blanks` to hide blank lines following a
+  transaction.
+
+        let g:ledger_fold_blanks = 0
+
+  A value of 0 will disable folding of blank lines, 1 will allow folding of a
+  single blank line between transactions; any larger value will enable folding
+  undconditionally.
+
+  Note that only lines containing no trailing spaces are considered for
+  folding. You can take advantage of this to disable this feature on a
+  case-by-case basis.
 
 Completion
 ----------

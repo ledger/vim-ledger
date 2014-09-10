@@ -15,15 +15,21 @@ endif
 let s:oe = v:version < 704 ? '' : '\%#=1'
 let s:lb1 = v:version < 704 ? '\@<=' : '\@1<='
 
+let s:fb = get(g:, 'ledger_fold_blanks', 0)
+let s:skip = s:fb > 0 ? '\|^\n' : ''
+if s:fb == 1
+  let s:skip .= '\n\@!'
+endif
+
 " for debugging
 syntax clear
 
 " DATE[=EDATE] [*|!] [(CODE)] DESC <-- first line of transaction
 "   ACCOUNT AMOUNT [; NOTE]  <-- posting
 
-syn region ledgerTransaction start=/^[[:digit:]~=]/ skip=/^\s/ end=/^/
-    \ fold keepend transparent
-    \ contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression
+exe 'syn region ledgerTransaction start=/^[[:digit:]~=]/ '.
+  \ 'skip=/^\s'. s:skip . '/ end=/^/ fold keepend transparent '.
+  \ 'contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
 syn match ledgerTransactionDate /^\d\S\+/ contained
 syn match ledgerTransactionExpression /^[=~]\s\+\zs.*/ contained
 syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
