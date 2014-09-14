@@ -53,6 +53,24 @@ Tips and useful commands
         noremap <silent><buffer> <2-LeftMouse>\
         :call ledger#transaction_state_toggle(line('.'), ' *?!')<CR>
 
+* `:AlignCommodity`
+
+  adds spaces between an account and commodity so that the decimal points of
+  the commodities all occur in the column given by `g:ledger_separator_col`.
+  If an amount has no decimal point, the imaginary decimal point to the right
+  of the least significant digit will align.
+
+  The command acts on a range, with the default being the current line. If the
+  cursor happens to be inside that range and to the right of the account name,
+  the cursor will be pushed to the right the appropriate amount, so that it
+  remains on the same character.
+
+  The alignment character can be set using `g:ledger_separator_string`.
+  The script assumes the use of spaces for alignment. It does not understand
+  tabs. You might like the following remap:
+
+           inoremap . .<C-O>:AlignCommodity<CR>
+
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
 
@@ -138,4 +156,3 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
-

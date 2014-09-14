@@ -51,6 +51,15 @@ if !exists('g:ledger_fillstring')
   let g:ledger_fillstring = ' '
 endif
 
+" You can set g:ledger_separator_col and g:ledger_separator_string to
+" customize the behavior of the AlignCommodity command.
+if !exists("g:ledger_separator_col")
+    let g:ledger_separator_col = 50
+endif
+if !exists("g:ledger_separator_string")
+    let g:ledger_separator_string = "."
+endif
+
 " If enabled this will list the most detailed matches at the top {{{
 " of the completion list.
 " For example when you have some accounts like this:
@@ -227,6 +236,8 @@ function! LedgerComplete(findstart, base) "{{{1
     endif
   endif
 endf "}}}
+
+command! -range AlignCommodity :call ledger#align_commodity(<line1>, <line2>)
 
 " Deprecated functions {{{1
 let s:deprecated = {
