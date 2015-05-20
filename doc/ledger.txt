@@ -53,6 +53,11 @@ Tips and useful commands
         noremap <silent><buffer> <2-LeftMouse>\
         :call ledger#transaction_state_toggle(line('.'), ' *?!')<CR>
 
+* `:call ledger#entry()`
+
+  enters a new transaction based on the text in the current line.
+  The text in the current line is replaced by the new transaction.
+  This is a front end to `ledger entry`.
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
 
