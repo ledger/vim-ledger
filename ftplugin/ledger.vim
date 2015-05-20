@@ -51,6 +51,26 @@ if !exists('g:ledger_fillstring')
   let g:ledger_fillstring = ' '
 endif
 
+if !exists('g:ledger_decimal_sep')
+  let g:ledger_decimal_sep = '.'
+endif
+
+if !exists('g:ledger_align_at')
+  let g:ledger_align_at = 60
+endif
+
+if !exists('g:ledger_default_commodity')
+  let g:ledger_default_commodity = ''
+endif
+
+if !exists('g:ledger_commodity_before')
+  let g:ledger_commodity_before = 1
+endif
+
+if !exists('g:ledger_commodity_sep')
+  let g:ledger_commodity_sep = ''
+endif
+
 " If enabled this will list the most detailed matches at the top {{{
 " of the completion list.
 " For example when you have some accounts like this:
@@ -328,3 +348,10 @@ endf "}}}
 function! s:count_expression(text, expression) "{{{2
   return len(split(a:text, a:expression, 1))-1
 endf "}}}
+
+" Commands {{{1
+if !exists(":LedgerAlign")
+  command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
+endif
+" }}}
+

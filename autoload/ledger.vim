@@ -330,3 +330,66 @@ function! s:findall(text, rx)
 
   return matches
 endf
+
+" Move the cursor to the specified column, filling the line with spaces if necessary.
+function! s:goto_col(pos)
+  exec "normal" a:pos . "|"
+  let diff = a:pos - virtcol('.')
+  if diff > 0 | exec "normal" diff . "a " | endif
+endf
+
+" Align the amount expression after an account name at the decimal point.
+"
+" This function moves the amount expression of a posting so that the decimal
+" separator is aligned at the column specified by g:ledger_align_at.
+"
+" For example, after selecting:
+"
+"   2015/05/09 Some Payee
+"     Expenses:Other    $120,23  ; Tags here
+"     Expenses:Something  $-4,99
+"     Expenses:More                 ($12,34 + $16,32)
+"
+"  :'<,'>call ledger#align_commodity() produces:
+"
+"   2015/05/09 Some Payee
+"      Expenses:Other                                    $120,23  ; Tags here
+"      Expenses:Something                                 $-4,99
+"      Expenses:More                                     ($12,34 + $16,32)
+"
+function! ledger#align_commodity()
+  " Extract the part of the line after the account name (excluding spaces):
+  let rhs = matchstr(getline('.'), '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
+  if rhs != ''
+    " Remove everything after the account name (including spaces):
+    .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
+    if g:ledger_decimal_sep == ''
+      let pos = matchend(rhs, '\m\d[^[:space:]]*')
+    else
+      " Find the position of the first decimal separator:
+      let pos = match(rhs, '\V' . g:ledger_decimal_sep)
+    endif
+    " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
+    call s:goto_col(g:ledger_align_at - pos - 1)
+    " Append the part of the line that was previously removed:
+    exe 'normal a' . rhs
+  endif
+endf!
+
+" Align the amount under the cursor and append/prepend the default currency.
+function! ledger#align_amount_at_cursor()
+  " Select and cut text:
+  normal viWd
+  " Find the position of the decimal separator
+  let pos = match(@", g:ledger_decimal_sep) " Returns zero when the separator is the empty string
+  " Paste text at the correct column and append/prepend default commodity:
+  if g:ledger_commodity_before
+    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@"))  - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
+    exe 'normal a' . g:ledger_default_commodity . g:ledger_commodity_sep
+    normal p
+  else
+    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@")) - 1)
+    exe 'normal pa' . g:ledger_commodity_sep . g:ledger_default_commodity
+  endif
+endf!
+
