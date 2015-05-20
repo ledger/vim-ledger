@@ -42,6 +42,11 @@ Tips and useful commands
 
 * Align commodities at the decimal point. See `help ledger-tips`.
 
+* `:call ledger#entry()`
+
+  will replace the text on the current line with a new transaction based
+  on the replaced text.
+
 Configuration
 -------------
 

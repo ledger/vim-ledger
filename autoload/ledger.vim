@@ -393,3 +393,10 @@ function! ledger#align_amount_at_cursor()
   endif
 endf!
 
+func! ledger#entry()
+  " enter a new transaction based on the text in the current line.
+  let l = line('.') - 1 " Insert transaction at the current line (i.e., below the line above the current one)
+  let query = getline('.')
+  normal "_dd
+  exec l . 'read !' g:ledger_bin '-f' shellescape(expand('%')) 'entry' shellescape(query)
+endfunc

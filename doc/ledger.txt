@@ -85,6 +85,13 @@ Tips and useful commands
 
   Now, you may type `123.45<C-l>`, and have `$123.45` properly aligned (assuming
   your default commodity is set to `'$'`).
+
+* `:call ledger#entry()`
+
+  enters a new transaction based on the text in the current line.
+  The text in the current line is replaced by the new transaction.
+  This is a front end to `ledger entry`.
+
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
 
