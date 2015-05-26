@@ -40,6 +40,8 @@ Tips and useful commands
         noremap <silent><buffer> <2-LeftMouse>\
         :call ledger#transaction_state_toggle(line('.'), ' *?!')<CR>
 
+* Align commodities at the decimal point. See `help ledger-tips`.
+
 Configuration
 -------------
 
