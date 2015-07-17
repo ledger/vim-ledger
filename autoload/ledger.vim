@@ -297,8 +297,8 @@ function! ledger#find_in_tree(tree, levels)
   let currentlvl = a:levels[0]
   let nextlvls = a:levels[1:]
   let branches = ledger#filter_items(keys(a:tree), currentlvl)
-  let exact = empty(nextlvls)
   for branch in branches
+    let exact = empty(nextlvls)
     call add(results, [branch, exact])
     if ! empty(nextlvls)
       for [result, exact] in ledger#find_in_tree(a:tree[branch], nextlvls)
