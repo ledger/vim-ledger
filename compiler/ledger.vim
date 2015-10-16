@@ -24,7 +24,6 @@ CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
 " Skip all other lines:
 CompilerSet errorformat+=%-G%.%#
 
-" unfortunately there is no 'check file' command,
-" so we will just use a query that returns no results. ever.
-exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ reg\ not\ ''.*''\ \>\ /dev/null'
+" Check file syntax
+exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ source\ %:S'
 
