@@ -401,3 +401,19 @@ func! ledger#entry()
   normal "_dd
   exec l . 'read !' g:ledger_bin '-f' shellescape(expand('%')) 'entry' shellescape(query)
 endfunc
+
+function! s:error_message(msg)
+  redraw  " See h:echo-redraw
+  echohl ErrorMsg
+  echo "\r"
+  echomsg a:msg
+  echohl NONE
+endf
+
+function! s:warning_message(msg)
+  redraw  " See h:echo-redraw
+  echohl WarningMsg
+  echo "\r"
+  echomsg a:msg
+  echohl NONE
+endf
