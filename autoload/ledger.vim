@@ -435,7 +435,7 @@ endf
 " a:2  Message to show when the window is empty.
 "
 " Returns 0 if the quickfix window is empty, 1 otherwise.
-function! s:quickfixToggle(...)
+function! s:quickfix_toggle(...)
   if g:ledger_use_location_list
     let l:list = 'l'
     let l:open = (len(getloclist(winnr())) > 0)
@@ -524,7 +524,7 @@ function! ledger#report(args)
   let l:output = systemlist(l:cmd)
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
-    call s:quickfixToggle('Errors', 'Unable to parse errors')
+    call s:quickfix_toggle('Errors', 'Unable to parse errors')
     return
   endif
   if empty(l:output)
@@ -556,7 +556,7 @@ function! ledger#register(args)
         \ ], split(a:args, ' ')))
   if g:ledger_debug | return l:cmd | endif
   call s:quickfix_populate(systemlist(l:cmd))
-  call s:quickfixToggle('Register report')
+  call s:quickfix_toggle('Register report')
 endf
 
 function! ledger#reconcile(account, target_amount)
@@ -570,7 +570,7 @@ function! ledger#reconcile(account, target_amount)
         \ ])
   if g:ledger_debug | return l:cmd | endif
   call s:quickfix_populate(systemlist(l:cmd))
-  if s:quickfixToggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
+  if s:quickfix_toggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
