@@ -30,7 +30,12 @@ TIPS                                                             *ledger-tips*
 
 Tips and useful commands
 
-* Try account-completion (as explained below)
+* Try account-completion (as explained below). If you use YouCompleteMe, you
+  should disable it for Ledger files. Put this in your .vimrc:
+
+        if exists('g:ycm_filetype_blacklist')
+          call extend(g:ycm_filetype_blacklist, { 'ledger': 1 })
+        endif
 
 * You may use `:make` for syntax checking. It may be convenient to define a
   mapping for the following command:
