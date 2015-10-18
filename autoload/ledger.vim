@@ -559,6 +559,37 @@ function! ledger#register(args)
   call s:quickfixToggle('Register report')
 endf
 
+function! ledger#reconcile(account, target_amount)
+  if !s:is_ledger_buffer() | return | endif
+  let l:cmd = s:ledger_cmd([
+        \ "register",
+        \ a:account,
+        \ "--uncleared",
+        \ "--format='" . g:ledger_qf_reconcile_format . "'",
+        \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '"
+        \ ])
+  if g:ledger_debug | return l:cmd | endif
+  call s:quickfix_populate(systemlist(l:cmd))
+  if s:quickfixToggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
+    let g:ledger_target_amount = a:target_amount
+    " Show updated account balance upon saving, as long as the quickfix window is open
+    augroup reconcile
+      autocmd!
+      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . a:account . "')"
+      autocmd BufWipeout <buffer> call <sid>finish_reconciling()
+    augroup END
+    call ledger#show_balance(a:account)
+  endif
+endf
+
+function! s:finish_reconciling()
+  unlet g:ledger_target_amount
+  augroup reconcile
+    autocmd!
+  augroup END
+  augroup! reconcile
+endf
+
 " Show the pending/cleared balance of a given account,
 " or of the account in the current line if no argument is given.
 function! ledger#show_balance(...)
@@ -590,5 +621,11 @@ function! ledger#show_balance(...)
   echohl LedgerCleared
   echon l:amounts[1]
   echohl NONE
+  if exists('g:ledger_target_amount')
+    echon ' ' g:ledger_target_string
+    echohl LedgerTarget
+    echon printf('%.2f', (str2float(g:ledger_target_amount) - str2float(l:amounts[2])))
+    echohl NONE
+  endif
 endf
 " }}}

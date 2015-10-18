@@ -119,11 +119,19 @@ endif
 if !exists('g:ledger_pending_string')
   let g:ledger_pending_string = 'Cleared or pending: '
 endif
+
+if !exists('g:ledger_target_string')
+  let g:ledger_target_string = 'Difference from target: '
+endif
 " }}}
 
 " Settings for the quickfix window {{{
 if !exists('g:ledger_qf_register_format')
   let g:ledger_qf_register_format = '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+endif
+
+if !exists('g:ledger_qf_reconcile_format')
+  let g:ledger_qf_reconcile_format = '%(date) %-4(code) %-50(payee) %-30(account) %15(amount)\n'
 endif
 
 if !exists('g:ledger_qf_size')
@@ -144,6 +152,7 @@ hi! link LedgerNumber Number
 hi! link LedgerNegativeNumber Special
 hi! link LedgerCleared Constant
 hi! link LedgerPending Todo
+hi! link LedgerTarget Statement
 hi! link LedgerImproperPerc Special
 " }}}
 
@@ -404,6 +413,13 @@ function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
         \ "v:val =~? '" . a:argLead . "'")
 endf "}}}
 
+function! s:reconcile(account) "{{{2
+  " call inputsave()
+  let l:amount = input('Target amount' . (empty(g:ledger_default_commodity) ? ': ' : ' (' . g:ledger_default_commodity . '): '))
+  " call inputrestore()
+  call ledger#reconcile(a:account, l:amount)
+endf "}}}
+
 " Commands {{{1
 if !exists(":Balance")
   command -nargs=? -complete=customlist,s:autocomplete_account_or_payee Balance call ledger#show_balance(<q-args>)
@@ -415,6 +431,10 @@ endif
 
 if !exists(":LedgerAlign")
   command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
+endif
+
+if !exists(":Reconcile")
+  command -nargs=1 -complete=customlist,s:autocomplete_account_or_payee Reconcile call <sid>reconcile(<q-args>)
 endif
 
 if !exists(":Register")

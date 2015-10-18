@@ -155,6 +155,33 @@ REPORTS                                                      *ledger-reports*
   may use the standard quickfix commands to jump from an entry in the register
   report to the corresponding location in the source file.
 
+* :`Reconcile`
+
+  Reconcile an account. For example:
+
+	:Reconcile checking
+
+  After you press Enter, you will be asked to enter a target amount (use
+  Vim's syntax for numbers, not your ledger's format). For example, for a
+  checking account, the target amount may be the balance of your latest bank
+  statement. The list of uncleared postings appears in the quickfix window.
+  The current balance of the account, together with the difference between the
+  target amount and the cleared balance, is shown at the bottom of the screen.
+  You may use standard quickfix commands to navigate through the postings. You
+  may use |ledger#transaction_state_set()| to update a transaction's state.
+  Every time you save your file, the balance and the difference from the
+  target amount are updated at the bottom of the screen. The goal, of course,
+  is to get such difference to zero. To finish reconciling an account, simply
+  close the quickfix window.
+
+  There is a highlight group to customize the color of the difference from
+  target:
+
+  * `LedgerTarget`
+
+    This is used to color the difference between the target amount and the
+    cleared balance.
+
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
 
@@ -227,6 +254,13 @@ behaviour of the ledger filetype.
 
   The format is specified using the standard Ledger syntax for --format.
 
+* Format of the reconcile quickfix window (see |:Reconcile|):
+
+	let g:ledger_qf_reconcile_format = \
+        '%(date) %-4(code) %-50(payee) %-30(account) %15(amount)\n'
+
+  The format is specified using the standard Ledger syntax for --format.
+
 * Flag that tells whether a location list or a quickfix list should be used:
 
 	let g:ledger_use_location_list = 0
@@ -257,6 +291,7 @@ behaviour of the ledger filetype.
 
 	let g:ledger_cleared_string = 'Cleared: '
 	let g:ledger_pending_string = 'Cleared or pending: '
+	let g:ledger_target_string = 'Difference from target: '
 
 * For debugging purposes:
 
