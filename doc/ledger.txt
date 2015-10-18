@@ -124,6 +124,27 @@ REPORTS                                                      *ledger-reports*
 
     This is used to color improper percentages.
 
+* `:Balance`
+
+  Show the pending and cleared balance of a given account below the status
+  line. For example:
+
+	:Balance checking:savings
+
+  The command offers payee and account autocompletion (see `:Ledger`). The
+  account argument is optional: if no argument is given, the first account
+  name found in the current line is used.
+
+  Two highlight groups can be used to customize the colors of the line:
+
+  * `LedgerCleared`
+
+    This is used to color the cleared balance.
+
+  * `LedgerPending`
+
+    This is used to color the pending balance.
+
 * `:Register`
 
   Opens an arbitrary register report in the quickfix window. For example:
@@ -231,6 +252,11 @@ behaviour of the ledger filetype.
 
   Filenames in the quickfix window are hidden by default. Set this to 1 is
   you want filenames to be visible.
+
+* Text of the output of the |:Balance| command:
+
+	let g:ledger_cleared_string = 'Cleared: '
+	let g:ledger_pending_string = 'Cleared or pending: '
 
 * For debugging purposes:
 

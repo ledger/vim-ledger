@@ -111,6 +111,14 @@ endif
 if !exists('g:ledger_use_location_list')
   let g:ledger_use_location_list = 0  " Use quickfix list by default
 endif
+
+if !exists('g:ledger_cleared_string')
+  let g:ledger_cleared_string = 'Cleared: '
+endif
+
+if !exists('g:ledger_pending_string')
+  let g:ledger_pending_string = 'Cleared or pending: '
+endif
 " }}}
 
 " Settings for the quickfix window {{{
@@ -134,6 +142,8 @@ endif
 " Highlight groups for Ledger reports {{{
 hi! link LedgerNumber Number
 hi! link LedgerNegativeNumber Special
+hi! link LedgerCleared Constant
+hi! link LedgerPending Todo
 hi! link LedgerImproperPerc Special
 " }}}
 
@@ -395,6 +405,10 @@ function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
 endf "}}}
 
 " Commands {{{1
+if !exists(":Balance")
+  command -nargs=? -complete=customlist,s:autocomplete_account_or_payee Balance call ledger#show_balance(<q-args>)
+endif
+
 if !exists(":Ledger")
   command -complete=customlist,s:autocomplete_account_or_payee -nargs=+ Ledger call ledger#report(<q-args>)
 endif

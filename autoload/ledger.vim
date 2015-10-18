@@ -558,3 +558,37 @@ function! ledger#register(args)
   call s:quickfix_populate(systemlist(l:cmd))
   call s:quickfixToggle('Register report')
 endf
+
+" Show the pending/cleared balance of a given account,
+" or of the account in the current line if no argument is given.
+function! ledger#show_balance(...)
+  let l:account = a:0 > 0 && !empty(a:1) ? a:1 : matchstr(getline('.'), '\m\(  \|\t\)\zs\S.\{-}\ze\(  \|\t\|$\)')
+  if empty(l:account)
+    call s:error_message('No account found')
+    return
+  endif
+  let l:cmd = s:ledger_cmd([
+        \ 'cleared',
+        \ l:account,
+        \ "--empty",
+        \ "--collapse",
+        \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
+        \ (exists("g:ledger_default_commodity") ? "-X " . g:ledger_default_commodity : '')
+        \ ])
+  if g:ledger_debug | return l:cmd | endif
+  let l:amounts = split(substitute(system(l:cmd), '\%x00', '/', 'g'), '|')
+  redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
+  if empty(l:amounts)
+    call s:error_message("Could not determine balance. Did you use a valid account?")
+    return
+  endif
+  echo g:ledger_pending_string
+  echohl LedgerPending
+  echon l:amounts[0]
+  echohl NONE
+  echon ' ' g:ledger_cleared_string
+  echohl LedgerCleared
+  echon l:amounts[1]
+  echohl NONE
+endf
+" }}}
