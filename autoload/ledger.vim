@@ -473,6 +473,7 @@ function! s:quickfix_populate(data)
   set errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
   " Format to parse command-line errors:
   set errorformat+=Error:\ %m
+  set errorformat+=%f:%l\ %m
   set errorformat+=%-G%.%#
   execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
   let &errorformat = l:efm  " Restore global errorformat
@@ -542,4 +543,18 @@ function! ledger#report(args)
   syntax match LedgerNumber /[^-]\d\+\([,.]\d\+\)\+/
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
   syntax match LedgerImproperPerc /\d\d\d\+%/
+endf
+
+" Show a register report in a quickfix list.
+function! ledger#register(args)
+  if !s:is_ledger_buffer() | return | endif
+  let l:cmd = s:ledger_cmd(extend([
+        \ "register",
+        \ "-f", "%",
+        \ "--format='" . g:ledger_qf_register_format . "'",
+        \ "--prepend-format='%(filename):%(beg_line) '"
+        \ ], split(a:args, ' ')))
+  if g:ledger_debug | return l:cmd | endif
+  call s:quickfix_populate(systemlist(l:cmd))
+  call s:quickfixToggle('Register report')
 endf

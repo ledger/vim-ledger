@@ -124,6 +124,16 @@ REPORTS                                                      *ledger-reports*
 
     This is used to color improper percentages.
 
+* `:Register`
+
+  Opens an arbitrary register report in the quickfix window. For example:
+
+	:Register groceries -p 'this month'
+
+  The command offers account and payee autocompletion (see |:Ledger|). You
+  may use the standard quickfix commands to jump from an entry in the register
+  report to the corresponding location in the source file.
+
 ==============================================================================
 SETTINGS                                                     *ledger-settings*
 
@@ -188,6 +198,13 @@ behaviour of the ledger filetype.
 
   Use `b` for bottom, `t` for top, `l` for left, `r` for right. Use uppercase letters
   if you want the window to always occupy the full width or height.
+
+* Format of quickfix register reports (see |:Register|):
+
+	let g:ledger_qf_register_format = \
+        '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+
+  The format is specified using the standard Ledger syntax for --format.
 
 * Flag that tells whether a location list or a quickfix list should be used:
 

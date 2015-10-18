@@ -114,6 +114,10 @@ endif
 " }}}
 
 " Settings for the quickfix window {{{
+if !exists('g:ledger_qf_register_format')
+  let g:ledger_qf_register_format = '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+endif
+
 if !exists('g:ledger_qf_size')
   let g:ledger_qf_size = 10  " Size of the quickfix window
 endif
@@ -397,6 +401,10 @@ endif
 
 if !exists(":LedgerAlign")
   command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
+endif
+
+if !exists(":Register")
+  command -complete=customlist,s:autocomplete_account_or_payee -nargs=* Register call ledger#register(<q-args>)
 endif
 " }}}
 
