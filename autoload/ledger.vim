@@ -1,3 +1,4 @@
+" vim:ts=2:sw=2:sts=2:foldmethod=marker
 function! ledger#transaction_state_toggle(lnum, ...)
   if a:0 == 1
     let chars = a:1
