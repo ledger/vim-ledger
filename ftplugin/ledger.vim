@@ -103,6 +103,40 @@ if !exists('g:ledger_include_original')
   let g:ledger_include_original = 0
 endif
 
+" Settings for Ledger reports {{{
+if !exists('g:ledger_winpos')
+  let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
+endif
+
+if !exists('g:ledger_use_location_list')
+  let g:ledger_use_location_list = 0  " Use quickfix list by default
+endif
+" }}}
+
+" Settings for the quickfix window {{{
+if !exists('g:ledger_qf_size')
+  let g:ledger_qf_size = 10  " Size of the quickfix window
+endif
+
+if !exists('g:ledger_qf_vertical')
+  let g:ledger_qf_vertical = 0
+endif
+
+if !exists('g:ledger_qf_hide_file')
+  let g:ledger_qf_hide_file = 1
+endif
+" }}}
+
+" Highlight groups for Ledger reports {{{
+hi! link LedgerNumber Number
+hi! link LedgerNegativeNumber Special
+hi! link LedgerImproperPerc Special
+" }}}
+
+if !exists('g:ledger_debug')
+  let g:ledger_debug = 0
+endif
+
 let s:rx_amount = '\('.
                 \   '\%([0-9]\+\)'.
                 \   '\%([,.][0-9]\+\)*'.
@@ -347,7 +381,20 @@ function! s:count_expression(text, expression) "{{{2
   return len(split(a:text, a:expression, 1))-1
 endf "}}}
 
+function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
+  return (a:argLead =~ '^@') ?
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' payees'),
+        \ "v:val =~? '" . strpart(a:argLead, 1) . "'"), '"@" . v:val')
+        \ :
+        \ filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' accounts'),
+        \ "v:val =~? '" . a:argLead . "'")
+endf "}}}
+
 " Commands {{{1
+if !exists(":Ledger")
+  command -complete=customlist,s:autocomplete_account_or_payee -nargs=+ Ledger call ledger#report(<q-args>)
+endif
+
 if !exists(":LedgerAlign")
   command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 endif

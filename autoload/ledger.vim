@@ -402,6 +402,15 @@ func! ledger#entry()
   exec l . 'read !' g:ledger_bin '-f' shellescape(expand('%')) 'entry' shellescape(query)
 endfunc
 
+" Report generation {{{1
+
+" Helper functions and variables {{{2
+" Position of report windows
+let s:winpos_map = {
+      \ "T": "to new",  "t": "abo new", "B": "bo new",  "b": "bel new",
+      \ "L": "to vnew", "l": "abo vnew", "R": "bo vnew", "r": "bel vnew"
+      \ }
+
 function! s:error_message(msg)
   redraw  " See h:echo-redraw
   echohl ErrorMsg
@@ -416,4 +425,121 @@ function! s:warning_message(msg)
   echo "\r"
   echomsg a:msg
   echohl NONE
+endf
+
+" Open the quickfix/location window when it is not empty,
+" closes it if it is empty.
+"
+" Optional parameters:
+" a:1  Quickfix window title.
+" a:2  Message to show when the window is empty.
+"
+" Returns 0 if the quickfix window is empty, 1 otherwise.
+function! s:quickfixToggle(...)
+  if g:ledger_use_location_list
+    let l:list = 'l'
+    let l:open = (len(getloclist(winnr())) > 0)
+  else
+    let l:list = 'c'
+    let l:open = (len(getqflist()) > 0)
+  endif
+
+  if l:open
+    execute (g:ledger_qf_vertical ? 'vert' : 'botright') l:list.'open' g:ledger_qf_size
+    " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
+    " See: http://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
+    if g:ledger_qf_hide_file
+      set conceallevel=2
+      set concealcursor=nc
+      syntax match qfFile /^[^|]*/ transparent conceal
+    endif
+    if a:0 > 0
+      let w:quickfix_title = a:1
+    endif
+    return 1
+  endif
+
+  execute l:list.'close'
+  call s:warning_message((a:0 > 1) ? a:2 : 'No results')
+  return 0
+endf
+
+" Populate a quickfix/location window with data. The argument must be a String
+" or a List.
+function! s:quickfix_populate(data)
+  " Note that cexpr/lexpr always uses the global value of errorformat
+  let l:efm = &errorformat  " Save global errorformat
+  set errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
+  set errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
+  " Format to parse command-line errors:
+  set errorformat+=Error:\ %m
+  set errorformat+=%-G%.%#
+  execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
+  let &errorformat = l:efm  " Restore global errorformat
+  return
+endf
+
+" Parse a list of ledger arguments and build a ledger command ready to be
+" executed.
+"
+" Note that %, # and < *at the start* of an item are expanded by Vim. If you
+" want to pass such characters to Ledger, escape them with a backslash.
+"
+" See also http://vim.wikia.com/wiki/Display_output_of_shell_commands_in_new_window
+" See also https://groups.google.com/forum/#!topic/vim_use/4ZejMpt7TeU
+function! s:ledger_cmd(arglist)
+  let l:cmd = g:ledger_bin
+  for l:part in a:arglist
+    if l:part =~ '\v^[%#<]'
+      let l:expanded_part = expand(l:part)
+      let l:cmd .= ' ' . (l:expanded_part == "" ? l:part : shellescape(l:expanded_part))
+    else
+      let l:cmd .= ' ' . l:part
+    endif
+  endfor
+  return l:cmd
+endf
+
+function! s:is_ledger_buffer()
+  if getbufvar(winbufnr(winnr()), "&ft") !=# "ledger"
+    call s:error_message("Please switch to a Ledger buffer first.")
+    return 0
+  endif
+  return 1
+endf
+" }}}
+
+" Run an arbitrary ledger command to process the current buffer, and show the
+" output in a new buffer. If there are errors, no new buffer is opened: the
+" errors are displayed in a quickfix window instead.
+"
+" Parameters:
+" args  A string of Ledger arguments.
+function! ledger#report(args)
+  if !s:is_ledger_buffer() | return | endif
+  let l:cmd = s:ledger_cmd(['-f', '%'] + split(a:args, ' '))
+  if g:ledger_debug | return l:cmd | endif
+  " Run Ledger
+  let l:output = systemlist(l:cmd)
+  if v:shell_error  " If there are errors, show them in a quickfix/location list.
+    call s:quickfix_populate(l:output)
+    call s:quickfixToggle('Errors', 'Unable to parse errors')
+    return
+  endif
+  if empty(l:output)
+    call s:warning_message('No results')
+    return
+  endif
+  " Open a new buffer to show Ledger's output.
+  execute get(s:winpos_map, g:ledger_winpos, "bo new")
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  call append(0, l:output)
+  setlocal nomodifiable
+  " Set local mappings to quit window or lose focus.
+  nnoremap <silent> <buffer> <tab> <c-w><c-w>
+  nnoremap <silent> <buffer> q <c-w>c
+  " Add some coloring to the report
+  syntax match LedgerNumber /[^-]\d\+\([,.]\d\+\)\+/
+  syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
+  syntax match LedgerImproperPerc /\d\d\d\+%/
 endf

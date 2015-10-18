@@ -9,6 +9,7 @@ Contents:
         Source................|ledger-source|
         Usage..................|ledger-usage|
         Tips....................|ledger-tips|
+        Reports..............|ledger-reports|
         Settings............|ledger-settings|
         Completion........|ledger-completion|
         License..............|ledger-license|
@@ -93,6 +94,37 @@ Tips and useful commands
   This is a front end to `ledger entry`.
 
 ==============================================================================
+REPORTS                                                      *ledger-reports*
+
+* `:Ledger`
+
+  Executes an arbitrary Ledger command and sends the output to a new buffer.
+  For example:
+
+        :Ledger bal ^assets ^liab
+
+  Errors are displayed in a quickfix window. The command offers account and
+  payee autocompletion (by pressing <Tab>): every name starting with `@` is
+  autocompleted as a payee; any other name is autocompleted as an account.
+
+  In a report buffer, you may press <Tab> to switch back to the Ledger
+  buffer and `q` to dismiss the buffer report.
+
+  There are three highlight groups that are used to color the report:
+
+  * `LedgerNumber`
+
+    This is used to color nonnegative numbers.
+
+  * `LedgerNegativeNumber`
+
+    This is used to color negative numbers.
+
+  * `LedgerImproperPerc`
+
+    This is used to color improper percentages.
+
+==============================================================================
 SETTINGS                                                     *ledger-settings*
 
 Configuration
@@ -149,6 +181,44 @@ behaviour of the ledger filetype.
 * String to be put between the commodity and the amount:
 
         let g:ledger_commodity_sep = ''
+
+* Position of a report buffer:
+
+        let g:ledger_winpos = 'B'
+
+  Use `b` for bottom, `t` for top, `l` for left, `r` for right. Use uppercase letters
+  if you want the window to always occupy the full width or height.
+
+* Flag that tells whether a location list or a quickfix list should be used:
+
+	let g:ledger_use_location_list = 0
+
+  The default is to use the quickfix window. Set to 1 to use a location list.
+
+* Position of the quickfix/location list:
+
+	let g:ledger_qf_vertical = 0
+
+  Set to 1 to open the quickfix window in a vertical split.
+
+* Size of the quickfix window:
+
+	let g:ledger_qf_size = 10
+
+  This is the number of lines of a horizontal quickfix window, or the number
+  of columns of a vertical quickfix window.
+
+* Flag to show or hide filenames in the quickfix window:
+
+	let g:ledger_qf_hide_file = 1
+
+  Filenames in the quickfix window are hidden by default. Set this to 1 is
+  you want filenames to be visible.
+
+* For debugging purposes:
+
+	let g:ledger_debug = 0
+
 ==============================================================================
 COMPLETION                                                 *ledger-completion*
 
