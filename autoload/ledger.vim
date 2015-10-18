@@ -393,6 +393,18 @@ function! ledger#align_amount_at_cursor()
   endif
 endf!
 
+function! ledger#autocomplete_and_align()
+  if pumvisible()
+    return "\<c-n>"
+    " See http://stackoverflow.com/questions/23323747/vim-vimscript-get-exact-character-under-the-cursor
+  elseif matchstr(getline('.'), '\%' . (col('.')-1) . 'c.') =~ '\d'
+    norm h
+    call ledger#align_amount_at_cursor()
+    return "\<c-o>A"
+  endif
+  return "\<c-x>\<c-o>"
+endf
+
 func! ledger#entry()
   " enter a new transaction based on the text in the current line.
   let l = line('.') - 1 " Insert transaction at the current line (i.e., below the line above the current one)
