@@ -17,12 +17,13 @@ if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(split(g:ledge
   finish
 endif
 
-" %-G throws away blank lines, everything else is assumed to be part of a
-" multi-line error message.
-CompilerSet errorformat=%-G,%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:%.%#,%ZError:\ %m,%C%.%#
+" Capture Ledger errors (%-C ignores all lines between "While parsing..." and "Error:..."):
+CompilerSet errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
+" Capture Ledger warnings:
 CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
+" Skip all other lines:
+CompilerSet errorformat+=%-G%.%#
 
-" unfortunately there is no 'check file' command,
-" so we will just use a query that returns no results. ever.
-exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ reg\ not\ ''.*''\ \>\ /dev/null'
+" Check file syntax
+exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ source\ %:S'
 
