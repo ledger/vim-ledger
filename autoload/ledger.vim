@@ -572,7 +572,7 @@ function! ledger#reconcile(account, target_amount, ...)
         \ ])
   let l:file = expand(l:file) " Needed for #show_balance() later
   call s:quickfix_populate(systemlist(l:cmd))
-  if s:quickfix_toggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
+  if s:quickfix_toggle("Reconcile " . a:account, "Nothing to reconcile")
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
