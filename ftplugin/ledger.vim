@@ -104,6 +104,10 @@ if !exists('g:ledger_include_original')
 endif
 
 " Settings for Ledger reports {{{
+if !exists('g:ledger_main')
+  let g:ledger_main = '%'
+endif
+
 if !exists('g:ledger_winpos')
   let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
 endif

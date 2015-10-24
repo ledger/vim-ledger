@@ -240,6 +240,12 @@ behaviour of the ledger filetype.
 
         let g:ledger_commodity_sep = ''
 
+* The file to be used to generate reports:
+
+        let g:ledger_main = '%'
+
+  The default is to use the current file.
+
 * Position of a report buffer:
 
         let g:ledger_winpos = 'B'

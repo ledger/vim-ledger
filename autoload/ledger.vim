@@ -561,25 +561,33 @@ function! ledger#register(args)
   call s:quickfix_toggle('Register report')
 endf
 
-function! ledger#reconcile(account, target_amount)
-  if !s:is_ledger_buffer() | return | endif
+" Reconcile the given account.
+" This function accepts a file path as a third optional argument.
+" The default is to use the value of g:ledger_main.
+function! ledger#reconcile(account, target_amount, ...)
+  let l:file = (a:0 > 0 ? a:1 : g:ledger_main)
   let l:cmd = s:ledger_cmd([
         \ "register",
-        \ a:account,
+        \ "-f",
+        \ l:file,
         \ "--uncleared",
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
-        \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '"
+        \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
+        \ a:account
         \ ])
+  let l:file = expand(l:file) " Needed for #show_balance() later
   call s:quickfix_populate(systemlist(l:cmd))
   if s:quickfix_toggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
       autocmd!
-      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . a:account . "')"
+      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . a:account . "','" . l:file . "')"
       autocmd BufWipeout <buffer> call <sid>finish_reconciling()
     augroup END
-    call ledger#show_balance(a:account)
+    " We need to pass the file path explicitly because at this point we are in
+    " the quickfix window
+    call ledger#show_balance(a:account, l:file)
   endif
 endf
 
@@ -591,8 +599,16 @@ function! s:finish_reconciling()
   augroup! reconcile
 endf
 
-" Show the pending/cleared balance of a given account,
-" or of the account in the current line if no argument is given.
+" Show the pending/cleared balance of an account.
+" This function has two optional parameters:
+"
+" a:1  An account name
+" a:2  A file path
+"
+" If both arguments are provided, the balance is computed for the given
+" account using the specified file. If no file path is provided, the value of
+" g:ledger_main is used. If no account if given, the account in the current
+" line and the value of g:ledger_main are used.
 function! ledger#show_balance(...)
   let l:account = a:0 > 0 && !empty(a:1) ? a:1 : matchstr(getline('.'), '\m\(  \|\t\)\zs\S.\{-}\ze\(  \|\t\|$\)')
   if empty(l:account)
@@ -604,6 +620,8 @@ function! ledger#show_balance(...)
         \ l:account,
         \ "--empty",
         \ "--collapse",
+        \ "-f",
+        \ (a:0 > 1 ? a:2 : g:ledger_main),
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
         \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
         \ ])
