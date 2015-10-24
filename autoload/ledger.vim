@@ -542,7 +542,7 @@ function! ledger#report(args)
   nnoremap <silent> <buffer> <tab> <c-w><c-w>
   nnoremap <silent> <buffer> q <c-w>c
   " Add some coloring to the report
-  syntax match LedgerNumber /[^-]\d\+\([,.]\d\+\)\+/
+  syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)\+/
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
   syntax match LedgerImproperPerc /\d\d\d\+%/
 endf
