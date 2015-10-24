@@ -503,14 +503,6 @@ function! s:ledger_cmd(arglist)
   endfor
   return l:cmd
 endf
-
-function! s:is_ledger_buffer()
-  if getbufvar(winbufnr(winnr()), "&ft") !=# "ledger"
-    call s:error_message("Please switch to a Ledger buffer first.")
-    return 0
-  endif
-  return 1
-endf
 " }}}
 
 " Run an arbitrary ledger command and show the output in a new buffer. If
@@ -520,7 +512,6 @@ endf
 " Parameters:
 " args  A string of Ledger command-line arguments.
 function! ledger#report(args)
-  if !s:is_ledger_buffer() | return | endif
   let l:output = systemlist(s:ledger_cmd(split(a:args)))
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
@@ -550,7 +541,6 @@ endf
 " Parameters:
 " args  A string of Ledger command-line arguments.
 function! ledger#register(args)
-  if !s:is_ledger_buffer() | return | endif
   let l:cmd = s:ledger_cmd(extend([
         \ "register",
         \ "--format='" . g:ledger_qf_register_format . "'",

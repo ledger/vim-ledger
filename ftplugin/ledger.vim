@@ -421,24 +421,18 @@ function! s:reconcile(account) "{{{2
 endf "}}}
 
 " Commands {{{1
-if !exists(":Balance")
-  command -nargs=? -complete=customlist,s:autocomplete_account_or_payee Balance call ledger#show_balance(<q-args>)
-endif
+command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
+      \ Balance call ledger#show_balance(<q-args>)
 
-if !exists(":Ledger")
-  command -complete=customlist,s:autocomplete_account_or_payee -nargs=+ Ledger call ledger#report(<q-args>)
-endif
+command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
+      \ Ledger call ledger#report('-f ' . g:ledger_main . ' ' . <q-args>)
 
-if !exists(":LedgerAlign")
-  command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
-endif
+command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
-if !exists(":Reconcile")
-  command -nargs=1 -complete=customlist,s:autocomplete_account_or_payee Reconcile call <sid>reconcile(<q-args>)
-endif
+command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
+      \ Reconcile call <sid>reconcile(<q-args>)
 
-if !exists(":Register")
-  command -complete=customlist,s:autocomplete_account_or_payee -nargs=* Register call ledger#register(<q-args>)
-endif
+command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
+      \ Register call ledger#register('-f ' . g:ledger_main . ' ' . <q-args>)
 " }}}
 
