@@ -169,6 +169,9 @@ REPORTS                                                      *ledger-reports*
   Terminal.app in OS X 10.11 or later), you may also double-click on a line
   number in the quickfix window to jump to the corresponding posting.
 
+  It is strongly recommended that you add mappings for common quickfix
+  commands like `:cprev` and `:cnext`, or that you use T. Pope's Unimpaired
+  plugin.
 
 * :`Reconcile`
 
