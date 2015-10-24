@@ -513,17 +513,15 @@ function! s:is_ledger_buffer()
 endf
 " }}}
 
-" Run an arbitrary ledger command to process the current buffer, and show the
-" output in a new buffer. If there are errors, no new buffer is opened: the
-" errors are displayed in a quickfix window instead.
+" Run an arbitrary ledger command and show the output in a new buffer. If
+" there are errors, no new buffer is opened: the errors are displayed in a
+" quickfix window instead.
 "
 " Parameters:
-" args  A string of Ledger arguments.
+" args  A string of Ledger command-line arguments.
 function! ledger#report(args)
   if !s:is_ledger_buffer() | return | endif
-  let l:cmd = s:ledger_cmd(['-f', '%'] + split(a:args, ' '))
-  " Run Ledger
-  let l:output = systemlist(l:cmd)
+  let l:output = systemlist(s:ledger_cmd(split(a:args)))
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
@@ -547,15 +545,18 @@ function! ledger#report(args)
   syntax match LedgerImproperPerc /\d\d\d\+%/
 endf
 
-" Show a register report in a quickfix list.
+" Show an arbitrary register report in a quickfix list.
+"
+" Parameters:
+" args  A string of Ledger command-line arguments.
 function! ledger#register(args)
   if !s:is_ledger_buffer() | return | endif
   let l:cmd = s:ledger_cmd(extend([
         \ "register",
-        \ "-f", "%",
         \ "--format='" . g:ledger_qf_register_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) '"
-        \ ], split(a:args, ' ')))
+        \ ], split(a:args))
+        \ )
   call s:quickfix_populate(systemlist(l:cmd))
   call s:quickfix_toggle('Register report')
 endf
