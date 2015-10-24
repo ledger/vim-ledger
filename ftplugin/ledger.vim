@@ -407,10 +407,10 @@ endf "}}}
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
   return (a:argLead =~ '^@') ?
         \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' payees'),
-        \ "v:val =~? '" . strpart(a:argLead, 1) . "'"), '"@" . v:val')
+        \ "v:val =~? '" . strpart(a:argLead, 1) . "'"), '"@" . escape(v:val, " ")')
         \ :
-        \ filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' accounts'),
-        \ "v:val =~? '" . a:argLead . "'")
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' accounts'),
+        \ "v:val =~? '" . a:argLead . "'"), 'escape(v:val, " ")')
 endf "}}}
 
 function! s:reconcile(account) "{{{2
