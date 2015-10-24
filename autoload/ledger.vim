@@ -613,7 +613,7 @@ function! ledger#show_balance(...)
   endif
   let l:amounts = split(l:output[-1], '|')
   redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
-  if empty(l:amounts)
+  if len(l:amounts) < 3
     call s:error_message("Could not determine balance. Did you use a valid account?")
     return
   endif
