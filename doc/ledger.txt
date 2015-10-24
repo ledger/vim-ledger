@@ -32,6 +32,17 @@ Tips and useful commands
 
 * Try account-completion (as explained below)
 
+* You may use `:make` for syntax checking. It may be convenient to define a
+  mapping for the following command:
+
+	:silent make | redraw! | cwindow
+
+  It is recommended to set the value of `g:ledger_bin` (see below) as follows:
+
+        let g:ledger_bin = 'ledger --pedantic --explicit --check-payees'
+
+  to catch most potential problems in your source file.
+
 * `:call ledger#transaction_date_set('.'), "auxiliary")`
 
   will set today's date as the auxiliary date of the current transaction. You
