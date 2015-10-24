@@ -86,12 +86,20 @@ Tips and useful commands
 
   when the cursor is on a number or immediately after it, invokes
   `ledger#align_amount_at_cursor()` to align it and add the default currency;
-  otherwise, performs autocompletion. If you define the following mappings
-  then you may perform both autocompletion and alignment using the <Tab> key:
+  otherwise, performs autocompletion. If you define the following mappings in
+  your `.vimrc` then you may perform both autocompletion and alignment using
+  the <Tab> key:
 
         au FileType ledger inoremap <silent> <Tab> \
         <C-r>=ledger#autocomplete_and_align()<CR>
         au FileType ledger vnoremap <silent> <Tab> :LedgerAlign<CR>
+
+  Alternatively, you may create a file `.vim/after/ftplugin/ledger.vim`
+  containing the following definitions:
+
+        inoremap <silent> <buffer> <Tab> \
+        <C-r>=ledger#autocomplete_and_align()<CR>
+        vnoremap <silent> <buffer> <Tab> :LedgerAlign<CR>
 
   Now, you may type `asset:check<Tab><Space>123.45<Tab>`, and have the
   account name autocompleted and `$123.45` properly aligned (assuming your
