@@ -607,7 +607,7 @@ function! ledger#show_balance(...)
     return
   endif
   let l:cmd = s:ledger_cmd([
-        \ 'cleared',
+        \ "cleared",
         \ l:account,
         \ "--empty",
         \ "--collapse",
