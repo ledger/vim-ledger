@@ -164,7 +164,11 @@ REPORTS                                                      *ledger-reports*
 
   The command offers account and payee autocompletion (see |:Ledger|). You
   may use the standard quickfix commands to jump from an entry in the register
-  report to the corresponding location in the source file.
+  report to the corresponding location in the source file. If you use GUI Vim
+  or if your terminal has support for the mouse (e.g., iTerm2, or even
+  Terminal.app in OS X 10.11 or later), you may also double-click on a line
+  number in the quickfix window to jump to the corresponding posting.
+
 
 * :`Reconcile`
 
