@@ -601,7 +601,7 @@ function! ledger#show_balance(...)
         \ "--empty",
         \ "--collapse",
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
-        \ (exists("g:ledger_default_commodity") ? "-X " . g:ledger_default_commodity : '')
+        \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
         \ ])
   let l:amounts = split(substitute(system(l:cmd), '\%x00', '/', 'g'), '|')
   redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
