@@ -189,8 +189,9 @@ REPORTS                                                      *ledger-reports*
   may use |ledger#transaction_state_set()| to update a transaction's state.
   Every time you save your file, the balance and the difference from the
   target amount are updated at the bottom of the screen. The goal, of course,
-  is to get such difference to zero. To finish reconciling an account, simply
-  close the quickfix window.
+  is to get such difference to zero. You may press `<C-l>` to refresh the
+  Reconcile buffer. To finish reconciling an account, simply close the
+  quickfix window.
 
   There is a highlight group to customize the color of the difference from
   target:

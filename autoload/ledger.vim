@@ -576,6 +576,9 @@ function! ledger#reconcile(account, target_amount, ...)
       execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . a:account . "','" . l:file . "')"
       autocmd BufWipeout <buffer> call <sid>finish_reconciling()
     augroup END
+    " Add refresh shortcut
+    execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
+          \ . a:account . "'," . a:target_amount . ",'" . l:file . "')<cr>"
     " We need to pass the file path explicitly because at this point we are in
     " the quickfix window
     call ledger#show_balance(a:account, l:file)
