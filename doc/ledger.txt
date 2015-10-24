@@ -107,8 +107,8 @@ REPORTS                                                      *ledger-reports*
   payee autocompletion (by pressing <Tab>): every name starting with `@` is
   autocompleted as a payee; any other name is autocompleted as an account.
 
-  In a report buffer, you may press <Tab> to switch back to the Ledger
-  buffer and `q` to dismiss the buffer report.
+  In a report buffer or in the quickfix window, you may press <Tab> to switch
+  back to your source file, and you may press `q` to dismiss the current window.
 
   There are three highlight groups that are used to color the report:
 
