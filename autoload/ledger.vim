@@ -476,6 +476,7 @@ function! s:quickfix_populate(data)
   set errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
   " Format to parse command-line errors:
   set errorformat+=Error:\ %m
+  " Format to parse reports:
   set errorformat+=%f:%l\ %m
   set errorformat+=%-G%.%#
   execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
