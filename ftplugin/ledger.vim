@@ -156,10 +156,6 @@ hi! link LedgerTarget Statement
 hi! link LedgerImproperPerc Special
 " }}}
 
-if !exists('g:ledger_debug')
-  let g:ledger_debug = 0
-endif
-
 let s:rx_amount = '\('.
                 \   '\%([0-9]\+\)'.
                 \   '\%([,.][0-9]\+\)*'.

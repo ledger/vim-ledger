@@ -519,7 +519,6 @@ endf
 function! ledger#report(args)
   if !s:is_ledger_buffer() | return | endif
   let l:cmd = s:ledger_cmd(['-f', '%'] + split(a:args, ' '))
-  if g:ledger_debug | return l:cmd | endif
   " Run Ledger
   let l:output = systemlist(l:cmd)
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
@@ -554,7 +553,6 @@ function! ledger#register(args)
         \ "--format='" . g:ledger_qf_register_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) '"
         \ ], split(a:args, ' ')))
-  if g:ledger_debug | return l:cmd | endif
   call s:quickfix_populate(systemlist(l:cmd))
   call s:quickfix_toggle('Register report')
 endf
@@ -568,7 +566,6 @@ function! ledger#reconcile(account, target_amount)
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '"
         \ ])
-  if g:ledger_debug | return l:cmd | endif
   call s:quickfix_populate(systemlist(l:cmd))
   if s:quickfix_toggle("Reconcile '" . a:account . "' account", "Nothing to reconcile")
     let g:ledger_target_amount = a:target_amount
@@ -606,7 +603,6 @@ function! ledger#show_balance(...)
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
         \ (exists("g:ledger_default_commodity") ? "-X " . g:ledger_default_commodity : '')
         \ ])
-  if g:ledger_debug | return l:cmd | endif
   let l:amounts = split(substitute(system(l:cmd), '\%x00', '/', 'g'), '|')
   redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
   if empty(l:amounts)

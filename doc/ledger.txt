@@ -293,10 +293,6 @@ behaviour of the ledger filetype.
 	let g:ledger_pending_string = 'Cleared or pending: '
 	let g:ledger_target_string = 'Difference from target: '
 
-* For debugging purposes:
-
-	let g:ledger_debug = 0
-
 ==============================================================================
 COMPLETION                                                 *ledger-completion*
 
