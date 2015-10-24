@@ -449,8 +449,8 @@ function! s:quickfix_toggle(...)
     " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
     " See: http://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
     if g:ledger_qf_hide_file
-      set conceallevel=2
-      set concealcursor=nc
+      setl conceallevel=2
+      setl concealcursor=nc
       syntax match qfFile /^[^|]*/ transparent conceal
     endif
     if a:0 > 0
