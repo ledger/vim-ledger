@@ -555,6 +555,10 @@ endf
 " Reconcile the given account.
 " This function accepts a file path as a third optional argument.
 " The default is to use the value of g:ledger_main.
+"
+" Parameters:
+" account  An account name (String)
+" target_amount The target amount (Float)
 function! ledger#reconcile(account, target_amount, ...)
   let l:file = (a:0 > 0 ? a:1 : g:ledger_main)
   let l:cmd = s:ledger_cmd([
@@ -578,7 +582,7 @@ function! ledger#reconcile(account, target_amount, ...)
     augroup END
     " Add refresh shortcut
     execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
-          \ . a:account . "'," . a:target_amount . ",'" . l:file . "')<cr>"
+          \ . a:account . "'," . string(a:target_amount) . ",'" . l:file . "')<cr>"
     " We need to pass the file path explicitly because at this point we are in
     " the quickfix window
     call ledger#show_balance(a:account, l:file)
@@ -644,7 +648,7 @@ function! ledger#show_balance(...)
   if exists('g:ledger_target_amount')
     echon ' ' g:ledger_target_string
     echohl LedgerTarget
-    echon printf('%.2f', (str2float(g:ledger_target_amount) - str2float(l:amounts[2])))
+    echon printf('%.2f', (g:ledger_target_amount - str2float(l:amounts[2])))
     echohl NONE
   endif
 endf

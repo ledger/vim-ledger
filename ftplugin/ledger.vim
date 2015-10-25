@@ -417,7 +417,7 @@ function! s:reconcile(account) "{{{2
   " call inputsave()
   let l:amount = input('Target amount' . (empty(g:ledger_default_commodity) ? ': ' : ' (' . g:ledger_default_commodity . '): '))
   " call inputrestore()
-  call ledger#reconcile(a:account, l:amount)
+  call ledger#reconcile(a:account, str2float(l:amount))
 endf "}}}
 
 " Commands {{{1
