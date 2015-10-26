@@ -406,10 +406,10 @@ endf "}}}
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
   return (a:argLead =~ '^@') ?
-        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' payees'),
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'),
         \ "v:val =~? '" . strpart(a:argLead, 1) . "'"), '"@" . escape(v:val, " ")')
         \ :
-        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand('%')) . ' accounts'),
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'),
         \ "v:val =~? '" . a:argLead . "'"), 'escape(v:val, " ")')
 endf "}}}
 
