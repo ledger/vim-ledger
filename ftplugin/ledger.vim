@@ -21,7 +21,7 @@ setl commentstring=;%s
 setl omnifunc=LedgerComplete
 
 " set location of ledger binary for checking and auto-formatting
-if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(split(g:ledger_bin, '\s')[0])
+if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
   if executable('ledger')
     let g:ledger_bin = 'ledger'
   else
@@ -35,6 +35,10 @@ endif
 
 if exists("g:ledger_bin")
   exe 'setl formatprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
+endif
+
+if !exists('g:ledger_extra_options')
+  let g:ledger_extra_options = ''
 endif
 
 " You can set a maximal number of columns the fold text (excluding amount)

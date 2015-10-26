@@ -493,7 +493,7 @@ endf
 " See also http://vim.wikia.com/wiki/Display_output_of_shell_commands_in_new_window
 " See also https://groups.google.com/forum/#!topic/vim_use/4ZejMpt7TeU
 function! s:ledger_cmd(arglist)
-  let l:cmd = g:ledger_bin
+  let l:cmd = g:ledger_bin . ' ' . g:ledger_extra_options
   for l:part in a:arglist
     if l:part =~ '\v^[%#<]'
       let l:expanded_part = expand(l:part)

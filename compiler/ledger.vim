@@ -13,7 +13,7 @@ if exists(":CompilerSet") != 2
 endif
 
 " default value will be set in ftplugin
-if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(split(g:ledger_bin, '\s')[0])
+if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
   finish
 endif
 
@@ -25,5 +25,5 @@ CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
 CompilerSet errorformat+=%-G%.%#
 
 " Check file syntax
-exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ source\ %:S'
+exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ %:S'
 

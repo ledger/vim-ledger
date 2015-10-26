@@ -37,9 +37,10 @@ Tips and useful commands
 
 	:silent make | redraw! | cwindow
 
-  It is recommended to set the value of `g:ledger_bin` (see below) as follows:
+  It is recommended to set the value of `g:ledger_extra_options` (see below)
+  as follows:
 
-        let g:ledger_bin = 'ledger --pedantic --explicit --check-payees'
+        let g:ledger_extra_options = '--pedantic --explicit --check-payees'
 
   to catch most potential problems in your source file.
 
@@ -208,6 +209,14 @@ Configuration
 
 Include the following let-statements somewhere in your `.vimrc` to modify the
 behaviour of the ledger filetype.
+
+* Path to the `ledger` executable:
+
+	let g:ledger_bin = 'ledger'
+
+* Additional default options for the `ledger` executable:
+
+	let g:ledger_extra_options = ''
 
 * Number of columns that will be used to display the foldtext. Set this when
   you think that the amount is too far off to the right.
