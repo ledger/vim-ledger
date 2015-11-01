@@ -417,26 +417,26 @@ function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
         \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
 endf "}}}
 
-function! s:reconcile(account) "{{{2
+function! s:reconcile(file, account) "{{{2
   " call inputsave()
   let l:amount = input('Target amount' . (empty(g:ledger_default_commodity) ? ': ' : ' (' . g:ledger_default_commodity . '): '))
   " call inputrestore()
-  call ledger#reconcile(a:account, str2float(l:amount))
+  call ledger#reconcile(a:file, a:account, str2float(l:amount))
 endf "}}}
 
 " Commands {{{1
 command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
-      \ Balance call ledger#show_balance(<q-args>)
+      \ Balance call ledger#show_balance(g:ledger_main, <q-args>)
 
 command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
-      \ Ledger call ledger#report('-f ' . g:ledger_main . ' ' . <q-args>)
+      \ Ledger call ledger#report(g:ledger_main, <q-args>)
 
 command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
 command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
-      \ Reconcile call <sid>reconcile(<q-args>)
+      \ Reconcile call <sid>reconcile(g:ledger_main, <q-args>)
 
 command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
-      \ Register call ledger#register('-f ' . g:ledger_main . ' ' . <q-args>)
+      \ Register call ledger#register(g:ledger_main, <q-args>)
 " }}}
 

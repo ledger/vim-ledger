@@ -484,25 +484,9 @@ function! s:quickfix_populate(data)
   return
 endf
 
-" Parse a list of ledger arguments and build a ledger command ready to be
-" executed.
-"
-" Note that %, # and < *at the start* of an item are expanded by Vim. If you
-" want to pass such characters to Ledger, escape them with a backslash.
-"
-" See also http://vim.wikia.com/wiki/Display_output_of_shell_commands_in_new_window
-" See also https://groups.google.com/forum/#!topic/vim_use/4ZejMpt7TeU
-function! s:ledger_cmd(arglist)
-  let l:cmd = g:ledger_bin . ' ' . g:ledger_extra_options
-  for l:part in a:arglist
-    if l:part =~ '\v^[%#<]'
-      let l:expanded_part = expand(l:part)
-      let l:cmd .= ' ' . (l:expanded_part == "" ? l:part : shellescape(l:expanded_part))
-    else
-      let l:cmd .= ' ' . l:part
-    endif
-  endfor
-  return l:cmd
+" Build a ledger command to process the given file.
+function! s:ledger_cmd(file, args)
+  return join([g:ledger_bin, g:ledger_extra_options, '-f', shellescape(expand(a:file)), a:args])
 endf
 " }}}
 
@@ -511,9 +495,10 @@ endf
 " quickfix window instead.
 "
 " Parameters:
+" file  The file to be processed.
 " args  A string of Ledger command-line arguments.
-function! ledger#report(args)
-  let l:output = systemlist(s:ledger_cmd(split(a:args)))
+function! ledger#report(file, args)
+  let l:output = systemlist(s:ledger_cmd(a:file, a:args))
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
@@ -540,14 +525,15 @@ endf
 " Show an arbitrary register report in a quickfix list.
 "
 " Parameters:
+" file  The file to be processed
 " args  A string of Ledger command-line arguments.
-function! ledger#register(args)
-  let l:cmd = s:ledger_cmd(extend([
+function! ledger#register(file, args)
+  let l:cmd = s:ledger_cmd(a:file, join([
         \ "register",
         \ "--format='" . g:ledger_qf_register_format . "'",
-        \ "--prepend-format='%(filename):%(beg_line) '"
-        \ ], split(a:args))
-        \ )
+        \ "--prepend-format='%(filename):%(beg_line) '",
+        \ a:args
+        \ ]))
   call s:quickfix_populate(systemlist(l:cmd))
   call s:quickfix_toggle('Register report')
 endf
@@ -557,35 +543,31 @@ endf
 " The default is to use the value of g:ledger_main.
 "
 " Parameters:
+" file  The file to be processed
 " account  An account name (String)
 " target_amount The target amount (Float)
-function! ledger#reconcile(account, target_amount, ...)
-  let l:file = (a:0 > 0 ? a:1 : g:ledger_main)
-  let l:cmd = s:ledger_cmd([
+function! ledger#reconcile(file, account, target_amount)
+  let l:cmd = s:ledger_cmd(a:file, join([
         \ "register",
-        \ "-f",
-        \ l:file,
         \ "--uncleared",
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
         \ a:account
-        \ ])
-  let l:file = expand(l:file) " Needed for #show_balance() later
+        \ ]))
+  let l:file = expand(a:file) " Needed for #show_balance() later
   call s:quickfix_populate(systemlist(l:cmd))
   if s:quickfix_toggle("Reconcile " . a:account, "Nothing to reconcile")
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
       autocmd!
-      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . a:account . "','" . l:file . "')"
+      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . l:file . "','" . a:account . "')"
       autocmd BufWipeout <buffer> call <sid>finish_reconciling()
     augroup END
     " Add refresh shortcut
     execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
-          \ . a:account . "'," . string(a:target_amount) . ",'" . l:file . "')<cr>"
-    " We need to pass the file path explicitly because at this point we are in
-    " the quickfix window
-    call ledger#show_balance(a:account, l:file)
+          \ . l:file . "','" . a:account . "'," . string(a:target_amount) . ")<cr>"
+    call ledger#show_balance(l:file, a:account)
   endif
 endf
 
@@ -598,31 +580,25 @@ function! s:finish_reconciling()
 endf
 
 " Show the pending/cleared balance of an account.
-" This function has two optional parameters:
+" This function has an optional parameter:
 "
 " a:1  An account name
-" a:2  A file path
 "
-" If both arguments are provided, the balance is computed for the given
-" account using the specified file. If no file path is provided, the value of
-" g:ledger_main is used. If no account if given, the account in the current
-" line and the value of g:ledger_main are used.
-function! ledger#show_balance(...)
+" If no account if given, the account in the current line is used.
+function! ledger#show_balance(file, ...)
   let l:account = a:0 > 0 && !empty(a:1) ? a:1 : matchstr(getline('.'), '\m\(  \|\t\)\zs\S.\{-}\ze\(  \|\t\|$\)')
   if empty(l:account)
     call s:error_message('No account found')
     return
   endif
-  let l:cmd = s:ledger_cmd([
+  let l:cmd = s:ledger_cmd(a:file, join([
         \ "cleared",
         \ l:account,
         \ "--empty",
         \ "--collapse",
-        \ "-f",
-        \ (a:0 > 1 ? a:2 : g:ledger_main),
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
         \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
-        \ ])
+        \ ]))
   let l:output = systemlist(l:cmd)
   " Errors may occur, for example,  when the account has multiple commodities
   " and g:ledger_default_commodity is empty.
