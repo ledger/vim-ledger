@@ -334,9 +334,9 @@ endf
 
 " Move the cursor to the specified column, filling the line with spaces if necessary.
 function! s:goto_col(pos)
-  exec "normal" a:pos . "|"
+  exec "normal!" a:pos . "|"
   let diff = a:pos - virtcol('.')
-  if diff > 0 | exec "normal" diff . "a " | endif
+  if diff > 0 | exec "normal!" diff . "a " | endif
 endf
 
 " Align the amount expression after an account name at the decimal point.
@@ -373,24 +373,24 @@ function! ledger#align_commodity()
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
     call s:goto_col(g:ledger_align_at - pos - 1)
     " Append the part of the line that was previously removed:
-    exe 'normal a' . rhs
+    exe 'normal! a' . rhs
   endif
 endf!
 
 " Align the amount under the cursor and append/prepend the default currency.
 function! ledger#align_amount_at_cursor()
   " Select and cut text:
-  normal viWd
+  normal! viWd
   " Find the position of the decimal separator
   let pos = match(@", g:ledger_decimal_sep) " Returns zero when the separator is the empty string
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
     call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@"))  - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
-    exe 'normal a' . g:ledger_default_commodity . g:ledger_commodity_sep
-    normal p
+    exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
+    normal! p
   else
     call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@")) - 1)
-    exe 'normal pa' . g:ledger_commodity_sep . g:ledger_default_commodity
+    exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
 endf!
 
@@ -398,7 +398,7 @@ func! ledger#entry()
   " enter a new transaction based on the text in the current line.
   let l = line('.') - 1 " Insert transaction at the current line (i.e., below the line above the current one)
   let query = getline('.')
-  normal "_dd
+  normal! "_dd
   exec l . 'read !' g:ledger_bin '-f' shellescape(expand(g:ledger_main)) 'entry' shellescape(query)
 endfunc
 
