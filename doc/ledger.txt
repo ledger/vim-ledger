@@ -9,6 +9,7 @@ Contents:
         Source................|ledger-source|
         Usage..................|ledger-usage|
         Tips....................|ledger-tips|
+        Reports..............|ledger-reports|
         Settings............|ledger-settings|
         Completion........|ledger-completion|
         License..............|ledger-license|
@@ -30,6 +31,18 @@ TIPS                                                             *ledger-tips*
 Tips and useful commands
 
 * Try account-completion (as explained below)
+
+* You may use `:make` for syntax checking. It may be convenient to define a
+  mapping for the following command:
+
+	:silent make | redraw! | cwindow
+
+  It is recommended to set the value of `g:ledger_extra_options` (see below)
+  as follows:
+
+        let g:ledger_extra_options = '--pedantic --explicit --check-payees'
+
+  to catch most potential problems in your source file.
 
 * `:call ledger#transaction_date_set('.'), "auxiliary")`
 
@@ -93,12 +106,117 @@ Tips and useful commands
   This is a front end to `ledger entry`.
 
 ==============================================================================
+REPORTS                                                      *ledger-reports*
+
+* `:Ledger`
+
+  Executes an arbitrary Ledger command and sends the output to a new buffer.
+  For example:
+
+        :Ledger bal ^assets ^liab
+
+  Errors are displayed in a quickfix window. The command offers account and
+  payee autocompletion (by pressing <Tab>): every name starting with `@` is
+  autocompleted as a payee; any other name is autocompleted as an account.
+
+  In a report buffer or in the quickfix window, you may press <Tab> to switch
+  back to your source file, and you may press `q` to dismiss the current window.
+
+  There are three highlight groups that are used to color the report:
+
+  * `LedgerNumber`
+
+    This is used to color nonnegative numbers.
+
+  * `LedgerNegativeNumber`
+
+    This is used to color negative numbers.
+
+  * `LedgerImproperPerc`
+
+    This is used to color improper percentages.
+
+* `:Balance`
+
+  Show the pending and cleared balance of a given account below the status
+  line. For example:
+
+	:Balance checking:savings
+
+  The command offers payee and account autocompletion (see `:Ledger`). The
+  account argument is optional: if no argument is given, the first account
+  name found in the current line is used.
+
+  Two highlight groups can be used to customize the colors of the line:
+
+  * `LedgerCleared`
+
+    This is used to color the cleared balance.
+
+  * `LedgerPending`
+
+    This is used to color the pending balance.
+
+* `:Register`
+
+  Opens an arbitrary register report in the quickfix window. For example:
+
+	:Register groceries -p 'this month'
+
+  The command offers account and payee autocompletion (see |:Ledger|). You
+  may use the standard quickfix commands to jump from an entry in the register
+  report to the corresponding location in the source file. If you use GUI Vim
+  or if your terminal has support for the mouse (e.g., iTerm2, or even
+  Terminal.app in OS X 10.11 or later), you may also double-click on a line
+  number in the quickfix window to jump to the corresponding posting.
+
+  It is strongly recommended that you add mappings for common quickfix
+  commands like `:cprev` and `:cnext`, or that you use T. Pope's Unimpaired
+  plugin.
+
+* :`Reconcile`
+
+  Reconcile an account. For example:
+
+	:Reconcile checking
+
+  After you press Enter, you will be asked to enter a target amount (use
+  Vim's syntax for numbers, not your ledger's format). For example, for a
+  checking account, the target amount may be the balance of your latest bank
+  statement. The list of uncleared postings appears in the quickfix window.
+  The current balance of the account, together with the difference between the
+  target amount and the cleared balance, is shown at the bottom of the screen.
+  You may use standard quickfix commands to navigate through the postings. You
+  may use |ledger#transaction_state_set()| to update a transaction's state.
+  Every time you save your file, the balance and the difference from the
+  target amount are updated at the bottom of the screen. The goal, of course,
+  is to get such difference to zero. You may press `<C-l>` to refresh the
+  Reconcile buffer. To finish reconciling an account, simply close the
+  quickfix window.
+
+  There is a highlight group to customize the color of the difference from
+  target:
+
+  * `LedgerTarget`
+
+    This is used to color the difference between the target amount and the
+    cleared balance.
+
+==============================================================================
 SETTINGS                                                     *ledger-settings*
 
 Configuration
 
 Include the following let-statements somewhere in your `.vimrc` to modify the
 behaviour of the ledger filetype.
+
+* Path to the `ledger` executable:
+
+	let g:ledger_bin = 'ledger'
+
+* Additional default options for the `ledger` executable:
+
+	let g:ledger_extra_options = ''
 
 * Number of columns that will be used to display the foldtext. Set this when
   you think that the amount is too far off to the right.
@@ -149,6 +267,66 @@ behaviour of the ledger filetype.
 * String to be put between the commodity and the amount:
 
         let g:ledger_commodity_sep = ''
+
+* The file to be used to generate reports:
+
+        let g:ledger_main = '%'
+
+  The default is to use the current file.
+
+* Position of a report buffer:
+
+        let g:ledger_winpos = 'B'
+
+  Use `b` for bottom, `t` for top, `l` for left, `r` for right. Use uppercase letters
+  if you want the window to always occupy the full width or height.
+
+* Format of quickfix register reports (see |:Register|):
+
+	let g:ledger_qf_register_format = \
+        '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+
+  The format is specified using the standard Ledger syntax for --format.
+
+* Format of the reconcile quickfix window (see |:Reconcile|):
+
+	let g:ledger_qf_reconcile_format = \
+        '%(date) %-4(code) %-50(payee) %-30(account) %15(amount)\n'
+
+  The format is specified using the standard Ledger syntax for --format.
+
+* Flag that tells whether a location list or a quickfix list should be used:
+
+	let g:ledger_use_location_list = 0
+
+  The default is to use the quickfix window. Set to 1 to use a location list.
+
+* Position of the quickfix/location list:
+
+	let g:ledger_qf_vertical = 0
+
+  Set to 1 to open the quickfix window in a vertical split.
+
+* Size of the quickfix window:
+
+	let g:ledger_qf_size = 10
+
+  This is the number of lines of a horizontal quickfix window, or the number
+  of columns of a vertical quickfix window.
+
+* Flag to show or hide filenames in the quickfix window:
+
+	let g:ledger_qf_hide_file = 1
+
+  Filenames in the quickfix window are hidden by default. Set this to 1 is
+  you want filenames to be visible.
+
+* Text of the output of the |:Balance| command:
+
+	let g:ledger_cleared_string = 'Cleared: '
+	let g:ledger_pending_string = 'Cleared or pending: '
+	let g:ledger_target_string = 'Difference from target: '
+
 ==============================================================================
 COMPLETION                                                 *ledger-completion*
 

@@ -21,7 +21,7 @@ setl commentstring=;%s
 setl omnifunc=LedgerComplete
 
 " set location of ledger binary for checking and auto-formatting
-if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(split(g:ledger_bin, '\s')[0])
+if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
   if executable('ledger')
     let g:ledger_bin = 'ledger'
   else
@@ -35,6 +35,10 @@ endif
 
 if exists("g:ledger_bin")
   exe 'setl formatprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
+endif
+
+if !exists('g:ledger_extra_options')
+  let g:ledger_extra_options = ''
 endif
 
 " You can set a maximal number of columns the fold text (excluding amount)
@@ -102,6 +106,63 @@ endif
 if !exists('g:ledger_include_original')
   let g:ledger_include_original = 0
 endif
+
+" Settings for Ledger reports {{{
+if !exists('g:ledger_main')
+  let g:ledger_main = '%'
+endif
+
+if !exists('g:ledger_winpos')
+  let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
+endif
+
+if !exists('g:ledger_use_location_list')
+  let g:ledger_use_location_list = 0  " Use quickfix list by default
+endif
+
+if !exists('g:ledger_cleared_string')
+  let g:ledger_cleared_string = 'Cleared: '
+endif
+
+if !exists('g:ledger_pending_string')
+  let g:ledger_pending_string = 'Cleared or pending: '
+endif
+
+if !exists('g:ledger_target_string')
+  let g:ledger_target_string = 'Difference from target: '
+endif
+" }}}
+
+" Settings for the quickfix window {{{
+if !exists('g:ledger_qf_register_format')
+  let g:ledger_qf_register_format = '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+endif
+
+if !exists('g:ledger_qf_reconcile_format')
+  let g:ledger_qf_reconcile_format = '%(date) %-4(code) %-50(payee) %-30(account) %15(amount)\n'
+endif
+
+if !exists('g:ledger_qf_size')
+  let g:ledger_qf_size = 10  " Size of the quickfix window
+endif
+
+if !exists('g:ledger_qf_vertical')
+  let g:ledger_qf_vertical = 0
+endif
+
+if !exists('g:ledger_qf_hide_file')
+  let g:ledger_qf_hide_file = 1
+endif
+" }}}
+
+" Highlight groups for Ledger reports {{{
+hi! link LedgerNumber Number
+hi! link LedgerNegativeNumber Special
+hi! link LedgerCleared Constant
+hi! link LedgerPending Todo
+hi! link LedgerTarget Statement
+hi! link LedgerImproperPerc Special
+" }}}
 
 let s:rx_amount = '\('.
                 \   '\%([0-9]\+\)'.
@@ -347,9 +408,35 @@ function! s:count_expression(text, expression) "{{{2
   return len(split(a:text, a:expression, 1))-1
 endf "}}}
 
+function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
+  return (a:argLead =~ '^@') ?
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'),
+        \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
+        \ :
+        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'),
+        \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
+endf "}}}
+
+function! s:reconcile(file, account) "{{{2
+  " call inputsave()
+  let l:amount = input('Target amount' . (empty(g:ledger_default_commodity) ? ': ' : ' (' . g:ledger_default_commodity . '): '))
+  " call inputrestore()
+  call ledger#reconcile(a:file, a:account, str2float(l:amount))
+endf "}}}
+
 " Commands {{{1
-if !exists(":LedgerAlign")
-  command -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
-endif
+command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
+      \ Balance call ledger#show_balance(g:ledger_main, <q-args>)
+
+command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
+      \ Ledger call ledger#report(g:ledger_main, <q-args>)
+
+command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
+
+command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
+      \ Reconcile call <sid>reconcile(g:ledger_main, <q-args>)
+
+command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
+      \ Register call ledger#register(g:ledger_main, <q-args>)
 " }}}
 

@@ -1,3 +1,4 @@
+" vim:ts=2:sw=2:sts=2:foldmethod=marker
 function! ledger#transaction_state_toggle(lnum, ...)
   if a:0 == 1
     let chars = a:1
@@ -398,5 +399,233 @@ func! ledger#entry()
   let l = line('.') - 1 " Insert transaction at the current line (i.e., below the line above the current one)
   let query = getline('.')
   normal "_dd
-  exec l . 'read !' g:ledger_bin '-f' shellescape(expand('%')) 'entry' shellescape(query)
+  exec l . 'read !' g:ledger_bin '-f' shellescape(expand(g:ledger_main)) 'entry' shellescape(query)
 endfunc
+
+" Report generation {{{1
+
+" Helper functions and variables {{{2
+" Position of report windows
+let s:winpos_map = {
+      \ "T": "to new",  "t": "abo new", "B": "bo new",  "b": "bel new",
+      \ "L": "to vnew", "l": "abo vnew", "R": "bo vnew", "r": "bel vnew"
+      \ }
+
+function! s:error_message(msg)
+  redraw  " See h:echo-redraw
+  echohl ErrorMsg
+  echo "\r"
+  echomsg a:msg
+  echohl NONE
+endf
+
+function! s:warning_message(msg)
+  redraw  " See h:echo-redraw
+  echohl WarningMsg
+  echo "\r"
+  echomsg a:msg
+  echohl NONE
+endf
+
+" Open the quickfix/location window when it is not empty,
+" closes it if it is empty.
+"
+" Optional parameters:
+" a:1  Quickfix window title.
+" a:2  Message to show when the window is empty.
+"
+" Returns 0 if the quickfix window is empty, 1 otherwise.
+function! s:quickfix_toggle(...)
+  if g:ledger_use_location_list
+    let l:list = 'l'
+    let l:open = (len(getloclist(winnr())) > 0)
+  else
+    let l:list = 'c'
+    let l:open = (len(getqflist()) > 0)
+  endif
+
+  if l:open
+    execute (g:ledger_qf_vertical ? 'vert' : 'botright') l:list.'open' g:ledger_qf_size
+    " Set local mappings to quit the quickfix window  or lose focus.
+    nnoremap <silent> <buffer> <tab> <c-w><c-w>
+    execute 'nnoremap <silent> <buffer> q :' l:list.'close<CR>'
+    " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
+    " See: http://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
+    if g:ledger_qf_hide_file
+      setl conceallevel=2
+      setl concealcursor=nc
+      syntax match qfFile /^[^|]*/ transparent conceal
+    endif
+    if a:0 > 0
+      let w:quickfix_title = a:1
+    endif
+    return 1
+  endif
+
+  execute l:list.'close'
+  call s:warning_message((a:0 > 1) ? a:2 : 'No results')
+  return 0
+endf
+
+" Populate a quickfix/location window with data. The argument must be a String
+" or a List.
+function! s:quickfix_populate(data)
+  " Note that cexpr/lexpr always uses the global value of errorformat
+  let l:efm = &errorformat  " Save global errorformat
+  set errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
+  set errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
+  " Format to parse command-line errors:
+  set errorformat+=Error:\ %m
+  " Format to parse reports:
+  set errorformat+=%f:%l\ %m
+  set errorformat+=%-G%.%#
+  execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
+  let &errorformat = l:efm  " Restore global errorformat
+  return
+endf
+
+" Build a ledger command to process the given file.
+function! s:ledger_cmd(file, args)
+  return join([g:ledger_bin, g:ledger_extra_options, '-f', shellescape(expand(a:file)), a:args])
+endf
+" }}}
+
+" Run an arbitrary ledger command and show the output in a new buffer. If
+" there are errors, no new buffer is opened: the errors are displayed in a
+" quickfix window instead.
+"
+" Parameters:
+" file  The file to be processed.
+" args  A string of Ledger command-line arguments.
+function! ledger#report(file, args)
+  let l:output = systemlist(s:ledger_cmd(a:file, a:args))
+  if v:shell_error  " If there are errors, show them in a quickfix/location list.
+    call s:quickfix_populate(l:output)
+    call s:quickfix_toggle('Errors', 'Unable to parse errors')
+    return
+  endif
+  if empty(l:output)
+    call s:warning_message('No results')
+    return
+  endif
+  " Open a new buffer to show Ledger's output.
+  execute get(s:winpos_map, g:ledger_winpos, "bo new")
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  call append(0, l:output)
+  setlocal nomodifiable
+  " Set local mappings to quit window or lose focus.
+  nnoremap <silent> <buffer> <tab> <c-w><c-w>
+  nnoremap <silent> <buffer> q <c-w>c
+  " Add some coloring to the report
+  syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)\+/
+  syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
+  syntax match LedgerImproperPerc /\d\d\d\+%/
+endf
+
+" Show an arbitrary register report in a quickfix list.
+"
+" Parameters:
+" file  The file to be processed
+" args  A string of Ledger command-line arguments.
+function! ledger#register(file, args)
+  let l:cmd = s:ledger_cmd(a:file, join([
+        \ "register",
+        \ "--format='" . g:ledger_qf_register_format . "'",
+        \ "--prepend-format='%(filename):%(beg_line) '",
+        \ a:args
+        \ ]))
+  call s:quickfix_populate(systemlist(l:cmd))
+  call s:quickfix_toggle('Register report')
+endf
+
+" Reconcile the given account.
+" This function accepts a file path as a third optional argument.
+" The default is to use the value of g:ledger_main.
+"
+" Parameters:
+" file  The file to be processed
+" account  An account name (String)
+" target_amount The target amount (Float)
+function! ledger#reconcile(file, account, target_amount)
+  let l:cmd = s:ledger_cmd(a:file, join([
+        \ "register",
+        \ "--uncleared",
+        \ "--format='" . g:ledger_qf_reconcile_format . "'",
+        \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
+        \ a:account
+        \ ]))
+  let l:file = expand(a:file) " Needed for #show_balance() later
+  call s:quickfix_populate(systemlist(l:cmd))
+  if s:quickfix_toggle("Reconcile " . a:account, "Nothing to reconcile")
+    let g:ledger_target_amount = a:target_amount
+    " Show updated account balance upon saving, as long as the quickfix window is open
+    augroup reconcile
+      autocmd!
+      execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . l:file . "','" . a:account . "')"
+      autocmd BufWipeout <buffer> call <sid>finish_reconciling()
+    augroup END
+    " Add refresh shortcut
+    execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
+          \ . l:file . "','" . a:account . "'," . string(a:target_amount) . ")<cr>"
+    call ledger#show_balance(l:file, a:account)
+  endif
+endf
+
+function! s:finish_reconciling()
+  unlet g:ledger_target_amount
+  augroup reconcile
+    autocmd!
+  augroup END
+  augroup! reconcile
+endf
+
+" Show the pending/cleared balance of an account.
+" This function has an optional parameter:
+"
+" a:1  An account name
+"
+" If no account if given, the account in the current line is used.
+function! ledger#show_balance(file, ...)
+  let l:account = a:0 > 0 && !empty(a:1) ? a:1 : matchstr(getline('.'), '\m\(  \|\t\)\zs\S.\{-}\ze\(  \|\t\|$\)')
+  if empty(l:account)
+    call s:error_message('No account found')
+    return
+  endif
+  let l:cmd = s:ledger_cmd(a:file, join([
+        \ "cleared",
+        \ l:account,
+        \ "--empty",
+        \ "--collapse",
+        \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
+        \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
+        \ ]))
+  let l:output = systemlist(l:cmd)
+  " Errors may occur, for example,  when the account has multiple commodities
+  " and g:ledger_default_commodity is empty.
+  if v:shell_error
+    call s:quickfix_populate(l:output)
+    call s:quickfix_toggle('Errors', 'Unable to parse errors')
+    return
+  endif
+  let l:amounts = split(l:output[-1], '|')
+  redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
+  if len(l:amounts) < 3
+    call s:error_message("Could not determine balance. Did you use a valid account?")
+    return
+  endif
+  echo g:ledger_pending_string
+  echohl LedgerPending
+  echon l:amounts[0]
+  echohl NONE
+  echon ' ' g:ledger_cleared_string
+  echohl LedgerCleared
+  echon l:amounts[1]
+  echohl NONE
+  if exists('g:ledger_target_amount')
+    echon ' ' g:ledger_target_string
+    echohl LedgerTarget
+    echon printf('%.2f', (g:ledger_target_amount - str2float(l:amounts[2])))
+    echohl NONE
+  endif
+endf
+" }}}
