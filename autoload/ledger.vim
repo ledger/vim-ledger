@@ -394,14 +394,6 @@ function! ledger#align_amount_at_cursor()
   endif
 endf!
 
-func! ledger#entry()
-  " enter a new transaction based on the text in the current line.
-  let l = line('.') - 1 " Insert transaction at the current line (i.e., below the line above the current one)
-  let query = getline('.')
-  normal! "_dd
-  exec l . 'read !' g:ledger_bin '-f' shellescape(expand(g:ledger_main)) 'entry' shellescape(query)
-endfunc
-
 " Report generation {{{1
 
 " Helper functions and variables {{{2
@@ -489,6 +481,22 @@ function! s:ledger_cmd(file, args)
   return join([g:ledger_bin, g:ledger_extra_options, '-f', shellescape(expand(a:file)), a:args])
 endf
 " }}}
+
+" Use current line as input to ledger entry and replace with output. If there
+" are errors, they are echoed instead.
+func! ledger#entry()
+  let l:output = systemlist(s:ledger_cmd(g:ledger_main, join(["entry", getline('.')])))
+  " Filter out warnings
+  let l:output = filter(l:output, "v:val !~? '^Warning: '")
+  " Errors may occur
+  if v:shell_error
+    echomsg join(l:output)
+    return
+  endif
+  " Append output so we insert instead of overwrite, then delete line
+  call append('.', l:output)
+  normal! "_dd
+endfunc
 
 " Run an arbitrary ledger command and show the output in a new buffer. If
 " there are errors, no new buffer is opened: the errors are displayed in a
