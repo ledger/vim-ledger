@@ -15,7 +15,7 @@ let b:undo_ftplugin = "setlocal ".
 
 setl foldtext=LedgerFoldText()
 setl foldmethod=syntax
-setl include=^!include
+setl include=^!\\?include
 setl comments=b:;
 setl commentstring=;%s
 setl omnifunc=LedgerComplete
