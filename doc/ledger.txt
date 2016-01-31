@@ -108,6 +108,14 @@ Tips and useful commands
 ==============================================================================
 REPORTS                                                      *ledger-reports*
 
+* `:call ledger#exec(file, args)`
+
+  Executes an arbitrary Ledger command and returns the output as a List (one
+  element for each line of output). The first argument is the path to a Ledger
+  file. The second argument is a string of Ledger options (options specified via
+  `g:ledger_extra_options` are included by default). Errors are sent to
+  a quickfix window.
+
 * `:Ledger`
 
   Executes an arbitrary Ledger command and sends the output to a new buffer.

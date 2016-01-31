@@ -498,6 +498,16 @@ func! ledger#entry()
   normal! "_dd
 endfunc
 
+function! ledger#exec(file, args)
+  let l:output = systemlist(s:ledger_cmd(a:file, a:args))
+  if v:shell_error  " If there are errors, show them in a quickfix/location list.
+    call s:quickfix_populate(l:output)
+    call s:quickfix_toggle('Errors', 'Unable to parse errors')
+    throw "Ledger Error"
+  endif
+  return l:output
+endf
+
 " Run an arbitrary ledger command and show the output in a new buffer. If
 " there are errors, no new buffer is opened: the errors are displayed in a
 " quickfix window instead.
@@ -506,12 +516,11 @@ endfunc
 " file  The file to be processed.
 " args  A string of Ledger command-line arguments.
 function! ledger#report(file, args)
-  let l:output = systemlist(s:ledger_cmd(a:file, a:args))
-  if v:shell_error  " If there are errors, show them in a quickfix/location list.
-    call s:quickfix_populate(l:output)
-    call s:quickfix_toggle('Errors', 'Unable to parse errors')
+  try
+    let l:output = ledger#exec(a:file, a:args)
+  catch /.*/
     return
-  endif
+  endtry
   if empty(l:output)
     call s:warning_message('No results')
     return
@@ -599,7 +608,8 @@ function! ledger#show_balance(file, ...)
     call s:error_message('No account found')
     return
   endif
-  let l:cmd = s:ledger_cmd(a:file, join([
+  try
+    let l:output = ledger#exec(a:file, join([
         \ "cleared",
         \ l:account,
         \ "--empty",
@@ -607,14 +617,11 @@ function! ledger#show_balance(file, ...)
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
         \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
         \ ]))
-  let l:output = systemlist(l:cmd)
-  " Errors may occur, for example,  when the account has multiple commodities
-  " and g:ledger_default_commodity is empty.
-  if v:shell_error
-    call s:quickfix_populate(l:output)
-    call s:quickfix_toggle('Errors', 'Unable to parse errors')
+  catch /.*/
+    " Errors may occur, for example, when the account has multiple commodities
+    " and g:ledger_default_commodity is empty.
     return
-  endif
+  endtry
   let l:amounts = split(l:output[-1], '|')
   redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
   if len(l:amounts) < 3
