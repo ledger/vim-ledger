@@ -371,7 +371,11 @@ function! ledger#align_commodity()
       let pos = match(rhs, '\V' . g:ledger_decimal_sep)
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
-    call s:goto_col(g:ledger_align_at - pos - 1)
+    if pos > 0
+      call s:goto_col(g:ledger_align_at - pos - 1)
+    else
+      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2)
+    endif
     " Append the part of the line that was previously removed:
     exe 'normal! a' . rhs
   endif
@@ -385,7 +389,7 @@ function! ledger#align_amount_at_cursor()
   let pos = match(@", g:ledger_decimal_sep) " Returns zero when the separator is the empty string
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
-    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@"))  - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
+    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@")) - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
     exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
     normal! p
   else
