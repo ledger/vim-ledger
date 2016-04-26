@@ -539,8 +539,8 @@ function! ledger#output(report)
   call append(0, a:report)
   setlocal nomodifiable
   " Set local mappings to quit window or lose focus.
-  nnoremap <silent> <buffer> <tab> <c-w><c-w>
-  nnoremap <silent> <buffer> q <c-w>c
+  nnoremap <silent> <buffer> <tab> <c-w><c-p>
+  nnoremap <silent> <buffer> q <c-w><c-p>@=winnr("#")<cr><c-w>c
   " Add some coloring to the report
   syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)\+/
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
