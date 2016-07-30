@@ -429,7 +429,7 @@ command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
       \ Balance call ledger#show_balance(g:ledger_main, <q-args>)
 
 command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
-      \ Ledger call ledger#report(g:ledger_main, <q-args>)
+      \ Ledger call ledger#output(ledger#report(g:ledger_main, <q-args>))
 
 command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
