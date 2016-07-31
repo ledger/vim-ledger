@@ -30,7 +30,12 @@ TIPS                                                             *ledger-tips*
 
 Tips and useful commands
 
-* Try account-completion (as explained below)
+* Try account-completion (as explained below). If you use YouCompleteMe, you
+  should disable it for Ledger files. Put this in your .vimrc:
+
+        if exists('g:ycm_filetype_blacklist')
+          call extend(g:ycm_filetype_blacklist, { 'ledger': 1 })
+        endif
 
 * You may use `:make` for syntax checking. It may be convenient to define a
   mapping for the following command:
@@ -77,12 +82,9 @@ Tips and useful commands
   The decimal separator can be set using `g:ledger_decimal_sep`. The default
   value of `g:ledger_decimal_sep` is `'.'`.
 
-  It is convenient to remap the command, for example to `<Leader>a`:
+  See below for the recommended mappings.
 
-        au FileType ledger vnoremap <silent><buffer> <Leader>a \
-        :LedgerAlign<CR>
-
-* :call ledger#align_amount_at_cursor()
+* `:call ledger#align_amount_at_cursor()`
 
   aligns the amount under the cursor and append/prepend the default currency.
   The default currency can be set using `g:ledger_default_commodity`. Whether
@@ -91,13 +93,31 @@ Tips and useful commands
   value is 1). A separator between the commodity and the amount may be set
   using `g:ledger_commodity_sep`.
 
-  It is convenient to define a mapping like the following:
+  See below for the recommended mappings.
 
-        au FileType ledger inoremap <silent><buffer> <C-l> \
-        <Esc>:call ledger#align_amount_at_cursor()<CR>
+* `:call ledger#autocomplete_and_align()`
 
-  Now, you may type `123.45<C-l>`, and have `$123.45` properly aligned (assuming
-  your default commodity is set to `'$'`).
+  when the cursor is on a number or immediately after it, invokes
+  `ledger#align_amount_at_cursor()` to align it and add the default currency;
+  otherwise, performs autocompletion. If you define the following mappings in
+  your `.vimrc` then you may perform both autocompletion and alignment using
+  the <Tab> key:
+
+        au FileType ledger inoremap <silent> <Tab> \
+        <C-r>=ledger#autocomplete_and_align()<CR>
+        au FileType ledger vnoremap <silent> <Tab> :LedgerAlign<CR>
+
+  Alternatively, you may create a file `.vim/after/ftplugin/ledger.vim`
+  containing the following definitions:
+
+        inoremap <silent> <buffer> <Tab> \
+        <C-r>=ledger#autocomplete_and_align()<CR>
+        vnoremap <silent> <buffer> <Tab> :LedgerAlign<CR>
+
+  Now, you may type `asset:check<Tab><Space>123.45<Tab>`, and have the
+  account name autocompleted and `$123.45` properly aligned (assuming your
+  default commodity is set to `'$'`). Or you may press <Tab> in Visual mode
+  to align a number of transactions at once.
 
 * `:call ledger#entry()`
 
