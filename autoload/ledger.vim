@@ -373,15 +373,25 @@ function! ledger#align_commodity()
   if rhs != ''
     " Remove everything after the account name (including spaces):
     .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
-    if g:ledger_decimal_sep == ''
-      let pos = matchend(rhs, '\m\d[^[:space:]]*')
+    if g:ledger_align_advance == 1
+      let pat = '\(= \)\?-\?\([A-Z$€£₹_(]\+ *\)\?\(-\?\([0-9]\+\|[0-9,\.]\{-1,}\)\)\([,\.][0-9)]\+\)\?\zs\( *[0-9A-Za-z€£₹_\"]\+\)\?\([ \t]*[@={]@\?[^\n;]\{-}\)\?\([ \t]\+;.\{-}\|[ \t]*\)'
+      let pos = match(rhs, pat)
     else
-      " Find the position of the first decimal separator:
-      let pos = s:strpos(rhs, '\V' . g:ledger_decimal_sep)
+      if g:ledger_decimal_sep == ''
+        let pos = matchend(rhs, '\m\d[^[:space:]]*')
+      else
+        " Find the position of the first decimal separator:
+        let pos = s:strpos(rhs, '\V' . g:ledger_decimal_sep)
+      endif
     endif
-    " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
+
     if pos > 0
-      call s:goto_col(g:ledger_align_at - pos - 1)
+      let pos = pos - 1
+    endif
+
+    " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
+    if pos >= 0
+      call s:goto_col(g:ledger_align_at - pos)
     else
       call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2)
     endif
