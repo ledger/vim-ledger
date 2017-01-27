@@ -374,8 +374,8 @@ function! ledger#align_commodity()
     " Remove everything after the account name (including spaces):
     .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
     if g:ledger_align_advance == 1
-      let pat = '\(= \)\?-\?\([A-Z$€£₹_(]\+ *\)\?\(-\?\([0-9]\+\|[0-9,\.]\{-1,}\)\)\([,\.][0-9)]\+\)\?\zs\( *[0-9A-Za-z€£₹_\"]\+\)\?\([ \t]*[@={]@\?[^\n;]\{-}\)\?\([ \t]\+;.\{-}\|[ \t]*\)'
-      let pos = match(rhs, pat)
+      let pat = '\(= \)\?\zs-\?\([A-Z$€£₹_(]\+ *\)\?\(-\?\([0-9]\+\|[0-9,\.]\{-1,}\)\)\+\ze\( *[0-9A-Za-z€£₹_\"]\+\)\?\([ \t]*[@={]@\?[^\n;]\{-}\)\?\([ \t]\+;.\{-}\|[ \t]*\)'
+      let pos = matchend(rhs, pat)
     else
       if g:ledger_decimal_sep == ''
         let pos = matchend(rhs, '\m\d[^[:space:]]*')
@@ -518,7 +518,8 @@ function! ledger#autocomplete_and_align()
   " confused with a commodity to be aligned).
   if match(getline('.'), '\s.*\d\%'.col('.').'c') > -1
     norm h
-    call ledger#align_amount_at_cursor()
+    "call ledger#align_amount_at_cursor()
+    call ledger#align_commodity()
     return "\<c-o>A"
   endif
   return "\<c-x>\<c-o>"
