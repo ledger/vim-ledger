@@ -339,6 +339,15 @@ function! s:goto_col(pos)
   if diff > 0 | exec "normal!" diff . "a " | endif
 endf
 
+" Return substring position (in chars).
+function! s:strpos(expr, pat)
+  let pos = match(a:expr, a:pat)
+  if pos > 0
+    let pos = strchars(a:expr[:pos]) - 1
+  endif
+  return pos
+endf
+
 " Align the amount expression after an account name at the decimal point.
 "
 " This function moves the amount expression of a posting so that the decimal
@@ -368,7 +377,7 @@ function! ledger#align_commodity()
       let pos = matchend(rhs, '\m\d[^[:space:]]*')
     else
       " Find the position of the first decimal separator:
-      let pos = match(rhs, '\V' . g:ledger_decimal_sep)
+      let pos = s:strpos(rhs, '\V' . g:ledger_decimal_sep)
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
     if pos > 0
@@ -386,14 +395,17 @@ function! ledger#align_amount_at_cursor()
   " Select and cut text:
   normal! viWd
   " Find the position of the decimal separator
-  let pos = match(@", g:ledger_decimal_sep) " Returns zero when the separator is the empty string
+  let pos = s:strpos(@", '\V' . g:ledger_decimal_sep) " Returns zero when the separator is the empty string
+  if pos <= 0
+    let pos = len(@")
+  endif
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
-    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@")) - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
+    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
     exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
     normal! p
   else
-    call s:goto_col(g:ledger_align_at - (pos > 0 ? pos : len(@")) - 1)
+    call s:goto_col(g:ledger_align_at - pos - 1)
     exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
 endf!
