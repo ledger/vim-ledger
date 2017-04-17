@@ -301,6 +301,10 @@ behaviour of the ledger filetype.
   Use `b` for bottom, `t` for top, `l` for left, `r` for right. Use uppercase letters
   if you want the window to always occupy the full width or height.
 
+* Format of transaction date:
+
+        let g:ledger_date_format = '%Y/%m/%d'
+
 * Format of quickfix register reports (see |:Register|):
 
 	let g:ledger_qf_register_format = \
