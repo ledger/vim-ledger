@@ -41,6 +41,10 @@ if !exists('g:ledger_extra_options')
   let g:ledger_extra_options = ''
 endif
 
+if !exists('g:ledger_date_format')
+  let g:ledger_date_format = '%Y/%m/%d'
+endif
+
 " You can set a maximal number of columns the fold text (excluding amount)
 " will use by overriding g:ledger_maxwidth in your .vimrc.
 " When maxwidth is zero, the amount will be displayed at the far right side
@@ -288,7 +292,7 @@ function! LedgerComplete(findstart, base) "{{{1
         let update_cache = 1
       endif
     elseif b:compl_context == 'new' "{{{2 (new line)
-      return [strftime('%Y/%m/%d')]
+      return [strftime(g:ledger_date_format)]
     endif "}}}
 
 

@@ -39,7 +39,7 @@ function! ledger#transaction_date_set(lnum, type, ...) "{{{1
     return
   endif
 
-  let formatted = strftime('%Y/%m/%d', time)
+  let formatted = strftime(g:ledger_date_format, time)
   if has_key(trans, 'date') && ! empty(trans['date'])
     let date = split(trans['date'], '=')
   else
