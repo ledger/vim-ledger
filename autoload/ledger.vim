@@ -21,7 +21,7 @@ endf
 
 function! ledger#transaction_state_set(lnum, char)
   " modifies or sets the state of the transaction at the cursor,
-  " removing the state alltogether if a:char is empty
+  " removing the state altogether if a:char is empty
   let trans = s:transaction.from_lnum(a:lnum)
   if empty(trans) || has_key(trans, 'expr')
     return
