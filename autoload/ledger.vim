@@ -501,8 +501,12 @@ endf
 function! ledger#autocomplete_and_align()
   if pumvisible()
     return "\<c-n>"
-    " See http://stackoverflow.com/questions/23323747/vim-vimscript-get-exact-character-under-the-cursor
-  elseif matchstr(getline('.'), '\%' . (col('.')-1) . 'c.') =~ '\d'
+  endif
+  " Align an amount only if there is a digit immediately before the cursor and
+  " such digit is preceded by at least one space (the latter condition is
+  " necessary to avoid situations where a date starting at the first column is
+  " confused with a commodity to be aligned).
+  if match(getline('.'), '\s.*\d\%'.col('.').'c') > -1
     norm h
     call ledger#align_amount_at_cursor()
     return "\<c-o>A"
