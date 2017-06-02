@@ -458,7 +458,7 @@ function! s:quickfix_toggle(...)
     nnoremap <silent> <buffer> <tab> <c-w><c-w>
     execute 'nnoremap <silent> <buffer> q :' l:list.'close<CR>'
     " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
-    " See: http://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
+    " See: https://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
     if g:ledger_qf_hide_file
       setl conceallevel=2
       setl concealcursor=nc
