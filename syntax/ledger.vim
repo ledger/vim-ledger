@@ -73,7 +73,7 @@ exe 'syn match ledgerApplyHead '.
 
 highlight default link ledgerComment Comment
 highlight default link ledgerTransactionExpression Statement
-highlight default link ledgerMetadata Tag
+highlight default link ledgerMetadata Comment
 highlight default link ledgerTypedTag Keyword
 highlight default link ledgerValueTag Type
 highlight default link ledgerTag Type
