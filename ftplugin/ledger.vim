@@ -160,12 +160,11 @@ endif
 " }}}
 
 " Highlight groups for Ledger reports {{{
-hi! link LedgerNumber Number
-hi! link LedgerNegativeNumber Special
-hi! link LedgerCleared Constant
-hi! link LedgerPending Todo
-hi! link LedgerTarget Statement
-hi! link LedgerImproperPerc Special
+hi link LedgerNumber Number
+hi link LedgerNegativeNumber Special
+hi link LedgerPending Todo
+hi link LedgerTarget Statement
+hi link LedgerImproperPerc Special
 " }}}
 
 let s:rx_amount = '\('.

@@ -29,7 +29,9 @@ syntax clear
 
 exe 'syn region ledgerTransaction start=/^[[:digit:]~=]/ '.
   \ 'skip=/^\s'. s:skip . '/ end=/^/ fold keepend transparent '.
-  \ 'contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
+  \ 'contains=ledgerCleared,ledgerUncleared,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
+syn match ledgerCleared /^\d\S\+ \* .*$/ contained contains=ledgerTransactionDate
+syn match ledgerUncleared /^\d\S\+ [^*].*$/ contained contains=ledgerTransactionDate
 syn match ledgerTransactionDate /^\d\S\+/ contained
 syn match ledgerTransactionExpression /^[=~]\s\+\zs.*/ contained
 syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
@@ -70,7 +72,6 @@ exe 'syn match ledgerApplyHead '.
   \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
 
 highlight default link ledgerComment Comment
-highlight default link ledgerTransactionDate Constant
 highlight default link ledgerTransactionExpression Statement
 highlight default link ledgerMetadata Tag
 highlight default link ledgerTypedTag Keyword
@@ -84,9 +85,12 @@ highlight default link ledgerAmount Number
 highlight default link ledgerPreDeclarationType Type
 highlight default link ledgerPreDeclarationName Identifier
 highlight default link ledgerPreDeclarationDirective Type
- 
+highlight default link ledgerTransactionDate String
+highlight default link ledgerCleared String
+highlight default link ledgerUncleared Statement
+
 " syncinc is easy: search for the first transaction.
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
- 
+
 let b:current_syntax = "ledger"
