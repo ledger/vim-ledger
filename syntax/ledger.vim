@@ -27,7 +27,10 @@ syntax clear
 " DATE[=EDATE] [*|!] [(CODE)] DESC <-- first line of transaction
 "   ACCOUNT AMOUNT [; NOTE]  <-- posting
 
-exe 'syn region ledgerTransaction start=/^[[:digit:]~=]/ '.
+exe 'syn region ledgerTransactionOpen start=/^[[:digit:]~=]\S\+\s\+[^*!]/ '.
+  \ 'skip=/^\s'. s:skip . '/ end=/^/ fold keepend transparent '.
+  \ 'contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
+exe 'syn region ledgerTransactionClosed start=/^[[:digit:]~=]\S\+\s\+[*!]\s/ '.
   \ 'skip=/^\s'. s:skip . '/ end=/^/ fold keepend transparent '.
   \ 'contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
 syn match ledgerTransactionDate /^\d\S\+/ contained
@@ -87,6 +90,7 @@ highlight default link ledgerPreDeclarationDirective Type
  
 " syncinc is easy: search for the first transaction.
 syn sync clear
-syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
+syn sync match ledgerSync grouphere ledgerTransactionOpen "^[[:digit:]~=]"
+syn sync match ledgerSync grouphere ledgerTransactionClosed "^[[:digit:]~=]"
  
 let b:current_syntax = "ledger"
