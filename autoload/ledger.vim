@@ -494,7 +494,12 @@ endf
 
 " Build a ledger command to process the given file.
 function! s:ledger_cmd(file, args)
-  return join([g:ledger_bin, g:ledger_extra_options, '-f', shellescape(expand(a:file)), a:args])
+  let l:options = g:ledger_extra_options
+  if len(g:ledger_date_format) > 0
+    let l:options = join([l:options, "--date-format", g:ledger_date_format,
+      \ "--input-date-format", g:ledger_date_format])
+  endif
+  return join([g:ledger_bin, l:options, '-f', shellescape(expand(a:file)), a:args])
 endf
 " }}}
 
