@@ -49,6 +49,18 @@ Tips and useful commands
 
   to catch most potential problems in your source file.
 
+* Remap vim paragraph motion to move by transaction.
+
+  In vim, the "{" and "}" keystrokes move the cursor up and down by whole
+  paragraphs. They can be redefined in ledger files to move by transaction
+  instead. Add these lines to .vimrc:
+
+        au FileType ledger noremap { ?^\d<CR>
+        au FileType ledger noremap } /^\d<CR>
+
+  The default definitions already work in ledger files that separate
+  transactions with blank lines.
+
 * `:call ledger#transaction_date_set('.'), "auxiliary")`
 
   will set today's date as the auxiliary date of the current transaction. You
