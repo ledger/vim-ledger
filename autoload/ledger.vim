@@ -604,6 +604,7 @@ function! ledger#reconcile(file, account, target_amount)
   let l:cmd = s:ledger_cmd(a:file, join([
         \ "register",
         \ "--uncleared",
+        \ "--sort '(amount < 0 ? amount : -amount), date, amount'",
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
         \ a:account
