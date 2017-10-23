@@ -52,6 +52,8 @@ syn match ledgerDirective
   \ /^\%(alias\|assert\|bucket\|capture\|check\|define\|expr\|fixed\|include\|year\)\s/
 syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 
+syn region ledgerBlockComment start=/^comment/ end=/^end comment/
+syn region ledgerBlockTest start=/^test/ end=/^end test/
 syn match ledgerComment /^;.*$/
 " comments at eol must be preceded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
@@ -74,6 +76,8 @@ exe 'syn match ledgerApplyHead '.
   \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
 
 highlight default link ledgerComment Comment
+highlight default link ledgerBlockComment Comment
+highlight default link ledgerBlockTest Comment
 highlight default link ledgerTransactionDate Constant
 highlight default link ledgerTransactionExpression Statement
 highlight default link ledgerMetadata Tag
