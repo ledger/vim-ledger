@@ -54,7 +54,7 @@ syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 
 syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
-syn match ledgerComment /^;.*$/
+syn match ledgerComment /^[;|*#].*$/
 " comments at eol must be preceded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
