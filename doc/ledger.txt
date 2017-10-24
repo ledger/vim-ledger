@@ -30,6 +30,10 @@ TIPS                                                             *ledger-tips*
 
 Tips and useful commands
 
+* vim-ledger can do syntax-sensitive folding when you set `foldmethod=syntax`
+  in the |modeline| of your ledger file. This way transactions can shrink down
+  to just one line.
+
 * Try account-completion (as explained below). If you use YouCompleteMe, you
   should disable it for Ledger files. Put this in your .vimrc:
 
