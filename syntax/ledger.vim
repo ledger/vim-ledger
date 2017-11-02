@@ -48,7 +48,13 @@ syn match ledgerPreDeclarationType /^\(account\|payee\|commodity\|tag\)/ contain
 syn match ledgerPreDeclarationName /^\S\+\s\+\zs.*/ contained
 syn match ledgerPreDeclarationDirective /^\s\+\zs\S\+/ contained
 
-syn match ledgerComment /^;.*$/
+syn match ledgerDirective
+  \ /^\%(alias\|assert\|bucket\|capture\|check\|define\|expr\|fixed\|include\|year\)\s/
+syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
+
+syn region ledgerBlockComment start=/^comment/ end=/^end comment/
+syn region ledgerBlockTest start=/^test/ end=/^end test/
+syn match ledgerComment /^[;|*#].*$/
 " comments at eol must be preceded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
@@ -70,6 +76,8 @@ exe 'syn match ledgerApplyHead '.
   \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
 
 highlight default link ledgerComment Comment
+highlight default link ledgerBlockComment Comment
+highlight default link ledgerBlockTest Comment
 highlight default link ledgerTransactionDate Constant
 highlight default link ledgerTransactionExpression Statement
 highlight default link ledgerMetadata Tag
@@ -84,6 +92,8 @@ highlight default link ledgerAmount Number
 highlight default link ledgerPreDeclarationType Type
 highlight default link ledgerPreDeclarationName Identifier
 highlight default link ledgerPreDeclarationDirective Type
+highlight default link ledgerDirective Type
+highlight default link ledgerOneCharDirective Type
  
 " syncinc is easy: search for the first transaction.
 syn sync clear
