@@ -277,7 +277,7 @@ behaviour of the ledger filetype.
 
   A value of 0 will disable folding of blank lines, 1 will allow folding of a
   single blank line between transactions; any larger value will enable folding
-  undconditionally.
+  unconditionally.
 
   Note that only lines containing no trailing spaces are considered for
   folding. You can take advantage of this to disable this feature on a
