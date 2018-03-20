@@ -694,3 +694,23 @@ function! ledger#show_balance(file, ...)
   endif
 endf
 " }}}
+
+function! ledger#load_accounts(file)
+  if empty(a:file)
+    call s:error_message('No file arg')
+    return
+  endif
+
+  let l:lns = readfile(a:file)
+  let l:accounts = []
+
+  for line in l:lns
+    let l:m = matchstr(line, 'account \zs.\+\ze')
+
+    if !empty(l:m)
+      call add(l:accounts, l:m)
+    endif
+  endfor
+
+  return l:accounts
+endf

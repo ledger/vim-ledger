@@ -330,10 +330,12 @@ endfor
 unlet s:old s:new s:fun
 " }}}1
 
+let b:loaded_accounts = []
+
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  let accounts = []
+  let accounts = b:loaded_accounts
   for xact in transactions
     " collect descriptions
     if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
@@ -374,6 +376,26 @@ function! s:collect_completion_data() "{{{1
 
   return cache
 endf "}}}
+
+function! LedgerLoadAccounts(file)
+  let l:accounts = ledger#load_accounts(a:file)
+
+  if len(l:accounts) > 0
+    let b:loaded_accounts = l:accounts
+  endif
+
+  let b:compl_cache = s:collect_completion_data()
+  let b:compl_cache['#'] = changenr()
+endfunction
+
+function! LedgerLoadDefaultAccounts()
+  if exists('g:ledger_account_file')
+    call LedgerLoadAccounts(g:ledger_account_file)
+  endif
+endfunction
+
+" Prime the autocomplete cache
+call LedgerLoadDefaultAccounts()
 
 " Helper functions {{{1
 
@@ -445,5 +467,7 @@ command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
 
 command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
       \ Register call ledger#register(g:ledger_main, <q-args>)
+
+command! -buffer -complete=file -nargs=1 LoadAccounts call LedgerLoadAccounts(<q-args>)
 " }}}
 
