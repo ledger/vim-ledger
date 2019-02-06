@@ -443,3 +443,7 @@ command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
       \ Register call ledger#register(g:ledger_main, <q-args>)
 " }}}
 
+" Auto reloa {{{1
+autocmd BufWritePost *.ledger call ledger#UpdateFile()
+autocmd BufWritePost *.ldg call ledger#UpdateFile()
+" }}}

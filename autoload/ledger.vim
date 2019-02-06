@@ -521,7 +521,7 @@ func! ledger#entry()
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
   " Errors may occur
-  if v:shell_error
+  if v:shell_error && !w:ledger_reloading
     echomsg join(l:output)
     return
   endif
@@ -541,8 +541,9 @@ endfunc
 " Returns:
 " Ledger's output as a String.
 function! ledger#report(file, args)
+  let w:ledger_cmd = 'call ledger#output(ledger#report('''.a:file.''', '''.a:args.'''))'
   let l:output = systemlist(s:ledger_cmd(a:file, a:args))
-  if v:shell_error  " If there are errors, show them in a quickfix/location list.
+  if v:shell_error  && !w:ledger_reloading " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
   endif
@@ -573,6 +574,9 @@ function! ledger#output(report)
   syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)\+/
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
   syntax match LedgerImproperPerc /\d\d\d\+%/
+
+  let w:ledger_report_buffer = 1
+
   return 1
 endf
 
@@ -656,7 +660,7 @@ function! ledger#show_balance(file, ...)
   let l:output = systemlist(l:cmd)
   " Errors may occur, for example,  when the account has multiple commodities
   " and g:ledger_default_commodity is empty.
-  if v:shell_error
+  if v:shell_error && !w:ledger_reloading
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
     return
@@ -682,4 +686,28 @@ function! ledger#show_balance(file, ...)
     echohl NONE
   endif
 endf
+" }}}
+
+" Report updating {{{1
+
+"close the report previously opened.
+function! QuitReport()
+    if exists('w:ledger_report_buffer')
+        normal q
+    endif
+endfunction
+
+"reload de last report executed
+function! ledger#UpdateFile()
+    "if there was a previous report
+    if exists('w:ledger_cmd')
+        "Close every report in the tab
+        windo call QuitReport()
+        "re execute the last report without opening a quickfix
+        let w:ledger_reloading = 1
+        execute w:ledger_cmd
+        let w:ledger_reloading = 0
+        execute 'normal <tab>'
+    endif
+endfunction
 " }}}
