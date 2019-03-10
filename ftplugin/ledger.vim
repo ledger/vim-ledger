@@ -183,7 +183,7 @@ let s:rx_amount = '\('.
 function! LedgerFoldText() "{{{1
   " find amount
   let amount = ""
-  let lnum = v:foldstart
+  let lnum = v:foldstart + 1
   while lnum <= v:foldend
     let line = getline(lnum)
 
