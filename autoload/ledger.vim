@@ -333,9 +333,11 @@ function! s:findall(text, rx)
 endf
 
 " Move the cursor to the specified column, filling the line with spaces if necessary.
-function! s:goto_col(pos)
-  exec "normal!" a:pos . "|"
-  let diff = a:pos - virtcol('.')
+" Ensure that at least min_spaces are added, and go to the end of the line if
+" the line is already too long
+function! s:goto_col(pos, min_spaces)
+  exec "normal!" "$"
+  let diff = max([a:min_spaces, a:pos - virtcol('.')])
   if diff > 0 | exec "normal!" diff . "a " | endif
 endf
 
@@ -384,11 +386,10 @@ function! ledger#align_commodity()
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
     if pos > 0
-      call s:goto_col(g:ledger_align_at - pos - 1)
+      call s:goto_col(g:ledger_align_at - pos - 1, 2)
     else
-      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2)
-    endif
-    " Append the part of the line that was previously removed:
+      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2, 2)
+    endif " Append the part of the line that was previously removed:
     exe 'normal! a' . rhs
   endif
 endf!
@@ -404,11 +405,11 @@ function! ledger#align_amount_at_cursor()
   endif
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
-    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
+    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1, 2)
     exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
     normal! p
   else
-    call s:goto_col(g:ledger_align_at - pos - 1)
+    call s:goto_col(g:ledger_align_at - pos - 1, 2)
     exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
 endf!
