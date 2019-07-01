@@ -13,6 +13,10 @@ let b:undo_ftplugin = "setlocal ".
                     \ "foldtext< ".
                     \ "include< comments< commentstring< omnifunc< formatprg<"
 
+if !exists('current_compiler')
+  compiler ledger
+endif
+
 setl foldtext=LedgerFoldText()
 setl include=^!\\?include
 setl comments=b:;
@@ -179,7 +183,7 @@ let s:rx_amount = '\('.
 function! LedgerFoldText() "{{{1
   " find amount
   let amount = ""
-  let lnum = v:foldstart
+  let lnum = v:foldstart + 1
   while lnum <= v:foldend
     let line = getline(lnum)
 
