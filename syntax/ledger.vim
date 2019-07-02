@@ -22,7 +22,7 @@ if s:fb == 1
 endif
 
 let s:ledgerAmount_contains = ''
-if get(g:, 'ledger_commodity_spell', 1) == 0
+if get(g:, 'ledger_commodity_spell', 0) == 0
     let s:ledgerAmount_contains .= '@NoSpell'
 endif
 

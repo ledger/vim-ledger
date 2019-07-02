@@ -304,9 +304,9 @@ behaviour of the ledger filetype.
 
         let g:ledger_commodity_sep = ''
 
-* Flag that disable the spelling of the amount:
+* Flag that enable the spelling of the amount:
 
-        let g:ledger_commodity_spell = 0
+        let g:ledger_commodity_spell = 1
 
 * Format of transaction date:
 
