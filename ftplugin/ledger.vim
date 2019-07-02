@@ -333,7 +333,7 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  let accounts = []
+  let accounts = ledger#declared_accounts()
   for xact in transactions
     " collect descriptions
     if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0

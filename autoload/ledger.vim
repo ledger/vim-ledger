@@ -267,6 +267,50 @@ endf "}}}
 
 " == helper functions ==
 
+" get a list of declared accounts in the buffer
+function! ledger#declared_accounts(...)
+  if a:0 == 2
+    let lnum = a:1
+    let lend = a:2
+  elseif a:0 == 0
+    let lnum = 1
+    let lend = line('$')
+  else
+    throw "wrong number of arguments for ledger#declared_accounts()"
+    return []
+  endif
+
+  " save view / position
+  let view = winsaveview()
+  let fe = &foldenable
+  set nofoldenable
+
+  let accounts = []
+  call cursor(lnum, 0)
+  while 1
+    let lnum = search('^account\s', 'cW', lend)
+    if !lnum || lnum > lend
+      break
+    endif
+
+    " remove comments at the end and "account" at the front
+    let line = split(getline(lnum), '\s\+;')[0]
+    let line = matchlist(line, 'account\s\+\(.\+\)')[1]
+
+    if len(line) > 1
+      call add(accounts, line)
+    endif
+
+    call cursor(lnum+1,0)
+  endw
+
+  " restore view / position
+  let &foldenable = fe
+  call winrestview(view)
+
+  return accounts
+endf
+
 function! s:get_transaction_extents(lnum)
   if ! (indent(a:lnum) || getline(a:lnum) =~ '^[~=[:digit:]]')
     " only do something if lnum is in a transaction
