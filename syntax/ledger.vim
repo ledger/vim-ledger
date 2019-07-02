@@ -21,6 +21,11 @@ if s:fb == 1
   let s:skip .= '\n\@!'
 endif
 
+let s:ledgerAmount_contains = ''
+if get(g:, 'ledger_commodity_spell', 0) == 0
+    let s:ledgerAmount_contains .= '@NoSpell'
+endif
+
 " for debugging
 syntax clear
 
@@ -39,7 +44,7 @@ syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
 exe 'syn match ledgerAccount '.
   \ '/'.s:oe.'^\s\+\zs\%(\S'.s:lb1.' \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained'
 exe 'syn match ledgerAmount '.
-  \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contained'
+  \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contains='.s:ledgerAmount_contains.' contained'
 
 syn region ledgerPreDeclaration start=/^\(account\|payee\|commodity\|tag\)/ skip=/^\s/ end=/^/
     \ keepend transparent
