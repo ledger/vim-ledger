@@ -267,6 +267,50 @@ endf "}}}
 
 " == helper functions ==
 
+" get a list of declared accounts in the buffer
+function! ledger#declared_accounts(...)
+  if a:0 == 2
+    let lnum = a:1
+    let lend = a:2
+  elseif a:0 == 0
+    let lnum = 1
+    let lend = line('$')
+  else
+    throw "wrong number of arguments for ledger#declared_accounts()"
+    return []
+  endif
+
+  " save view / position
+  let view = winsaveview()
+  let fe = &foldenable
+  set nofoldenable
+
+  let accounts = []
+  call cursor(lnum, 0)
+  while 1
+    let lnum = search('^account\s', 'cW', lend)
+    if !lnum || lnum > lend
+      break
+    endif
+
+    " remove comments at the end and "account" at the front
+    let line = split(getline(lnum), '\s\+;')[0]
+    let line = matchlist(line, 'account\s\+\(.\+\)')[1]
+
+    if len(line) > 1
+      call add(accounts, line)
+    endif
+
+    call cursor(lnum+1,0)
+  endw
+
+  " restore view / position
+  let &foldenable = fe
+  call winrestview(view)
+
+  return accounts
+endf
+
 function! s:get_transaction_extents(lnum)
   if ! (indent(a:lnum) || getline(a:lnum) =~ '^[~=[:digit:]]')
     " only do something if lnum is in a transaction
@@ -333,15 +377,17 @@ function! s:findall(text, rx)
 endf
 
 " Move the cursor to the specified column, filling the line with spaces if necessary.
-function! s:goto_col(pos)
-  exec "normal!" a:pos . "|"
-  let diff = a:pos - virtcol('.')
+" Ensure that at least min_spaces are added, and go to the end of the line if
+" the line is already too long
+function! s:goto_col(pos, min_spaces)
+  exec "normal!" "$"
+  let diff = max([a:min_spaces, a:pos - virtcol('.')])
   if diff > 0 | exec "normal!" diff . "a " | endif
 endf
 
-" Return substring position (in chars).
-function! s:strpos(expr, pat)
-  let pos = match(a:expr, a:pat)
+" Return character position of decimal separator (multibyte safe)
+function! s:decimalpos(expr)
+  let pos = match(a:expr, '\V' . g:ledger_decimal_sep)
   if pos > 0
     let pos = strchars(a:expr[:pos]) - 1
   endif
@@ -373,19 +419,21 @@ function! ledger#align_commodity()
   if rhs != ''
     " Remove everything after the account name (including spaces):
     .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
-    if g:ledger_decimal_sep == ''
-      let pos = matchend(rhs, '\m\d[^[:space:]]*')
-    else
+    let pos = -1
+    if g:ledger_decimal_sep != ''
       " Find the position of the first decimal separator:
-      let pos = s:strpos(rhs, '\V' . g:ledger_decimal_sep)
+      let pos = s:decimalpos(rhs)
+    endif
+    if pos < 0
+      " Find the position after the first digits
+      let pos = matchend(rhs, '\m\d[^[:space:]]*')
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
     if pos > 0
-      call s:goto_col(g:ledger_align_at - pos - 1)
+      call s:goto_col(g:ledger_align_at - pos - 1, 2)
     else
-      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2)
-    endif
-    " Append the part of the line that was previously removed:
+      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2, 2)
+    endif " Append the part of the line that was previously removed:
     exe 'normal! a' . rhs
   endif
 endf!
@@ -395,17 +443,17 @@ function! ledger#align_amount_at_cursor()
   " Select and cut text:
   normal! viWd
   " Find the position of the decimal separator
-  let pos = s:strpos(@", '\V' . g:ledger_decimal_sep) " Returns zero when the separator is the empty string
+  let pos = s:decimalpos(@") " Returns zero when the separator is the empty string
   if pos <= 0
     let pos = len(@")
   endif
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
-    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1)
+    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1, 2)
     exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
     normal! p
   else
-    call s:goto_col(g:ledger_align_at - pos - 1)
+    call s:goto_col(g:ledger_align_at - pos - 1, 2)
     exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
 endf!
@@ -570,8 +618,8 @@ function! ledger#output(report)
   nnoremap <silent> <buffer> <tab> <c-w><c-p>
   nnoremap <silent> <buffer> q <c-w><c-p>@=winnr("#")<cr><c-w>c
   " Add some coloring to the report
-  syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)\+/
-  syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)\+/
+  syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)*/
+  syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)*/
   syntax match LedgerImproperPerc /\d\d\d\+%/
   return 1
 endf

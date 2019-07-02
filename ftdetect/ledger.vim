@@ -1,1 +1,1 @@
-autocmd BufEnter,BufRead *.ldg,*.ledger setlocal filetype=ledger | compiler ledger
+autocmd BufNewFile,BufRead *.ldg,*.ledger,*.journal setlocal filetype=ledger

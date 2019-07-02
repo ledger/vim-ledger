@@ -13,6 +13,10 @@ let b:undo_ftplugin = "setlocal ".
                     \ "foldtext< ".
                     \ "include< comments< commentstring< omnifunc< formatprg<"
 
+if !exists('current_compiler')
+  compiler ledger
+endif
+
 setl foldtext=LedgerFoldText()
 setl include=^!\\?include
 setl comments=b:;
@@ -159,12 +163,12 @@ endif
 " }}}
 
 " Highlight groups for Ledger reports {{{
-hi! link LedgerNumber Number
-hi! link LedgerNegativeNumber Special
-hi! link LedgerCleared Constant
-hi! link LedgerPending Todo
-hi! link LedgerTarget Statement
-hi! link LedgerImproperPerc Special
+hi link LedgerNumber Number
+hi link LedgerNegativeNumber Special
+hi link LedgerCleared Constant
+hi link LedgerPending Todo
+hi link LedgerTarget Statement
+hi link LedgerImproperPerc Special
 " }}}
 
 let s:rx_amount = '\('.
@@ -179,7 +183,7 @@ let s:rx_amount = '\('.
 function! LedgerFoldText() "{{{1
   " find amount
   let amount = ""
-  let lnum = v:foldstart
+  let lnum = v:foldstart + 1
   while lnum <= v:foldend
     let line = getline(lnum)
 
@@ -329,7 +333,7 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  let accounts = []
+  let accounts = ledger#declared_accounts()
   for xact in transactions
     " collect descriptions
     if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0

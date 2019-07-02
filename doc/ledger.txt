@@ -277,7 +277,7 @@ behaviour of the ledger filetype.
 
   A value of 0 will disable folding of blank lines, 1 will allow folding of a
   single blank line between transactions; any larger value will enable folding
-  undconditionally.
+  unconditionally.
 
   Note that only lines containing no trailing spaces are considered for
   folding. You can take advantage of this to disable this feature on a
@@ -400,7 +400,8 @@ LICENSE                                                       *ledger-license*
 
 https://github.com/ledger/vim-ledger
 
-Copyright 2009-2013 Johann Klähn
+Copyright 2019 Caleb Maclennan
+Copyright 2009–2017 Johann Klähn
 Copyright 2009 Stefan Karrmann
 Copyright 2005 Wolfgang Oertl
 
