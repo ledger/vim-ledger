@@ -99,7 +99,7 @@ function! ledger#transactions(...)
 
   let transactions = []
   call cursor(lnum, 0)
-  while lnum && lnum <= end
+  while lnum && lnum < end
     let trans = s:transaction.from_lnum(lnum)
     if ! empty(trans)
       call add(transactions, trans)
