@@ -342,11 +342,21 @@ function! s:collect_completion_data() "{{{1
     let [t, postings] = xact.parse_body()
     let tagdicts = [t]
 
-    for posting in postings
-      if has_key(posting, 'tags')
-        call add(tagdicts, posting.tags)
-      endif
-    endfor
+		" collect account names
+		if exists("g:ledger_accounts_cmd")
+			let accounts = split(system(g:ledger_accounts_cmd), '\n')
+		else
+			for posting in postings
+				if has_key(posting, 'tags')
+					call add(tagdicts, posting.tags)
+				endif
+				" remove virtual-transaction-marks
+				let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
+				if index(accounts, name) < 0
+					call add(accounts, name)
+				endif
+			endfor
+		endif
 
     " collect tags
     for tags in tagdicts | for [tag, val] in items(tags)
@@ -357,11 +367,6 @@ function! s:collect_completion_data() "{{{1
       let cache.tags[tag] = values
     endfor | endfor
   endfor
-
-  let cmd = g:ledger_bin . ' -f ' . shellescape(expand('%'))
-        \ . " --balance-format=\"%A\\n\" --flat bal"
-  let output = system(cmd)
-  let accounts = split(output, '\n')
 
   for account in accounts
     let last = cache.accounts
