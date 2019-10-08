@@ -254,6 +254,22 @@ behaviour of the ledger filetype.
 
 	let g:ledger_extra_options = ''
 
+* To use a custom external system command to generate a list of account names
+  for completion, set the following. If g:ledger_bin is set, this will default
+  to running that command with arguments to parse the current file using the
+  accounts subcommand (works with ledger or hledger), otherwise it will parse
+  the postings in the current file itself.
+
+	let g:ledger_accounts_cmd = 'your_command args'
+
+* To use a custom external system command to generate a list of descriptions
+  for completion, set the following. If g:ledger_bin is set, this will default
+  to running that command with arguments to parse the current file using the
+  descriptions subcommand (works with ledger or hledger), otherwise it will
+  parse the transactions in the current file itself.
+
+	let g:ledger_descriptions_cmd = 'your_command args'
+
 * Number of columns that will be used to display the foldtext. Set this when
   you think that the amount is too far off to the right.
 
