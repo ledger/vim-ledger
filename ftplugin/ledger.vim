@@ -23,6 +23,10 @@ setl comments=b:;
 setl commentstring=;%s
 setl omnifunc=LedgerComplete
 
+if !exists('g:ledger_main')
+  let g:ledger_main = '%'
+endif
+
 " set location of ledger binary for checking and auto-formatting
 if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
   if executable('ledger')
@@ -58,6 +62,18 @@ endif
 
 if !exists('g:ledger_fillstring')
   let g:ledger_fillstring = ' '
+endif
+
+if !exists('g:ledger_accounts_generate')
+	let g:ledger_accounts_generate = 0
+endif
+
+if !exists("g:ledger_accounts_cmd")
+	if exists("g:ledger_bin")
+		let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
+	else
+		let g:ledger_accounts_generate = 0
+	endif
 endif
 
 if !exists('g:ledger_decimal_sep')
@@ -115,10 +131,6 @@ if !exists('g:ledger_include_original')
 endif
 
 " Settings for Ledger reports {{{
-if !exists('g:ledger_main')
-  let g:ledger_main = '%'
-endif
-
 if !exists('g:ledger_winpos')
   let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
 endif
@@ -343,7 +355,7 @@ function! s:collect_completion_data() "{{{1
     let tagdicts = [t]
 
 		" collect account names
-		if exists("g:ledger_accounts_cmd")
+		if g:ledger_accounts_generate && exists("g:ledger_accounts_cmd")
 			let accounts = split(system(g:ledger_accounts_cmd), '\n')
 		else
 			for posting in postings
