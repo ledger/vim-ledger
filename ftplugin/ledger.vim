@@ -70,6 +70,12 @@ if !exists("g:ledger_accounts_cmd")
   endif
 endif
 
+if !exists("g:ledger_descriptions_cmd")
+  if exists("g:ledger_bin")
+    let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+  endif
+endif
+
 if !exists('g:ledger_decimal_sep')
   let g:ledger_decimal_sep = '.'
 endif
@@ -344,10 +350,15 @@ function! s:collect_completion_data() "{{{1
   else
     let accounts = ledger#declared_accounts()
   endif
+  if exists("g:ledger_descriptions_cmd")
+    let cache.descriptions = systemlist(g:ledger_descriptions_cmd)
+  endif
   for xact in transactions
-    " collect descriptions
-    if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
-      call add(cache.descriptions, xact['description'])
+    if !exists("g:ledger_descriptions_cmd")
+      " collect descriptions
+      if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
+        call add(cache.descriptions, xact['description'])
+      endif
     endif
     let [t, postings] = xact.parse_body()
     let tagdicts = [t]
