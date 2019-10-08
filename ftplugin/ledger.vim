@@ -64,16 +64,10 @@ if !exists('g:ledger_fillstring')
   let g:ledger_fillstring = ' '
 endif
 
-if !exists('g:ledger_accounts_generate')
-	let g:ledger_accounts_generate = 0
-endif
-
 if !exists("g:ledger_accounts_cmd")
-	if exists("g:ledger_bin")
-		let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
-	else
-		let g:ledger_accounts_generate = 0
-	endif
+  if exists("g:ledger_bin")
+    let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
+  endif
 endif
 
 if !exists('g:ledger_decimal_sep')
@@ -345,7 +339,7 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  if g:ledger_accounts_generate && exists("g:ledger_accounts_cmd")
+  if exists("g:ledger_accounts_cmd")
     let accounts = systemlist(g:ledger_accounts_cmd)
   else
     let accounts = ledger#declared_accounts()
@@ -359,7 +353,7 @@ function! s:collect_completion_data() "{{{1
     let tagdicts = [t]
 
 		" collect account names
-    if !g:ledger_accounts_generate && !exists("g:ledger_accounts_cmd")
+    if !exists("g:ledger_accounts_cmd")
       for posting in postings
         if has_key(posting, 'tags')
           call add(tagdicts, posting.tags)
