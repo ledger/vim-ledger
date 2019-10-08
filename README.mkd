@@ -85,7 +85,7 @@ behaviour of the ledger filetype.
 Completion
 ----------
 
-Omni completion is currently implemented for account names only.
+Omni completion is implemented for transactions descriptions and posting account names.
 
 ### Accounts
 

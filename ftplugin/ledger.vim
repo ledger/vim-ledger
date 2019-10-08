@@ -23,6 +23,10 @@ setl comments=b:;
 setl commentstring=;%s
 setl omnifunc=LedgerComplete
 
+if !exists('g:ledger_main')
+  let g:ledger_main = '%'
+endif
+
 " set location of ledger binary for checking and auto-formatting
 if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
   if executable('ledger')
@@ -58,6 +62,18 @@ endif
 
 if !exists('g:ledger_fillstring')
   let g:ledger_fillstring = ' '
+endif
+
+if !exists("g:ledger_accounts_cmd")
+  if exists("g:ledger_bin")
+    let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
+  endif
+endif
+
+if !exists("g:ledger_descriptions_cmd")
+  if exists("g:ledger_bin")
+    let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+  endif
 endif
 
 if !exists('g:ledger_decimal_sep')
@@ -115,10 +131,6 @@ if !exists('g:ledger_include_original')
 endif
 
 " Settings for Ledger reports {{{
-if !exists('g:ledger_main')
-  let g:ledger_main = '%'
-endif
-
 if !exists('g:ledger_winpos')
   let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
 endif
@@ -355,26 +367,37 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  let accounts = ledger#declared_accounts()
+  if exists("g:ledger_accounts_cmd")
+    let accounts = systemlist(g:ledger_accounts_cmd)
+  else
+    let accounts = ledger#declared_accounts()
+  endif
+  if exists("g:ledger_descriptions_cmd")
+    let cache.descriptions = systemlist(g:ledger_descriptions_cmd)
+  endif
   for xact in transactions
-    " collect descriptions
-    if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
-      call add(cache.descriptions, xact['description'])
+    if !exists("g:ledger_descriptions_cmd")
+      " collect descriptions
+      if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
+        call add(cache.descriptions, xact['description'])
+      endif
     endif
     let [t, postings] = xact.parse_body()
     let tagdicts = [t]
 
-    " collect account names
-    for posting in postings
-      if has_key(posting, 'tags')
-        call add(tagdicts, posting.tags)
-      endif
-      " remove virtual-transaction-marks
-      let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
-      if index(accounts, name) < 0
-        call add(accounts, name)
-      endif
-    endfor
+		" collect account names
+    if !exists("g:ledger_accounts_cmd")
+      for posting in postings
+        if has_key(posting, 'tags')
+          call add(tagdicts, posting.tags)
+        endif
+        " remove virtual-transaction-marks
+        let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
+        if index(accounts, name) < 0
+          call add(accounts, name)
+        endif
+      endfor
+    endif
 
     " collect tags
     for tags in tagdicts | for [tag, val] in items(tags)
