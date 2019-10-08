@@ -199,7 +199,6 @@ function! LedgerFoldText() "{{{1
     let lnum += 1
   endwhile
 
-  let fmt = '%s %s '
   " strip whitespace at beginning and end of line
   let foldtext = substitute(getline(v:foldstart),
                           \ '\(^\s\+\|\s\+$\)', '', 'g')
@@ -209,26 +208,49 @@ function! LedgerFoldText() "{{{1
   if g:ledger_maxwidth
     let columns = min([columns, g:ledger_maxwidth])
   endif
-  let columns -= s:multibyte_strlen(printf(fmt, '', amount))
 
-  " add spaces so the text is always long enough when we strip it
-  " to a certain width (fake table)
-  if strlen(g:ledger_fillstring)
-    " add extra spaces so fillstring aligns
-    let filen = s:multibyte_strlen(g:ledger_fillstring)
-    let folen = s:multibyte_strlen(foldtext)
-    let foldtext .= repeat(' ', filen - (folen%filen))
+  let amount = printf(' %s ', amount)
+  " left cut-off if window is too narrow to display the amount
+  while columns < strdisplaywidth(amount)
+    let amount = substitute(amount, '^.', '', '')
+  endwhile
+  let columns -= strdisplaywidth(amount)
 
-    let foldtext .= repeat(g:ledger_fillstring,
-                  \ s:get_columns()/filen)
-  else
-    let foldtext .= repeat(' ', s:get_columns())
+  if columns <= 0
+    return amount
   endif
 
-  " we don't use slices[:5], because that messes up multibyte characters
-  let foldtext = substitute(foldtext, '.\{'.columns.'}\zs.*$', '', '')
+  " right cut-off if there is not sufficient space to display the description
+  while columns < strdisplaywidth(foldtext)
+    let foldtext = substitute(foldtext, '.$', '', '')
+  endwhile
+  let columns -= strdisplaywidth(foldtext)
 
-  return printf(fmt, foldtext, amount)
+  if columns <= 0
+    return foldtext . amount
+  endif
+
+  " fill in the fillstring
+  if strlen(g:ledger_fillstring)
+    let fillstring = g:ledger_fillstring
+  else
+    let fillstring = ' '
+  endif
+  let fillstrlen = strdisplaywidth(fillstring)
+
+  let foldtext .= ' '
+  let columns -= 1
+  while columns >= fillstrlen
+    let foldtext .= fillstring
+    let columns -= fillstrlen
+  endwhile
+
+  while columns < strdisplaywidth(fillstring)
+    let fillstring = substitute(fillstring, '.$', '', '')
+  endwhile
+  let foldtext .= fillstring
+
+  return foldtext . amount
 endfunction "}}}
 
 function! LedgerComplete(findstart, base) "{{{1
