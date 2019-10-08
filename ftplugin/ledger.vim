@@ -345,7 +345,11 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
-  let accounts = ledger#declared_accounts()
+  if g:ledger_accounts_generate && exists("g:ledger_accounts_cmd")
+    let accounts = systemlist(g:ledger_accounts_cmd)
+  else
+    let accounts = ledger#declared_accounts()
+  endif
   for xact in transactions
     " collect descriptions
     if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
@@ -355,20 +359,18 @@ function! s:collect_completion_data() "{{{1
     let tagdicts = [t]
 
 		" collect account names
-		if g:ledger_accounts_generate && exists("g:ledger_accounts_cmd")
-			let accounts = split(system(g:ledger_accounts_cmd), '\n')
-		else
-			for posting in postings
-				if has_key(posting, 'tags')
-					call add(tagdicts, posting.tags)
-				endif
-				" remove virtual-transaction-marks
-				let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
-				if index(accounts, name) < 0
-					call add(accounts, name)
-				endif
-			endfor
-		endif
+    if !g:ledger_accounts_generate && !exists("g:ledger_accounts_cmd")
+      for posting in postings
+        if has_key(posting, 'tags')
+          call add(tagdicts, posting.tags)
+        endif
+        " remove virtual-transaction-marks
+        let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
+        if index(accounts, name) < 0
+          call add(accounts, name)
+        endif
+      endfor
+    endif
 
     " collect tags
     for tags in tagdicts | for [tag, val] in items(tags)
