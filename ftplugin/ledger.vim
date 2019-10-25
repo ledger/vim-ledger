@@ -72,7 +72,7 @@ endif
 
 if !exists("g:ledger_descriptions_cmd")
   if exists("g:ledger_bin")
-    let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+    let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'
   endif
 endif
 
