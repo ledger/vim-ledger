@@ -1,6 +1,6 @@
 scriptencoding utf-8
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
-function! ledger#transaction_state_toggle(lnum, ...)
+function! ledger#transaction_state_toggle(lnum, ...) abort
   if a:0 == 1
     let chars = a:1
   else
@@ -20,7 +20,7 @@ function! ledger#transaction_state_toggle(lnum, ...)
   call setline(trans['head'], trans.format_head())
 endf
 
-function! ledger#transaction_state_set(lnum, char)
+function! ledger#transaction_state_set(lnum, char) abort
   " modifies or sets the state of the transaction at the cursor,
   " removing the state altogether if a:char is empty
   let trans = s:transaction.from_lnum(a:lnum)
@@ -33,7 +33,7 @@ function! ledger#transaction_state_set(lnum, char)
   call setline(trans['head'], trans.format_head())
 endf
 
-function! ledger#transaction_date_set(lnum, type, ...) "{{{1
+function! ledger#transaction_date_set(lnum, type, ...) abort
   let time = a:0 == 1 ? a:1 : localtime()
   let trans = s:transaction.from_lnum(a:lnum)
   if empty(trans) || has_key(trans, 'expr')
@@ -73,15 +73,15 @@ function! ledger#transaction_date_set(lnum, type, ...) "{{{1
   let trans['date'] = join(date[0:1], '=')
 
   call setline(trans['head'], trans.format_head())
-endf "}}}
+endf
 
 " == get transactions ==
 
-function! ledger#transaction_from_lnum(lnum)
+function! ledger#transaction_from_lnum(lnum) abort
   return s:transaction.from_lnum(a:lnum)
 endf
 
-function! ledger#transactions(...)
+function! ledger#transactions(...) abort
   if a:0 == 2
     let lnum = a:1
     let end = a:2
@@ -119,11 +119,11 @@ endf
 " == transaction object implementation ==
 
 let s:transaction = {} "{{{1
-function! s:transaction.new() dict
+function! s:transaction.new() abort dict
   return copy(s:transaction)
 endf
 
-function! s:transaction.from_lnum(lnum) dict "{{{2
+function! s:transaction.from_lnum(lnum) abort dict "{{{2
   let [head, tail] = s:get_transaction_extents(a:lnum)
   if ! head
     return {}
@@ -173,7 +173,7 @@ function! s:transaction.from_lnum(lnum) dict "{{{2
   return trans
 endf "}}}
 
-function! s:transaction.set_state(char) dict "{{{2
+function! s:transaction.set_state(char) abort dict "{{{2
   if has_key(self, 'state') && a:char =~# '^\s*$'
     call remove(self, 'state')
   else
@@ -181,7 +181,7 @@ function! s:transaction.set_state(char) dict "{{{2
   endif
 endf "}}}
 
-function! s:transaction.parse_body(...) dict "{{{2
+function! s:transaction.parse_body(...) abort dict "{{{2
   if a:0 == 2
     let head = a:1
     let tail = a:2
@@ -246,7 +246,7 @@ function! s:transaction.parse_body(...) dict "{{{2
   return [tags, postings]
 endf "}}}
 
-function! s:transaction.format_head() dict "{{{2
+function! s:transaction.format_head() abort dict "{{{2
   if has_key(self, 'expr')
     return '~ '.self['expr']
   elseif has_key(self, 'auto')
@@ -269,7 +269,7 @@ endf "}}}
 " == helper functions ==
 
 " get a list of declared accounts in the buffer
-function! ledger#declared_accounts(...)
+function! ledger#declared_accounts(...) abort
   if a:0 == 2
     let lnum = a:1
     let lend = a:2
@@ -312,7 +312,7 @@ function! ledger#declared_accounts(...)
   return accounts
 endf
 
-function! s:get_transaction_extents(lnum)
+function! s:get_transaction_extents(lnum) abort
   if ! (indent(a:lnum) || getline(a:lnum) =~# '^[~=[:digit:]]')
     " only do something if lnum is in a transaction
     return [0, 0]
@@ -335,7 +335,7 @@ function! s:get_transaction_extents(lnum)
   return head ? [head, tail] : [0, 0]
 endf
 
-function! ledger#find_in_tree(tree, levels)
+function! ledger#find_in_tree(tree, levels) abort
   if empty(a:levels)
     return []
   endif
@@ -355,12 +355,12 @@ function! ledger#find_in_tree(tree, levels)
   return results
 endf
 
-function! ledger#filter_items(list, keyword)
+function! ledger#filter_items(list, keyword) abort
   " return only those items that start with a specified keyword
   return filter(copy(a:list), 'v:val =~ ''^\V'.substitute(a:keyword, '\\', '\\\\', 'g').'''')
 endf
 
-function! s:findall(text, rx)
+function! s:findall(text, rx) abort
   " returns all the matches in a string,
   " there will be overlapping matches according to :help match()
   let matches = []
@@ -380,14 +380,14 @@ endf
 " Move the cursor to the specified column, filling the line with spaces if necessary.
 " Ensure that at least min_spaces are added, and go to the end of the line if
 " the line is already too long
-function! s:goto_col(pos, min_spaces)
+function! s:goto_col(pos, min_spaces) abort
   exec 'normal!' '$'
   let diff = max([a:min_spaces, a:pos - virtcol('.')])
   if diff > 0 | exec 'normal!' diff . 'a ' | endif
 endf
 
 " Return character position of decimal separator (multibyte safe)
-function! s:decimalpos(expr)
+function! s:decimalpos(expr) abort
   let pos = match(a:expr, '\V' . g:ledger_decimal_sep)
   if pos > 0
     let pos = strchars(a:expr[:pos]) - 1
@@ -414,7 +414,7 @@ endf
 "      Expenses:Something                                 $-4,99
 "      Expenses:More                                     ($12,34 + $16,32)
 "
-function! ledger#align_commodity()
+function! ledger#align_commodity() abort
   " Extract the part of the line after the account name (excluding spaces):
   let rhs = matchstr(getline('.'), '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
   if rhs !=# ''
@@ -440,7 +440,7 @@ function! ledger#align_commodity()
 endf
 
 " Align the amount under the cursor and append/prepend the default currency.
-function! ledger#align_amount_at_cursor()
+function! ledger#align_amount_at_cursor() abort
   " Select and cut text:
   normal! viWd
   " Find the position of the decimal separator
@@ -468,7 +468,7 @@ let s:winpos_map = {
       \ 'L': 'to vnew', 'l': 'abo vnew', 'R': 'bo vnew', 'r': 'bel vnew'
       \ }
 
-function! s:error_message(msg)
+function! s:error_message(msg) abort
   redraw  " See h:echo-redraw
   echohl ErrorMsg
   echo "\r"
@@ -476,7 +476,7 @@ function! s:error_message(msg)
   echohl NONE
 endf
 
-function! s:warning_message(msg)
+function! s:warning_message(msg) abort
   redraw  " See h:echo-redraw
   echohl WarningMsg
   echo "\r"
@@ -492,7 +492,7 @@ endf
 " a:2  Message to show when the window is empty.
 "
 " Returns 0 if the quickfix window is empty, 1 otherwise.
-function! s:quickfix_toggle(...)
+function! s:quickfix_toggle(...) abort
   if g:ledger_use_location_list
     let l:list = 'l'
     let l:open = (len(getloclist(winnr())) > 0)
@@ -526,7 +526,7 @@ endf
 
 " Populate a quickfix/location window with data. The argument must be a String
 " or a List.
-function! s:quickfix_populate(data)
+function! s:quickfix_populate(data) abort
   " Note that cexpr/lexpr always uses the global value of errorformat
   let l:efm = &errorformat  " Save global errorformat
   set errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
@@ -542,12 +542,12 @@ function! s:quickfix_populate(data)
 endf
 
 " Build a ledger command to process the given file.
-function! s:ledger_cmd(file, args)
+function! s:ledger_cmd(file, args) abort
   return join([g:ledger_bin, g:ledger_extra_options, '-f', shellescape(expand(a:file)), a:args])
 endf
 " }}}
 
-function! ledger#autocomplete_and_align()
+function! ledger#autocomplete_and_align() abort
   if pumvisible()
     return "\<c-n>"
   endif
@@ -565,7 +565,7 @@ endf
 
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
-func! ledger#entry()
+function! ledger#entry() abort
   let l:output = systemlist(s:ledger_cmd(g:ledger_main, join(['entry', getline('.')])))
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
@@ -589,7 +589,7 @@ endfunc
 "
 " Returns:
 " Ledger's output as a String.
-function! ledger#report(file, args)
+function! ledger#report(file, args) abort
   let l:output = systemlist(s:ledger_cmd(a:file, a:args))
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
@@ -605,7 +605,7 @@ endf
 "
 " Returns:
 " 1 if a new buffer is created; 0 otherwise.
-function! ledger#output(report)
+function! ledger#output(report) abort
   if empty(a:report)
     call s:warning_message('No results')
     return 0
@@ -630,7 +630,7 @@ endf
 " Parameters:
 " file  The file to be processed
 " args  A string of Ledger command-line arguments.
-function! ledger#register(file, args)
+function! ledger#register(file, args) abort
   let l:cmd = s:ledger_cmd(a:file, join([
         \ 'register',
         \ "--format='" . g:ledger_qf_register_format . "'",
@@ -649,7 +649,7 @@ endf
 " file  The file to be processed
 " account  An account name (String)
 " target_amount The target amount (Float)
-function! ledger#reconcile(file, account, target_amount)
+function! ledger#reconcile(file, account, target_amount) abort
   let l:cmd = s:ledger_cmd(a:file, join([
         \ 'register',
         \ '--uncleared',
@@ -674,7 +674,7 @@ function! ledger#reconcile(file, account, target_amount)
   endif
 endf
 
-function! s:finish_reconciling()
+function! s:finish_reconciling() abort
   unlet g:ledger_target_amount
   augroup reconcile
     autocmd!
@@ -688,7 +688,7 @@ endf
 " a:1  An account name
 "
 " If no account if given, the account in the current line is used.
-function! ledger#show_balance(file, ...)
+function! ledger#show_balance(file, ...) abort
   let l:account = a:0 > 0 && !empty(a:1) ? a:1 : matchstr(getline('.'), '\m\(  \|\t\)\zs\S.\{-}\ze\(  \|\t\|$\)')
   if empty(l:account)
     call s:error_message('No account found')
