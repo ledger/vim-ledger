@@ -1,6 +1,8 @@
 vim-ledger
 ==========
 
+[![Vint](https://github.com/ledger/vim-ledger/workflows/Vint/badge.svg)](https://github.com/ledger/vim-ledger/actions?workflow=Vint)
+
 This is the ledger filetype for Vim.
 
 Usage
