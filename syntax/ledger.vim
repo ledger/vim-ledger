@@ -5,7 +5,7 @@
 " by Wolfgang Oertl; Use according to the terms of the GPL>=2.
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
 
-if version < 600
+if v:version < 600
   syntax clear
 elseif exists('b:current_sytax')
   finish
