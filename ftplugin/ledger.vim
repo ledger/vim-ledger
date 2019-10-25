@@ -27,17 +27,22 @@ if !exists('g:ledger_main')
   let g:ledger_main = '%'
 endif
 
-" set location of ledger binary for checking and auto-formatting
-if ! exists("g:ledger_bin") || empty(g:ledger_bin) || ! executable(g:ledger_bin)
-  if executable('ledger')
+if !exists("g:ledger_bin") || empty(g:ledger_bin) || !executable(g:ledger_bin)
+  if executable('hledger')
+    let g:ledger_bin = 'hledger'
+  elseif executable('ledger')
     let g:ledger_bin = 'ledger'
   else
     unlet! g:ledger_bin
     echohl WarningMsg
-    echomsg "ledger command not found. Set g:ledger_bin or extend $PATH ".
-          \ "to enable error checking and auto-formatting."
+    echomsg "neither hledger nor ledger command found. Set g:ledger_bin or ".
+          \ "extend $PATH to enable error checking and auto-formatting."
     echohl None
   endif
+endif
+
+if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
+  let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
 endif
 
 if exists("g:ledger_bin")
@@ -72,7 +77,11 @@ endif
 
 if !exists("g:ledger_descriptions_cmd")
   if exists("g:ledger_bin")
-    let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+    if g:ledger_is_hledger
+      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+    else
+      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'
+    endif
   endif
 endif
 
