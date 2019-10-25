@@ -3,7 +3,7 @@
 " by Johann Klähn; Use according to the terms of the GPL>=2.
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
 
-if exists("b:did_indent")
+if exists('b:did_indent')
   finish
 endif
 let b:did_indent = 1
@@ -11,7 +11,7 @@ let b:did_indent = 1
 setl autoindent
 setl indentexpr=GetLedgerIndent()
 
-if exists("*GetLedgerIndent")
+if exists('*GetLedgerIndent')
   finish
 endif
 

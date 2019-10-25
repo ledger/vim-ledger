@@ -7,7 +7,7 @@
 
 if version < 600
   syntax clear
-elseif exists("b:current_sytax")
+elseif exists('b:current_sytax')
   finish
 endif
 
@@ -104,4 +104,4 @@ highlight default link ledgerOneCharDirective Type
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
  
-let b:current_syntax = "ledger"
+let b:current_syntax = 'ledger'

@@ -47,7 +47,7 @@ function! ledger#transaction_date_set(lnum, type, ...) "{{{1
   endif
 
   if a:type =~? 'effective\|actual'
-    echoerr "actual/effective arguments were replaced by primary/auxiliary"
+    echoerr 'actual/effective arguments were replaced by primary/auxiliary'
     return
   endif
 
@@ -88,7 +88,7 @@ function! ledger#transactions(...)
     let lnum = 1
     let end = line('$')
   else
-    throw "wrong number of arguments for get_transactions()"
+    throw 'wrong number of arguments for get_transactions()'
     return []
   endif
 
@@ -188,7 +188,7 @@ function! s:transaction.parse_body(...) dict "{{{2
     let head = self['head']
     let tail = self['tail']
   else
-    throw "wrong number of arguments for parse_body()"
+    throw 'wrong number of arguments for parse_body()'
     return []
   endif
 
@@ -276,7 +276,7 @@ function! ledger#declared_accounts(...)
     let lnum = 1
     let lend = line('$')
   else
-    throw "wrong number of arguments for ledger#declared_accounts()"
+    throw 'wrong number of arguments for ledger#declared_accounts()'
     return []
   endif
 
@@ -380,9 +380,9 @@ endf
 " Ensure that at least min_spaces are added, and go to the end of the line if
 " the line is already too long
 function! s:goto_col(pos, min_spaces)
-  exec "normal!" "$"
+  exec 'normal!' '$'
   let diff = max([a:min_spaces, a:pos - virtcol('.')])
-  if diff > 0 | exec "normal!" diff . "a " | endif
+  if diff > 0 | exec 'normal!' diff . 'a ' | endif
 endf
 
 " Return character position of decimal separator (multibyte safe)
@@ -463,8 +463,8 @@ endf
 " Helper functions and variables {{{2
 " Position of report windows
 let s:winpos_map = {
-      \ "T": "to new",  "t": "abo new", "B": "bo new",  "b": "bel new",
-      \ "L": "to vnew", "l": "abo vnew", "R": "bo vnew", "r": "bel vnew"
+      \ 'T': 'to new',  't': 'abo new', 'B': 'bo new',  'b': 'bel new',
+      \ 'L': 'to vnew', 'l': 'abo vnew', 'R': 'bo vnew', 'r': 'bel vnew'
       \ }
 
 function! s:error_message(msg)
@@ -565,7 +565,7 @@ endf
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
 func! ledger#entry()
-  let l:output = systemlist(s:ledger_cmd(g:ledger_main, join(["entry", getline('.')])))
+  let l:output = systemlist(s:ledger_cmd(g:ledger_main, join(['entry', getline('.')])))
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
   " Errors may occur
@@ -610,13 +610,13 @@ function! ledger#output(report)
     return 0
   endif
   " Open a new buffer to show Ledger's output.
-  execute get(s:winpos_map, g:ledger_winpos, "bo new")
+  execute get(s:winpos_map, g:ledger_winpos, 'bo new')
   setlocal buftype=nofile bufhidden=wipe modifiable nobuflisted noswapfile nowrap
   call append(0, a:report)
   setlocal nomodifiable
   " Set local mappings to quit window or lose focus.
   nnoremap <silent> <buffer> <tab> <c-w><c-p>
-  nnoremap <silent> <buffer> q <c-w><c-p>@=winnr("#")<cr><c-w>c
+  nnoremap <silent> <buffer> q <c-w><c-p>@=winnr('#')<cr><c-w>c
   " Add some coloring to the report
   syntax match LedgerNumber /-\@1<!\d\+\([,.]\d\+\)*/
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)*/
@@ -631,7 +631,7 @@ endf
 " args  A string of Ledger command-line arguments.
 function! ledger#register(file, args)
   let l:cmd = s:ledger_cmd(a:file, join([
-        \ "register",
+        \ 'register',
         \ "--format='" . g:ledger_qf_register_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) '",
         \ a:args
@@ -650,15 +650,15 @@ endf
 " target_amount The target amount (Float)
 function! ledger#reconcile(file, account, target_amount)
   let l:cmd = s:ledger_cmd(a:file, join([
-        \ "register",
-        \ "--uncleared",
+        \ 'register',
+        \ '--uncleared',
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
         \ a:account
         \ ]))
   let l:file = expand(a:file) " Needed for #show_balance() later
   call s:quickfix_populate(systemlist(l:cmd))
-  if s:quickfix_toggle("Reconcile " . a:account, "Nothing to reconcile")
+  if s:quickfix_toggle('Reconcile ' . a:account, 'Nothing to reconcile')
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
@@ -668,7 +668,7 @@ function! ledger#reconcile(file, account, target_amount)
     augroup END
     " Add refresh shortcut
     execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
-          \ . l:file . "','" . a:account . "'," . string(a:target_amount) . ")<cr>"
+          \ . l:file . "','" . a:account . "'," . string(a:target_amount) . ')<cr>'
     call ledger#show_balance(l:file, a:account)
   endif
 endf
@@ -694,12 +694,12 @@ function! ledger#show_balance(file, ...)
     return
   endif
   let l:cmd = s:ledger_cmd(a:file, join([
-        \ "cleared",
+        \ 'cleared',
         \ l:account,
-        \ "--empty",
-        \ "--collapse",
+        \ '--empty',
+        \ '--collapse',
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
-        \ (empty(g:ledger_default_commodity) ? '' : "-X " . shellescape(g:ledger_default_commodity))
+        \ (empty(g:ledger_default_commodity) ? '' : '-X ' . shellescape(g:ledger_default_commodity))
         \ ]))
   let l:output = systemlist(l:cmd)
   " Errors may occur, for example,  when the account has multiple commodities
@@ -712,7 +712,7 @@ function! ledger#show_balance(file, ...)
   let l:amounts = split(l:output[-1], '|')
   redraw  " Necessary in some cases to overwrite previous messages. See :h echo-redraw
   if len(l:amounts) < 3
-    call s:error_message("Could not determine balance. Did you use a valid account?")
+    call s:error_message('Could not determine balance. Did you use a valid account?')
     return
   endif
   echo g:ledger_pending_string
