@@ -61,7 +61,7 @@ syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
 syn match ledgerComment /^[;|*#].*$/
 " comments at eol must be preceded by at least 2 spaces / 1 tab
-syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
+syn region ledgerMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 exe 'syn match ledgerTags '.
     \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.

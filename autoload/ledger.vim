@@ -436,7 +436,7 @@ function! ledger#align_commodity()
     endif " Append the part of the line that was previously removed:
     exe 'normal! a' . rhs
   endif
-endf!
+endf
 
 " Align the amount under the cursor and append/prepend the default currency.
 function! ledger#align_amount_at_cursor()
@@ -456,7 +456,7 @@ function! ledger#align_amount_at_cursor()
     call s:goto_col(g:ledger_align_at - pos - 1, 2)
     exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
-endf!
+endf
 
 " Report generation {{{1
 
