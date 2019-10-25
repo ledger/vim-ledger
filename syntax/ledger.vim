@@ -5,9 +5,11 @@
 " by Wolfgang Oertl; Use according to the terms of the GPL>=2.
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
 
-if version < 600
+scriptencoding utf-8
+
+if v:version < 600
   syntax clear
-elseif exists("b:current_sytax")
+elseif exists('b:current_sytax')
   finish
 endif
 
@@ -61,7 +63,7 @@ syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
 syn match ledgerComment /^[;|*#].*$/
 " comments at eol must be preceded by at least 2 spaces / 1 tab
-syn region ledgerMetadata start=/\%(  \|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
+syn region ledgerMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 exe 'syn match ledgerTags '.
     \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
@@ -104,4 +106,4 @@ highlight default link ledgerOneCharDirective Type
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
  
-let b:current_syntax = "ledger"
+let b:current_syntax = 'ledger'

@@ -3,7 +3,9 @@
 " by Johann Klähn; Use according to the terms of the GPL>=2.
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
 
-if exists("b:did_indent")
+scriptencoding utf-8
+
+if exists('b:did_indent')
   finish
 endif
 let b:did_indent = 1
@@ -11,7 +13,7 @@ let b:did_indent = 1
 setl autoindent
 setl indentexpr=GetLedgerIndent()
 
-if exists("*GetLedgerIndent")
+if exists('*GetLedgerIndent')
   finish
 endif
 
@@ -23,18 +25,18 @@ function GetLedgerIndent(...)
   let line = getline(lnum)
   let prev = getline(lnum - 1)
 
-  if line =~ '^\s\+\S'
+  if line =~# '^\s\+\S'
     " Lines that already are indented (→postings, sub-directives) keep their indentation.
-    return &sw
-  elseif line =~ '^\s*$'
+    return &shiftwidth
+  elseif line =~# '^\s*$'
     " Current line is empty, try to guess its type based on the previous line.
-    if prev =~ '^\([[:digit:]~=]\|\s\+\S\)'
+    if prev =~# '^\([[:digit:]~=]\|\s\+\S\)'
       " This is very likely a posting or a sub-directive.
       " While lines following the start of a transaction are automatically
       " indented you will have to indent the first line following a
       " pre-declaration manually. This makes it easier to type long lists of
       " 'account' pre-declarations without sub-directives, for example.
-      return &sw
+      return &shiftwidth
     else
       return 0
     endif
