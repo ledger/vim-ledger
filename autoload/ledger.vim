@@ -416,10 +416,11 @@ endf
 "
 function! ledger#align_commodity() abort
   " Extract the part of the line after the account name (excluding spaces):
-  let rhs = matchstr(getline('.'), '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
+  let l:line = getline('.')
+  let rhs = matchstr(l:line, '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
   if rhs !=# ''
     " Remove everything after the account name (including spaces):
-    .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
+    call setline('.', substitute(l:line, '\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$', '', ''))
     let pos = -1
     if g:ledger_decimal_sep !=# ''
       " Find the position of the first decimal separator:
