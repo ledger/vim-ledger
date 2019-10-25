@@ -25,12 +25,12 @@ function GetLedgerIndent(...)
   let line = getline(lnum)
   let prev = getline(lnum - 1)
 
-  if line =~ '^\s\+\S'
+  if line =~# '^\s\+\S'
     " Lines that already are indented (→postings, sub-directives) keep their indentation.
     return &shiftwidth
-  elseif line =~ '^\s*$'
+  elseif line =~# '^\s*$'
     " Current line is empty, try to guess its type based on the previous line.
-    if prev =~ '^\([[:digit:]~=]\|\s\+\S\)'
+    if prev =~# '^\([[:digit:]~=]\|\s\+\S\)'
       " This is very likely a posting or a sub-directive.
       " While lines following the start of a transaction are automatically
       " indented you will have to indent the first line following a

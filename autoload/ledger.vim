@@ -148,18 +148,18 @@ function! s:transaction.from_lnum(lnum) dict "{{{2
   elseif parts[0] ==# '='
     let trans['auto'] = join(parts[1:])
     return trans
-  elseif parts[0] !~ '^\d'
+  elseif parts[0] !~# '^\d'
     " this case is avoided in s:get_transaction_extents(),
     " but we'll check anyway.
     return {}
   endif
 
   for part in parts
-    if     ! has_key(trans, 'date')  && part =~ '^\d'
+    if     ! has_key(trans, 'date')  && part =~# '^\d'
       let trans['date'] = part
-    elseif ! has_key(trans, 'code')  && part =~ '^([^)]*)$'
+    elseif ! has_key(trans, 'code')  && part =~# '^([^)]*)$'
       let trans['code'] = part[1:-2]
-    elseif ! has_key(trans, 'state') && part =~ '^[[:punct:]]$'
+    elseif ! has_key(trans, 'state') && part =~# '^[[:punct:]]$'
       " the first character by itself is assumed to be the state of the transaction.
       let trans['state'] = part
     else
@@ -174,7 +174,7 @@ function! s:transaction.from_lnum(lnum) dict "{{{2
 endf "}}}
 
 function! s:transaction.set_state(char) dict "{{{2
-  if has_key(self, 'state') && a:char =~ '^\s*$'
+  if has_key(self, 'state') && a:char =~# '^\s*$'
     call remove(self, 'state')
   else
     let self['state'] = a:char
@@ -203,10 +203,10 @@ function! s:transaction.parse_body(...) dict "{{{2
   while lnum <= tail
     let line = split(getline(lnum), '\s*\%(\t\|  \);', 1)
 
-    if line[0] =~ '^\s\+[^[:blank:];]'
+    if line[0] =~# '^\s\+[^[:blank:];]'
       " posting
       let [state, rest] = matchlist(line[0], '^\s\+\([*!]\?\)\s*\(.*\)$')[1:2]
-      if rest =~ '\t\|  '
+      if rest =~# '\t\|  '
         let [account, amount] = matchlist(rest, '^\(.\{-}\)\%(\t\|  \)\s*\(.\{-}\)\s*$')[1:2]
       else
         let amount = ''
@@ -228,12 +228,12 @@ function! s:transaction.parse_body(...) dict "{{{2
     endif
 
     let comment = join(line[1:], '  ;')
-    if comment =~ '^\s*:'
+    if comment =~# '^\s*:'
       " tags without values
       for t in s:findall(comment, ':\zs[^:[:blank:]]\([^:]*[^:[:blank:]]\)\?\ze:')
         let tag_container[t] = ''
       endfor
-    elseif comment =~ '^\s*[^:[:blank:]][^:]\+:'
+    elseif comment =~# '^\s*[^:[:blank:]][^:]\+:'
       " tag with value
       let key = matchstr(comment, '^\s*\zs[^:]\+\ze:')
       if ! empty(key)
@@ -313,7 +313,7 @@ function! ledger#declared_accounts(...)
 endf
 
 function! s:get_transaction_extents(lnum)
-  if ! (indent(a:lnum) || getline(a:lnum) =~ '^[~=[:digit:]]')
+  if ! (indent(a:lnum) || getline(a:lnum) =~# '^[~=[:digit:]]')
     " only do something if lnum is in a transaction
     return [0, 0]
   endif
@@ -417,11 +417,11 @@ endf
 function! ledger#align_commodity()
   " Extract the part of the line after the account name (excluding spaces):
   let rhs = matchstr(getline('.'), '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
-  if rhs != ''
+  if rhs !=# ''
     " Remove everything after the account name (including spaces):
     .s/\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$//
     let pos = -1
-    if g:ledger_decimal_sep != ''
+    if g:ledger_decimal_sep !=# ''
       " Find the position of the first decimal separator:
       let pos = s:decimalpos(rhs)
     endif

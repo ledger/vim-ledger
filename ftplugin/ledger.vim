@@ -211,7 +211,7 @@ function! LedgerFoldText() "{{{1
     let line = getline(lnum)
 
     " Skip metadata/leading comment
-    if line !~ '^\%(\s\+;\|\d\)'
+    if line !~# '^\%(\s\+;\|\d\)'
       " No comment, look for amount...
       let groups = matchlist(line, s:rx_amount)
       if ! empty(groups)
@@ -281,7 +281,7 @@ function! LedgerComplete(findstart, base) "{{{1
     let lnum = line('.')
     let line = getline('.')
     let b:compl_context = ''
-    if line =~ '^\s\+[^[:blank:];]' "{{{2 (account)
+    if line =~# '^\s\+[^[:blank:];]' "{{{2 (account)
       " only allow completion when in or at end of account name
       if matchend(line, '^\s\+\%(\S \S\|\S\)\+') >= col('.') - 1
         " the start of the first non-blank character
@@ -290,13 +290,13 @@ function! LedgerComplete(findstart, base) "{{{1
         let b:compl_context = 'account'
         return matchend(line, '^\s\+[*!]\?\s*[\[(]\?')
       endif
-    elseif line =~ '^\d' "{{{2 (description)
+    elseif line =~# '^\d' "{{{2 (description)
       let pre = matchend(line, '^\d\S\+\%(([^)]*)\|[*?!]\|\s\)\+')
       if pre < col('.') - 1
         let b:compl_context = 'description'
         return pre
       endif
-    elseif line =~ '^$' "{{{2 (new line)
+    elseif line =~# '^$' "{{{2 (new line)
       let b:compl_context = 'new'
     endif "}}}
     return -1
@@ -308,9 +308,9 @@ function! LedgerComplete(findstart, base) "{{{1
     let update_cache = 0
 
     let results = []
-    if b:compl_context == 'account' "{{{2 (account)
+    if b:compl_context ==# 'account' "{{{2 (account)
       let hierarchy = split(a:base, ':')
-      if a:base =~ ':$'
+      if a:base =~# ':$'
         call add(hierarchy, '')
       endif
 
@@ -333,13 +333,13 @@ function! LedgerComplete(findstart, base) "{{{1
       else
         let results = sort(results)
       endif
-    elseif b:compl_context == 'description' "{{{2 (description)
+    elseif b:compl_context ==# 'description' "{{{2 (description)
       let results = ledger#filter_items(b:compl_cache.descriptions, a:base)
 
       if len(results) < 1
         let update_cache = 1
       endif
-    elseif b:compl_context == 'new' "{{{2 (new line)
+    elseif b:compl_context ==# 'new' "{{{2 (new line)
       return [strftime(g:ledger_date_format)]
     endif "}}}
 
@@ -472,7 +472,7 @@ function! s:count_expression(text, expression) "{{{2
 endf "}}}
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
-  return (a:argLead =~ '^@') ?
+  return (a:argLead =~# '^@') ?
         \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'),
         \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
         \ :
