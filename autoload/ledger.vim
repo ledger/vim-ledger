@@ -556,7 +556,7 @@ function! ledger#autocomplete_and_align() abort
   " necessary to avoid situations where a date starting at the first column is
   " confused with a commodity to be aligned).
   if match(getline('.'), '\s.*\d\%'.col('.').'c') > -1
-    norm h
+    normal! h
     call ledger#align_amount_at_cursor()
     return "\<c-o>A"
   endif
