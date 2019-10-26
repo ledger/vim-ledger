@@ -545,7 +545,7 @@ endf
 " Build a ledger command to process the given file.
 function! s:ledger_cmd(file, args) abort
   let l:options = g:ledger_extra_options
-  if len(g:ledger_date_format) > 0
+  if len(g:ledger_date_format) > 0 && !g:ledger_is_hledger
     let l:options = join([l:options, '--date-format', g:ledger_date_format,
       \ '--input-date-format', g:ledger_date_format])
   endif
