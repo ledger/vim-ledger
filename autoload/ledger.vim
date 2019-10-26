@@ -656,7 +656,7 @@ function! ledger#reconcile(file, account, target_amount) abort
         \ '--uncleared',
         \ "--format='" . g:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
-        \ a:account
+        \ shellescape(a:account)
         \ ]))
   let l:file = expand(a:file) " Needed for #show_balance() later
   call s:quickfix_populate(systemlist(l:cmd))
@@ -697,7 +697,7 @@ function! ledger#show_balance(file, ...) abort
   endif
   let l:cmd = s:ledger_cmd(a:file, join([
         \ 'cleared',
-        \ l:account,
+        \ shellescape(l:account),
         \ '--empty',
         \ '--collapse',
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
