@@ -30,6 +30,10 @@ TIPS                                                             *ledger-tips*
 
 Tips and useful commands
 
+* vim-ledger can do syntax-sensitive folding when you set `foldmethod=syntax`
+  in the |modeline| of your ledger file. This way transactions can shrink down
+  to just one line.
+
 * Try account-completion (as explained below). If you use YouCompleteMe, you
   should disable it for Ledger files. Put this in your .vimrc:
 
@@ -48,6 +52,18 @@ Tips and useful commands
         let g:ledger_extra_options = '--pedantic --explicit --check-payees'
 
   to catch most potential problems in your source file.
+
+* Remap vim paragraph motion to move by transaction.
+
+  In vim, the "{" and "}" keystrokes move the cursor up and down by whole
+  paragraphs. They can be redefined in ledger files to move by transaction
+  instead. Add these lines to .vimrc:
+
+        au FileType ledger noremap { ?^\d<CR>
+        au FileType ledger noremap } /^\d<CR>
+
+  The default definitions already work in ledger files that separate
+  transactions with blank lines.
 
 * `:call ledger#transaction_date_set('.'), "auxiliary")`
 
@@ -238,6 +254,22 @@ behaviour of the ledger filetype.
 
 	let g:ledger_extra_options = ''
 
+* To use a custom external system command to generate a list of account names
+  for completion, set the following. If g:ledger_bin is set, this will default
+  to running that command with arguments to parse the current file using the
+  accounts subcommand (works with ledger or hledger), otherwise it will parse
+  the postings in the current file itself.
+
+	let g:ledger_accounts_cmd = 'your_command args'
+
+* To use a custom external system command to generate a list of descriptions
+  for completion, set the following. If g:ledger_bin is set, this will default
+  to running that command with arguments to parse the current file using the
+  descriptions subcommand (works with ledger or hledger), otherwise it will
+  parse the transactions in the current file itself.
+
+	let g:ledger_descriptions_cmd = 'your_command args'
+
 * Number of columns that will be used to display the foldtext. Set this when
   you think that the amount is too far off to the right.
 
@@ -261,7 +293,7 @@ behaviour of the ledger filetype.
 
   A value of 0 will disable folding of blank lines, 1 will allow folding of a
   single blank line between transactions; any larger value will enable folding
-  undconditionally.
+  unconditionally.
 
   Note that only lines containing no trailing spaces are considered for
   folding. You can take advantage of this to disable this feature on a
@@ -287,6 +319,10 @@ behaviour of the ledger filetype.
 * String to be put between the commodity and the amount:
 
         let g:ledger_commodity_sep = ''
+
+* Flag that enable the spelling of the amount:
+
+        let g:ledger_commodity_spell = 1
 
 * Format of transaction date:
 
@@ -380,7 +416,8 @@ LICENSE                                                       *ledger-license*
 
 https://github.com/ledger/vim-ledger
 
-Copyright 2009-2013 Johann Klähn
+Copyright 2019 Caleb Maclennan
+Copyright 2009–2017 Johann Klähn
 Copyright 2009 Stefan Karrmann
 Copyright 2005 Wolfgang Oertl
 
