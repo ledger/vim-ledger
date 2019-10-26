@@ -15,10 +15,6 @@ let b:undo_ftplugin = 'setlocal '.
                     \ 'foldtext< '.
                     \ 'include< comments< commentstring< omnifunc< formatprg<'
 
-if !exists('current_compiler')
-  compiler ledger
-endif
-
 setl foldtext=LedgerFoldText()
 setl include=^!\\?include
 setl comments=b:;
@@ -184,6 +180,10 @@ if !exists('g:ledger_qf_hide_file')
   let g:ledger_qf_hide_file = 1
 endif
 " }}}
+
+if !exists('current_compiler')
+  compiler ledger
+endif
 
 " Highlight groups for Ledger reports {{{
 hi link LedgerNumber Number
