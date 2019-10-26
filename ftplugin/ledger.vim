@@ -25,7 +25,9 @@ if !exists('g:ledger_main')
   let g:ledger_main = '%'
 endif
 
-if !exists('g:ledger_bin') || empty(g:ledger_bin)
+if exists('g:ledger_no_bin') && g:ledger_no_bin
+	unlet! g:ledger_bin
+elseif !exists('g:ledger_bin') || empty(g:ledger_bin)
   if executable('hledger')
     let g:ledger_bin = 'hledger'
   elseif executable('ledger')
