@@ -25,7 +25,7 @@ if !exists('g:ledger_main')
   let g:ledger_main = '%'
 endif
 
-if !exists('g:ledger_bin') || empty(g:ledger_bin) || !executable(g:ledger_bin)
+if !exists('g:ledger_bin') || empty(g:ledger_bin)
   if executable('hledger')
     let g:ledger_bin = 'hledger'
   elseif executable('ledger')
@@ -33,10 +33,14 @@ if !exists('g:ledger_bin') || empty(g:ledger_bin) || !executable(g:ledger_bin)
   else
     unlet! g:ledger_bin
     echohl WarningMsg
-    echomsg 'neither hledger nor ledger command found. Set g:ledger_bin or '.
-          \ 'extend $PATH to enable error checking and auto-formatting.'
+    echomsg 'No ledger command detected, set g:ledger_bin to enable more vim-ledger features.'
     echohl None
   endif
+elseif !executable(g:ledger_bin)
+	unlet! g:ledger_bin
+	echohl WarningMsg
+	echomsg 'Command set in g:ledger_bin is not executable, fix to to enable more vim-ledger features.'
+	echohl None
 endif
 
 if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
