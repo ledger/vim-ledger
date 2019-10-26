@@ -40,13 +40,15 @@ exe 'syn region ledgerTransaction start=/^[[:digit:]~=]/ '.
 syn match ledgerTransactionDate /^\d\S\+/ contained
 syn match ledgerTransactionExpression /^[=~]\s\+\zs.*/ contained
 syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
-    \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerMetadata
+    \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerValueExpression,ledgerMetadata
 " every space in an account name shall be surrounded by two non-spaces
 " every account name ends with a tab, two spaces or the end of the line
 exe 'syn match ledgerAccount '.
   \ '/'.s:oe.'^\s\+\zs\%(\S'.s:lb1.' \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained'
 exe 'syn match ledgerAmount '.
-  \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+/ contains='.s:ledgerAmount_contains.' contained'
+  \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^();[:space:]]\|\s\+[^();[:space:]]\)\+/ contains='.s:ledgerAmount_contains.' contained'
+exe 'syn match ledgerValueExpression '.
+  \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs(\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+)/ contains='.s:ledgerAmount_contains.' contained'
 
 syn region ledgerPreDeclaration start=/^\(account\|payee\|commodity\|tag\)/ skip=/^\s/ end=/^/
     \ keepend transparent
@@ -96,6 +98,7 @@ highlight default link ledgerEndApply Tag
 highlight default link ledgerApplyHead Type
 highlight default link ledgerAccount Identifier
 highlight default link ledgerAmount Number
+highlight default link ledgerValueExpression Function
 highlight default link ledgerPreDeclarationType Type
 highlight default link ledgerPreDeclarationName Identifier
 highlight default link ledgerPreDeclarationDirective Type
