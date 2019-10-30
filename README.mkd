@@ -3,7 +3,10 @@ vim-ledger
 
 [![Vint](https://github.com/ledger/vim-ledger/workflows/Vint/badge.svg)](https://github.com/ledger/vim-ledger/actions?workflow=Vint)
 
-This is the ledger filetype for Vim.
+Filetype detection, syntax highlighting, auto-formatting, auto-completion, and
+other tools for working with ledger files. Compatible with both [`ledger`
+][ledgercli] and [`hledger`][hledger]. See [plaintextaccounting.org][pta] for
+background information and other useful links.
 
 Usage
 -----
@@ -128,3 +131,7 @@ Public License for more details.
 
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ [hledger]: https://hledger.org/
+ [ledgercli]: https://www.ledger-cli.org/
+ [pta]: https://plaintextaccounting.org/
