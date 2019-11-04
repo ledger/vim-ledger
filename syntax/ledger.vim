@@ -23,6 +23,8 @@ endif
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
 
+let s:line_comment_chars = b:is_hledger ? ';*#' : ';|*#%'
+
 let s:fb = get(g:, 'ledger_fold_blanks', 0)
 let s:skip = s:fb > 0 ? '\|^\n' : ''
 if s:fb == 1
@@ -69,7 +71,7 @@ syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 
 syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
-syn match ledgerComment /^[;|*#].*$/
+exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 " comments at eol must be preceded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
