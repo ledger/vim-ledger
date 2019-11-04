@@ -11,6 +11,14 @@ if exists('b:current_syntax')
   finish
 endif
 
+if !exists ('b:is_hledger')
+  if exists('g:ledger_is_hledger')
+    let b:is_hledger = 1
+  else
+    let b:is_hledger = 0
+  endif
+endif
+
 " Force old regex engine (:help two-engines)
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
@@ -107,4 +115,4 @@ highlight default link ledgerOneCharDirective Type
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
  
-let b:current_syntax = 'ledger'
+let b:current_syntax = b:is_hledger ? 'hledger' : 'ledger'
