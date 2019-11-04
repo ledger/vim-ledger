@@ -7,7 +7,7 @@
 
 scriptencoding utf-8
 
-if exists('b:current_sytax')
+if exists('b:current_syntax')
   finish
 endif
 
