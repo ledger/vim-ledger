@@ -7,15 +7,13 @@
 
 scriptencoding utf-8
 
-if v:version < 600
-  syntax clear
-elseif exists('b:current_sytax')
+if exists('b:current_sytax')
   finish
 endif
 
 " Force old regex engine (:help two-engines)
-let s:oe = v:version < 704 ? '' : '\%#=1'
-let s:lb1 = v:version < 704 ? '\@<=' : '\@1<='
+let s:oe = '\%#=1'
+let s:lb1 = '\@1<='
 
 let s:fb = get(g:, 'ledger_fold_blanks', 0)
 let s:skip = s:fb > 0 ? '\|^\n' : ''
