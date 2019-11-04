@@ -7,15 +7,23 @@
 
 scriptencoding utf-8
 
-if v:version < 600
-  syntax clear
-elseif exists('b:current_sytax')
+if exists('b:current_syntax')
   finish
 endif
 
+if !exists ('b:is_hledger')
+  if exists('g:ledger_is_hledger')
+    let b:is_hledger = 1
+  else
+    let b:is_hledger = 0
+  endif
+endif
+
 " Force old regex engine (:help two-engines)
-let s:oe = v:version < 704 ? '' : '\%#=1'
-let s:lb1 = v:version < 704 ? '\@<=' : '\@1<='
+let s:oe = '\%#=1'
+let s:lb1 = '\@1<='
+
+let s:line_comment_chars = b:is_hledger ? ';*#' : ';|*#%'
 
 let s:fb = get(g:, 'ledger_fold_blanks', 0)
 let s:skip = s:fb > 0 ? '\|^\n' : ''
@@ -63,7 +71,7 @@ syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 
 syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
-syn match ledgerComment /^[;|*#].*$/
+exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 " comments at eol must be preceded by at least 2 spaces / 1 tab
 syn region ledgerMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
@@ -109,4 +117,4 @@ highlight default link ledgerOneCharDirective Type
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
  
-let b:current_syntax = 'ledger'
+let b:current_syntax = b:is_hledger ? 'hledger' : 'ledger'
