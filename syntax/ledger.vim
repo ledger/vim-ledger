@@ -44,11 +44,11 @@ syntax clear
 
 exe 'syn region ledgerTransaction start=/^[[:digit:]~=]/ '.
   \ 'skip=/^\s'. s:skip . '/ end=/^/ fold keepend transparent '.
-  \ 'contains=ledgerTransactionDate,ledgerMetadata,ledgerPosting,ledgerTransactionExpression'
+  \ 'contains=ledgerTransactionDate,ledgerTransactionMetadata,ledgerPosting,ledgerTransactionExpression'
 syn match ledgerTransactionDate /^\d\S\+/ contained
 syn match ledgerTransactionExpression /^[=~]\s\+\zs.*/ contained
-syn match ledgerPosting /^\s\+[^[:blank:];][^;]*\ze\%($\|;\)/
-    \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerValueExpression,ledgerMetadata
+syn match ledgerPosting /^\s\+[^[:blank:];].*/
+    \ contained transparent contains=ledgerAccount,ledgerAmount,ledgerValueExpression,ledgerPostingMetadata
 " every space in an account name shall be surrounded by two non-spaces
 " every account name ends with a tab, two spaces or the end of the line
 exe 'syn match ledgerAccount '.
@@ -73,7 +73,9 @@ syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
 exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 " comments at eol must be preceded by at least 2 spaces / 1 tab
-syn region ledgerMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
+syn region ledgerTransactionMetadata start=/\%(\s\s\|\t\|^\s\+\);/ skip=/^\s\+;/ end=/^/
+    \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+syn region ledgerPostingMetadata start=/;/ end=/^/
     \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 exe 'syn match ledgerTags '.
     \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
@@ -97,7 +99,8 @@ highlight default link ledgerBlockComment Comment
 highlight default link ledgerBlockTest Comment
 highlight default link ledgerTransactionDate Constant
 highlight default link ledgerTransactionExpression Statement
-highlight default link ledgerMetadata Tag
+highlight default link ledgerTransactionMetadata Tag
+highlight default link ledgerPostingMetadata Tag
 highlight default link ledgerTypedTag Keyword
 highlight default link ledgerValueTag Type
 highlight default link ledgerTag Type
