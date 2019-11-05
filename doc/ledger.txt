@@ -65,7 +65,7 @@ Tips and useful commands
   The default definitions already work in ledger files that separate
   transactions with blank lines.
 
-* `:call ledger#transaction_date_set('.'), "auxiliary")`
+* `:call ledger#transaction_date_set(line('.'), "auxiliary")`
 
   will set today's date as the auxiliary date of the current transaction. You
   can use also "primary" or "unshift" in place of "auxiliary". When you pass
