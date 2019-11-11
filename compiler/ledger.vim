@@ -5,27 +5,24 @@
 
 scriptencoding utf-8
 
-if exists('current_compiler')
+if exists('current_compiler') || !exists('g:ledger_bin')
   finish
 endif
-let current_compiler = 'ledger'
+
+let current_compiler = g:ledger_bin
 
 if exists(':CompilerSet') != 2
   command -nargs=* CompilerSet setlocal <args>
 endif
 
-" default value will be set in ftplugin
-if ! exists('g:ledger_bin') || empty(g:ledger_bin) || ! executable(g:ledger_bin)
-  finish
+if !g:ledger_is_hledger
+	" Capture Ledger errors (%-C ignores all lines between "While parsing..." and "Error:..."):
+	CompilerSet errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
+	" Capture Ledger warnings:
+	CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
+	" Skip all other lines:
+	CompilerSet errorformat+=%-G%.%#
+	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ %'
+else
+	exe 'CompilerSet makeprg=('.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ print\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ >\ /dev/null)'
 endif
-
-" Capture Ledger errors (%-C ignores all lines between "While parsing..." and "Error:..."):
-CompilerSet errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
-" Capture Ledger warnings:
-CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
-" Skip all other lines:
-CompilerSet errorformat+=%-G%.%#
-
-" Check file syntax
-exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ %:S'
-
