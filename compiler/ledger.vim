@@ -22,7 +22,7 @@ if !g:ledger_is_hledger
 	CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
 	" Skip all other lines:
 	CompilerSet errorformat+=%-G%.%#
-
-	" Check file syntax
 	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ %'
+else
+	exe 'CompilerSet makeprg=('.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ %\ print\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ >\ /dev/null)'
 endif
