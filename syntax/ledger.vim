@@ -99,6 +99,9 @@ syn region ledgerApply
 exe 'syn match ledgerApplyHead '.
   \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
 
+syntax keyword ledgerTodo FIXME TODO
+  \ contained containedin=ledgerComment,ledgerTransaction,ledgerTransactionMetadata,ledgerPostingMetadata
+
 highlight default link ledgerComment Comment
 highlight default link ledgerBlockComment Comment
 highlight default link ledgerBlockTest Comment
@@ -120,6 +123,7 @@ highlight default link ledgerPreDeclarationName Identifier
 highlight default link ledgerPreDeclarationDirective Type
 highlight default link ledgerDirective Type
 highlight default link ledgerOneCharDirective Type
+highlight default link ledgerTodo Todo
  
 " syncinc is easy: search for the first transaction.
 syn sync clear
