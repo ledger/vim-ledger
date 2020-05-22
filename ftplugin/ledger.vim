@@ -167,11 +167,17 @@ endif
 
 " Settings for the quickfix window {{{
 if !exists('g:ledger_qf_register_format')
-  let g:ledger_qf_register_format = '%(date) %-50(payee) %-30(account) %15(amount) %15(total)\n'
+  let g:ledger_qf_register_format =
+				\ '%(date) %(justify(payee, 50)) '.
+				\	'%(justify(account, 30)) %(justify(amount, 15, -1, true)) '.
+				\	'%(justify(total, 15, -1, true))\n'
 endif
 
 if !exists('g:ledger_qf_reconcile_format')
-  let g:ledger_qf_reconcile_format = '%(date) %-4(code) %-50(payee) %-30(account) %15(amount)\n'
+  let g:ledger_qf_reconcile_format =
+				\ '%(date) %(justify(code, 4)) '.
+				\ '%(justify(payee, 50)) %(justify(account, 30)) '.
+				\ '%(justify(amount, 15, -1, true))\n'
 endif
 
 if !exists('g:ledger_qf_size')
