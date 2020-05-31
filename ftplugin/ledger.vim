@@ -97,6 +97,10 @@ if !exists('g:ledger_align_at')
   let g:ledger_align_at = 60
 endif
 
+if !exists('g:ledger_align_commodity')
+  let g:ledger_align_commodity = 0
+endif
+
 if !exists('g:ledger_default_commodity')
   let g:ledger_default_commodity = ''
 endif
