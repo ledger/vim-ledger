@@ -100,6 +100,17 @@ Tips and useful commands
 
   See below for the recommended mappings.
 
+* `:LedgerAlignBuffer`
+
+  This command aligns the commodity for each posting in the entire buffer,
+  similar to the command `:LedgerAlign`. It differs from manually specifying
+  the entire buffer as the range to `:LedgerAlign` or
+  `ledger#align_commodity()` by saving and restoring the cursor and window
+  position.
+
+  Due to performance concerns, it is not recommended to call this command
+  on large buffers.
+
 * `:call ledger#align_amount_at_cursor()`
 
   aligns the amount under the cursor and append/prepend the default currency.
