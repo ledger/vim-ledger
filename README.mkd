@@ -2,6 +2,7 @@ vim-ledger
 ==========
 
 [![Vint](https://github.com/ledger/vim-ledger/workflows/Vint/badge.svg)](https://github.com/ledger/vim-ledger/actions?workflow=Vint)
+[![Vader](https://github.com/ledger/vim-ledger/workflows/Vader/badge.svg)](https://github.com/ledger/vim-ledger/actions?workflow=Vader)
 
 Filetype detection, syntax highlighting, auto-formatting, auto-completion, and
 other tools for working with ledger files. Compatible with both [`ledger`
