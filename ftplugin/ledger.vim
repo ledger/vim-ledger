@@ -512,6 +512,8 @@ command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
 
 command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
+command! -buffer LedgerAlignBuffer call ledger#align_commodity_buffer()
+
 command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
       \ Reconcile call <sid>reconcile(g:ledger_main, <q-args>)
 
