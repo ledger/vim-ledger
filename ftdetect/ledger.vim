@@ -1,2 +1,2 @@
 " vint: -ProhibitAutocmdWithNoGroup
-autocmd BufNewFile,BufRead *.ldg,*.ledger,*.journal setlocal filetype=ledger
+autocmd BufNewFile,BufRead *.ldg,*.ledger,*.journal setfiletype ledger
