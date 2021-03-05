@@ -2,15 +2,12 @@ name: Reviewdog
 on: [pull_request]
 jobs:
   vint:
-    strategy:
-      fail-fast: false
+    name: vint
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Lint Vimscript in PR changes
-      uses: reviewdog/action-vint@v1
-      with:
-        github_token: ${{ secrets.github_token }}
-        reporter: github-pr-review
-        level: info
+      - uses: actions/checkout@v2
+      - name: vint
+        uses: reviewdog/action-vint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review

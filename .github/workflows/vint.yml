@@ -2,15 +2,14 @@ name: Vint
 on: [push]
 jobs:
   vint:
-    strategy:
-      fail-fast: false
+    name: vint
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-    - name: Setup dependencies
-      run: pip install vim-vint
-    - name: Lint Vimscript
-      run: vint .
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Setup dependencies
+        run: pip install vim-vint
+      - name: Lint Vimscript
+        run: vint .
