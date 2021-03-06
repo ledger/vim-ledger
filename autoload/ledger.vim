@@ -422,7 +422,9 @@ function! ledger#align_commodity() abort
     " Remove everything after the account name (including spaces):
     call setline('.', substitute(l:line, '\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$', '', ''))
     let pos = -1
-    if g:ledger_decimal_sep !=# ''
+    if g:ledger_align_commodity == 1
+      let pos = 0
+    elseif g:ledger_decimal_sep !=# ''
       " Find the position of the first decimal separator:
       let pos = s:decimalpos(rhs)
     endif
@@ -431,7 +433,7 @@ function! ledger#align_commodity() abort
       let pos = matchend(rhs, '\m\d[^[:space:]]*')
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
-    if pos > 0
+    if pos >= 0
       call s:goto_col(g:ledger_align_at - pos - 1, 2)
     else
       call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2, 2)

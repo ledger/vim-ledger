@@ -322,6 +322,10 @@ behaviour of the ledger filetype.
 
         let g:ledger_default_commodity = ''
 
+* Align on the commodity location instead of the amount
+
+	let g:ledger_align_commodity = 1
+
 * Flag that tells whether the commodity should be prepended or appended to the
   amount:
 
