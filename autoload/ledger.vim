@@ -237,8 +237,10 @@ function! s:transaction.from_lnum(lnum) abort dict "{{{2
 endf "}}}
 
 function! s:transaction.set_state(char) abort dict "{{{2
-  if has_key(self, 'state') && a:char =~# '^\s*$'
-    call remove(self, 'state')
+  if a:char =~# '^\s*$'
+    if has_key(self, 'state')
+      call remove(self, 'state')
+    endif
   else
     let self['state'] = a:char
   endif
