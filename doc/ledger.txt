@@ -87,6 +87,16 @@ Tips and useful commands
         noremap <silent><buffer> <2-LeftMouse>\
         :call ledger#transaction_state_toggle(line('.'), ' *?!')<CR>
 
+* `:call ledger#transaction_post_state_set(line('.'), '*')`
+
+  is similar to ledger#transaction_state_set but can set state of individual
+  post.
+
+* `:call ledger#transaction_post_state_toggle(line('.'), ' *?!')`
+
+  is similar to ledger#transaction_state_toggle but can toggle state of
+  individual post.
+
 * `:LedgerAlign`
 
   moves the amount expression of a posting so that the decimal separator is
