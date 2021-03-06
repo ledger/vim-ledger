@@ -9,11 +9,24 @@ See [plaintextaccounting.org][pta] for background information and other useful l
 
 ## Usage
 
-Copy each file to the corresponding directory in your `~/.vim` directory or install using [Pathogen](https://github.com/tpope/vim-pathogen).
+Install as you would any other VIM plugin.
+There are a variety of ways depending on your plugin manager.
+For example with [Pathogen](https://github.com/tpope/vim-pathogen) you would clone this repository into your configuration directory.
+With [vim-plug](https://github.com/junegunn/vim-plug) and many similar ones, you would declare it in your rc file like this, then run `:PlugInstall`:
 
-You can also use a modeline like this in every ledger file:
 
-    vim:filetype=ledger
+```vimscript
+Plug 'ledger/vim-ledger'
+```
+
+You can also manually copy the corresponding directories into your VIM plugins directory.
+
+One installed this plugin will identify files ending with `.ldg`, `.ledger`, or `.journal` as ledger files automatically.
+Alaternatively if you use a different extension you can add a modeline to each like this:
+
+```ledger
+; vim: filetype=ledger
+```
 
 ## Tips and useful commands
 
