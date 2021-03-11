@@ -1,0 +1,22 @@
+Given ledger:
+  ;{{{Year: 2011
+  ;{{{Month: January
+
+  2011/01/01 * What a new years night!
+      Expenses:Parties    $ 1500.00
+      Assets:Checking
+
+
+  2011/01/01 * What a new years night!
+      Expenses:Parties    $ 1500.00
+      Assets:Checking
+
+  ;}}}
+  ;{{{Month:February
+
+  2011/01/01 * What a new years night!
+      Expenses:Parties    $ 1500.00
+      Assets:Checking
+
+  ;}}}
+  ;}}}
