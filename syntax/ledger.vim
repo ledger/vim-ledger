@@ -102,6 +102,38 @@ exe 'syn match ledgerApplyHead '.
 syntax keyword ledgerTodo FIXME TODO
   \ contained containedin=ledgerComment,ledgerTransaction,ledgerTransactionMetadata,ledgerPostingMetadata
 
+syn cluster ledgerAll contains={}
+" syn cluster ledgerAll add=ledgerComment
+" syn cluster ledgerAll add=ledgerBlockComment
+syn cluster ledgerAll add=ledgerBlockTest
+syn cluster ledgerAll add=ledgerTransactionDate
+syn cluster ledgerAll add=ledgerTransactionExpression
+syn cluster ledgerAll add=ledgerTransactionMetadata
+syn cluster ledgerAll add=ledgerPostingMetadata
+syn cluster ledgerAll add=ledgerTypedTag
+syn cluster ledgerAll add=ledgerValueTag
+syn cluster ledgerAll add=ledgerTag
+syn cluster ledgerAll add=ledgerStartApply
+syn cluster ledgerAll add=ledgerEndApply
+syn cluster ledgerAll add=ledgerApplyHead
+syn cluster ledgerAll add=ledgerAccount
+syn cluster ledgerAll add=ledgerAmount
+syn cluster ledgerAll add=ledgerValueExpression
+syn cluster ledgerAll add=ledgerPreDeclarationType
+syn cluster ledgerAll add=ledgerPreDeclarationName
+syn cluster ledgerAll add=ledgerPreDeclarationDirective
+syn cluster ledgerAll add=ledgerDirective
+syn cluster ledgerAll add=ledgerOneCharDirective
+syn cluster ledgerAll add=ledgerTodo
+
+" if get(g:, 'ledger_fold_markers', 0) == 1
+	" syn region foldMarker matchgroup=foldMarkers start='{{{' end ='}}}' fold transparent contained contains=
+	syn region foldMarker matchgroup=foldMarkers start='{{{' end ='}}}' fold transparent
+				\ contained containedin=ledgerBlockComment,ledgerComment
+	" contains=ledgerAll
+	" syn sync fromstart
+" endif
+
 highlight default link ledgerComment Comment
 highlight default link ledgerBlockComment Comment
 highlight default link ledgerBlockTest Comment
@@ -124,9 +156,9 @@ highlight default link ledgerPreDeclarationDirective Type
 highlight default link ledgerDirective Type
 highlight default link ledgerOneCharDirective Type
 highlight default link ledgerTodo Todo
- 
+
 " syncinc is easy: search for the first transaction.
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
- 
+
 let b:current_syntax = b:is_hledger ? 'hledger' : 'ledger'
