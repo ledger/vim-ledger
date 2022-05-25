@@ -21,7 +21,7 @@ function! ledger#transaction_state_toggle(lnum, ...) abort
 endf
 
 function! ledger#transaction_state_set(lnum, char) abort
-  " modifies or sets the state of the transaction at the cursor,
+  " modifies or sets the state of the transaction at the given line no.,
   " removing the state altogether if a:char is empty
   let trans = s:transaction.from_lnum(a:lnum)
   if empty(trans) || has_key(trans, 'expr')
@@ -126,7 +126,7 @@ function! ledger#transaction_post_state_set(lnum, char) abort
     return
   endif
 
-  let line = getline('.')
+  let line = getline(a:lnum)
   if a:char =~# '^\s*$'
     let newline = substitute(line, '\V' . state . '\m[ \t]', '', '')
   elseif state ==# ' '
