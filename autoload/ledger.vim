@@ -728,8 +728,6 @@ function! ledger#register(file, args) abort
 endf
 
 " Reconcile the given account.
-" This function accepts a file path as a third optional argument.
-" The default is to use the value of g:ledger_main.
 "
 " Parameters:
 " file  The file to be processed
