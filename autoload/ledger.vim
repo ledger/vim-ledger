@@ -479,7 +479,15 @@ endf
 "      Expenses:Something                                 $-4,99
 "      Expenses:More                                     ($12,34 + $16,32)
 "
-function! ledger#align_commodity() abort
+function! ledger#align_commodity(...) abort
+  if a:0
+    " See :help 'formatexpr'
+    " a:1 -- v:lnum
+    " a:2 -- v:count
+    execute a:1 .. ',' .. (a:1 + a:2 - 1) .. 'call ledger#align_commodity()'
+    return
+  endif
+
   " Extract the part of the line after the account name (excluding spaces):
   let l:line = getline('.')
   let rhs = matchstr(l:line, '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
