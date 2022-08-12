@@ -540,7 +540,7 @@ function! ledger#align_amount_at_cursor() abort
   endif
 endf
 
-function! ledger#align_formatexpr(lnum, count)
+function! ledger#align_formatexpr(lnum, count) abort
   execute a:lnum . ',' . (a:lnum + a:count - 1) . 'call ledger#align_commodity()'
 endfunction
 
