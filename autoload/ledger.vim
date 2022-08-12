@@ -479,15 +479,7 @@ endf
 "      Expenses:Something                                 $-4,99
 "      Expenses:More                                     ($12,34 + $16,32)
 "
-function! ledger#align_commodity(...) abort
-  if a:0
-    " See :help 'formatexpr'
-    " a:1 -- v:lnum
-    " a:2 -- v:count
-    execute a:1 .. ',' .. (a:1 + a:2 - 1) .. 'call ledger#align_commodity()'
-    return
-  endif
-
+function! ledger#align_commodity() abort
   " Extract the part of the line after the account name (excluding spaces):
   let l:line = getline('.')
   let rhs = matchstr(l:line, '\m^\s\+[^;[:space:]].\{-}\(\t\|  \)\s*\zs.*$')
@@ -547,6 +539,10 @@ function! ledger#align_amount_at_cursor() abort
     exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
 endf
+
+function! ledger#align_formatexpr(lnum, count)
+  execute a:lnum . ',' . (a:lnum + a:count - 1) . 'call ledger#align_commodity()'
+endfunction
 
 " Report generation {{{1
 

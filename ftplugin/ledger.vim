@@ -20,7 +20,7 @@ setl include=^!\\?include
 setl comments=b:;
 setl commentstring=;%s
 setl omnifunc=LedgerComplete
-setl formatexpr=ledger#align_commodity(v:lnum,v:count)
+setl formatexpr=ledger#align_formatexpr(v:lnum,v:count)
 
 if !exists('g:ledger_main')
   let g:ledger_main = '%'
