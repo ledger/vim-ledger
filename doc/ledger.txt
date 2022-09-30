@@ -106,7 +106,8 @@ Tips and useful commands
   being the current line.
 
   The decimal separator can be set using `g:ledger_decimal_sep`. The default
-  value of `g:ledger_decimal_sep` is `'.'`.
+  value of `g:ledger_decimal_sep` is `'.'`. More than one possible character
+  may be specified and any matches will count, e.g. `'.,'`.
 
   See below for the recommended mappings.
 
