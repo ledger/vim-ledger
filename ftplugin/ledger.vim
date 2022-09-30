@@ -94,6 +94,10 @@ if !exists('g:ledger_decimal_sep')
   let g:ledger_decimal_sep = '.'
 endif
 
+if !exists('g:ledger_align_last')
+  let g:ledger_align_last = v:false
+endif
+
 if !exists('g:ledger_align_at')
   let g:ledger_align_at = 60
 endif
