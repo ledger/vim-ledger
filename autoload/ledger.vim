@@ -453,6 +453,8 @@ endf
 
 " Return character position of decimal separator (multibyte safe)
 function! s:decimalpos(expr) abort
+  " Remove trailing comments
+  let l:expr = substitute(a:expr, '\v +;.*$', '', '')
   let pos = match(l:expr, '\v[' . g:ledger_decimal_sep . ']')
   if pos > 0
     let pos = strchars(a:expr[:pos]) - 1
