@@ -19,6 +19,21 @@ With [vim-plug](https://github.com/junegunn/vim-plug) and many similar ones, you
 Plug 'ledger/vim-ledger'
 ```
 
+### Install using VIM packages functionality (vim 8+)
+
+To install as a single plugin, using VIM packages functionality first create a target folder:
+``` plugin
+mkdir -p ~/.vim/pack/ledger/start
+cd ~/.vim/pack/ledger/start
+git clone <URL>
+```
+
+Edit .vimrc and append the line:
+```
+set loadplugins
+```
+
+
 You can also manually copy the corresponding directories into your VIM plugins directory.
 
 One installed this plugin will identify files ending with `.ldg`, `.ledger`, or `.journal` as ledger files automatically.
