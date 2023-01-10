@@ -111,10 +111,10 @@ Tips and useful commands
 
   By default the alignment is done on the first matching decimal separator.
   This may be changed by setting `g:ledger_align_last` to `v:true`, in which
-  case the last possible decimal separater will be used. This is useful for
+  case the last possible decimal separator will be used. This is useful for
   mixed-currency ledgers where decimal and thousands separators in different
   currencies may clash and/or aligning on the right hand side of rate
-  convesions is desired.
+  conversions is desired.
 
   See below for the recommended mappings.
 

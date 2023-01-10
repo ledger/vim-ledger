@@ -22,7 +22,7 @@ Plug 'ledger/vim-ledger'
 You can also manually copy the corresponding directories into your VIM plugins directory.
 
 One installed this plugin will identify files ending with `.ldg`, `.ledger`, or `.journal` as ledger files automatically.
-Alaternatively if you use a different extension you can add a modeline to each like this:
+Alternatively if you use a different extension you can add a modeline to each like this:
 
 ```ledger
 ; vim: filetype=ledger
@@ -81,7 +81,7 @@ Include the following let-statements somewhere in your `.vimrc` to modify the be
 
         let g:ledger_fold_blanks = 0
 
-  A value of 0 will disable folding of blank lines, 1 will allow folding of a single blank line between transactions; any larger value will enable folding undconditionally.
+  A value of 0 will disable folding of blank lines, 1 will allow folding of a single blank line between transactions; any larger value will enable folding unconditionally.
 
   Note that only lines containing no trailing spaces are considered for folding.
   You can take advantage of this to disable this feature on a case-by-case basis.
