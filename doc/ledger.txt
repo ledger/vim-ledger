@@ -289,7 +289,7 @@ behaviour of the ledger filetype.
   accounts subcommand (works with ledger or hledger), otherwise it will parse
   the postings in the current file itself.
 
-	let g:ledger_accounts_cmd = 'your_command args'
+	let g:ledger_accounts_cmd = 'ledger accounts'
 
 * To use a custom external system command to generate a list of descriptions
   for completion, set the following. If g:ledger_bin is set, this will default
@@ -297,7 +297,7 @@ behaviour of the ledger filetype.
   descriptions subcommand (works with ledger or hledger), otherwise it will
   parse the transactions in the current file itself.
 
-	let g:ledger_descriptions_cmd = 'your_command args'
+	let g:ledger_descriptions_cmd = 'ledger payees'
 
 * Number of columns that will be used to display the foldtext. Set this when
   you think that the amount is too far off to the right.
