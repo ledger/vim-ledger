@@ -73,9 +73,9 @@ exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 " though they both nested in commens the same way.
 if b:is_hledger
   syn region ledgerTransactionMetadata start=/;/ end=/^/
-        \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+        \ keepend contained contains=ledgerTags
   syn region ledgerPostingMetadata start=/;/ end=/^/
-        \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+        \ keepend contained contains=ledgerTags
 else
   syn region ledgerTransactionMetadata start=/\%(\s\s\|\t\|^\s\+\);/ end=/^/
         \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
@@ -86,15 +86,12 @@ endif
 " https://hledger.org/tags-tutorial.html
 " https://www.ledger-cli.org/3.0/doc/ledger3.html#Metadata
 if b:is_hledger
-  exe 'syn match ledgerTags '.
-      \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
-      \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
-      \ 'contained contains=ledgerTag'
-  syn match ledgerTag /:\zs[^:]\+\ze:/ contained
-  exe 'syn match ledgerValueTag '.
-    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
-  exe 'syn match ledgerTypedTag '.
-    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
+  syn match ledgerTags /\w\+:[^,;]*/
+      \ contained contains=ledgerTag
+  syn match ledgerTag /[^\s,:]\+/ contained nextgroup=ledgerTagDef
+  syn match ledgerTagDef ":" contained nextgroup=ledgerTagValue,ledgerTagSep
+  syn match ledgerTagValue /[^,;]\+/ contained nextgroup=ledgerTagSep
+  syn match ledgerTagSep /,/ contained
 else
   exe 'syn match ledgerTags '.
       \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
@@ -126,7 +123,10 @@ highlight default link ledgerTransactionMetadata Tag
 highlight default link ledgerPostingMetadata Tag
 highlight default link ledgerTypedTag Keyword
 highlight default link ledgerValueTag Type
-highlight default link ledgerTag Type
+highlight default link ledgerTag Identifier
+highlight default link ledgerTagValue Type
+highlight default link ledgerTagDef Delimiter
+highlight default link ledgerTagSep Delimiter
 highlight default link ledgerStartApply Tag
 highlight default link ledgerEndApply Tag
 highlight default link ledgerApplyHead Type
