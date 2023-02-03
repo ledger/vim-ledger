@@ -19,7 +19,11 @@ endif
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
 
-let s:line_comment_chars = b:is_hledger ? ';*#' : ';|*#%'
+if b:is_hledger
+  syn match ledgerComment /^[;*#].*$/
+else
+  syn match ledgerComment /^[;*#|%].*$/
+endif
 
 let s:fb = get(g:, 'ledger_fold_blanks', 0)
 let s:skip = s:fb > 0 ? '\|^\n' : ''
@@ -67,7 +71,6 @@ syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 
 syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
-exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 
 " Tags (metadata) are handled a bit differntly in ledger-cli vs. hledger even
 " though they both nested in commens the same way.
