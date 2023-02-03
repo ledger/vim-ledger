@@ -123,8 +123,8 @@ highlight default link ledgerTransactionMetadata Tag
 highlight default link ledgerPostingMetadata Tag
 highlight default link ledgerTypedTag Keyword
 highlight default link ledgerValueTag Type
-highlight default link ledgerTag Identifier
-highlight default link ledgerTagValue Type
+highlight default link ledgerTag Type
+highlight default link ledgerTagValue Label
 highlight default link ledgerTagDef Delimiter
 highlight default link ledgerTagSep Delimiter
 highlight default link ledgerStartApply Tag
