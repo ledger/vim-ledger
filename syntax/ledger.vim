@@ -12,11 +12,7 @@ if exists('b:current_syntax')
 endif
 
 if !exists ('b:is_hledger')
-  if exists('g:ledger_is_hledger')
-    let b:is_hledger = 1
-  else
-    let b:is_hledger = 0
-  endif
+  let b:is_hledger = get(g:, 'ledger_is_hledger', 0) == 1
 endif
 
 " Force old regex engine (:help two-engines)
@@ -72,25 +68,44 @@ syn match ledgerOneCharDirective /^\%(P\|A\|Y\|N\|D\|C\)\s/
 syn region ledgerBlockComment start=/^comment/ end=/^end comment/
 syn region ledgerBlockTest start=/^test/ end=/^end test/
 exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
-" comments at eol must be preceded by at least 2 spaces / 1 tab
+
+" Tags (metadata) are handled a bit differntly in ledger-cli vs. hledger even
+" though they both nested in commens the same way.
 if b:is_hledger
   syn region ledgerTransactionMetadata start=/;/ end=/^/
+        \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+  syn region ledgerPostingMetadata start=/;/ end=/^/
         \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 else
   syn region ledgerTransactionMetadata start=/\%(\s\s\|\t\|^\s\+\);/ end=/^/
         \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
+  syn region ledgerPostingMetadata start=/;/ end=/^/
+        \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
 endif
-syn region ledgerPostingMetadata start=/;/ end=/^/
-    \ keepend contained contains=ledgerTags,ledgerValueTag,ledgerTypedTag
-exe 'syn match ledgerTags '.
-    \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
-    \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
-    \ 'contained contains=ledgerTag'
-syn match ledgerTag /:\zs[^:]\+\ze:/ contained
-exe 'syn match ledgerValueTag '.
-  \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
-exe 'syn match ledgerTypedTag '.
-  \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
+
+" https://hledger.org/tags-tutorial.html
+" https://www.ledger-cli.org/3.0/doc/ledger3.html#Metadata
+if b:is_hledger
+  exe 'syn match ledgerTags '.
+      \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
+      \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
+      \ 'contained contains=ledgerTag'
+  syn match ledgerTag /:\zs[^:]\+\ze:/ contained
+  exe 'syn match ledgerValueTag '.
+    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
+  exe 'syn match ledgerTypedTag '.
+    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
+else
+  exe 'syn match ledgerTags '.
+      \ '/'.s:oe.'\%(\%(;\s*\|^tag\s\+\)\)\@<='.
+      \ ':[^:[:space:]][^:]*\%(::\?[^:[:space:]][^:]*\)*:\s*$/ '.
+      \ 'contained contains=ledgerTag'
+  syn match ledgerTag /:\zs[^:]\+\ze:/ contained
+  exe 'syn match ledgerValueTag '.
+    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+:\ze.\+$/ contained'
+  exe 'syn match ledgerTypedTag '.
+    \ '/'.s:oe.'\%(\%(;\|^tag\)[^:]\+\)\@<=[^:]\+::\ze.\+$/ contained'
+endif
 
 syn region ledgerApply
     \ matchgroup=ledgerStartApply start=/^apply\>/
