@@ -15,17 +15,21 @@ if !exists ('b:is_hledger')
   let b:is_hledger = get(g:, 'ledger_is_hledger', 0) == 1
 endif
 
+
+syntax case ignore
+syntax keyword ledgerTodo contained fixme todo
+syntax case match
+
+if b:is_hledger
+  syntax match ledgerComment /\v^[;*#].*$/
+else
+  syntax match ledgerComment /\v^[;*#|%].*$/
+endif
+syntax match ledgerComment contains=ledgerTodo,@Spell
+
 " Force old regex engine (:help two-engines)
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
-
-syntax case ignore
-
-if b:is_hledger
-  syn match ledgerComment /^[;*#].*$/
-else
-  syn match ledgerComment /^[;*#|%].*$/
-endif
 
 let s:fb = get(g:, 'ledger_fold_blanks', 0)
 let s:skip = s:fb > 0 ? '\|^\n' : ''
@@ -115,9 +119,6 @@ syn region ledgerApply
     \ contains=ledgerApplyHead,ledgerApply,ledgerTransaction,ledgerComment
 exe 'syn match ledgerApplyHead '.
       \ '/'.s:oe.'\%(^apply\s\+\)\@<=\S.*$/ contained'
-
-syntax keyword ledgerTodo FIXME TODO
-      \ contained containedin=ledgerComment,ledgerTransaction,ledgerTransactionMetadata,ledgerPostingMetadata
 
 highlight default link ledgerComment Comment
 highlight default link ledgerBlockComment Comment
