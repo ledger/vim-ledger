@@ -19,6 +19,8 @@ endif
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
 
+syntax case ignore
+
 if b:is_hledger
   syn match ledgerComment /^[;*#].*$/
 else
