@@ -12,7 +12,7 @@ if exists('b:current_syntax')
 endif
 
 if !exists ('b:is_hledger')
-  let b:is_hledger = get(g:, 'ledger_is_hledger', 0) == 1
+  let b:is_hledger = g:ledger_is_hledger
 endif
 
 " Force old regex engine (:help two-engines)

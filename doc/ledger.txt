@@ -279,6 +279,18 @@ behaviour of the ledger filetype.
 
 	let g:ledger_bin = 'ledger'
 
+* Whether to use ledger or hledger specific features. Setting this value is
+  optional and in most coses will be guessed correctly based on g:ledger_bin,
+  but in the event it isn't guessed correctly or you want to use different
+  syntax features even with your default tooling setup for the other engine
+  this flag can be set to override the value.
+
+	let g:ledger_is_hledger = v:true
+
+  A per-buffer variant of this can also be used as an ovrride:
+
+	let b:is_hledger = v:true
+
 * Additional default options for the `ledger` executable:
 
 	let g:ledger_extra_options = ''
