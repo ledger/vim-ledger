@@ -86,11 +86,11 @@ endif
 " https://hledger.org/tags-tutorial.html
 " https://www.ledger-cli.org/3.0/doc/ledger3.html#Metadata
 if b:is_hledger
-  syn match ledgerTags /\v[[:alnum:]_-]+:[^,;]*/
+  syn match ledgerTags /\v[[:alnum:]_-]+:[^;]*/
       \ contained contains=ledgerTag
   syn match ledgerTag /\v[[:alnum:]_-]+/ contained nextgroup=ledgerTagDef
   syn match ledgerTagDef ":" contained nextgroup=ledgerTagValue,ledgerTagSep
-  syn match ledgerTagValue /\v[^,;]+/ contained nextgroup=ledgerTagSep
+  syn match ledgerTagValue /\v[^;]+/ contained nextgroup=ledgerTagSep
   syn match ledgerTagSep /,/ contained
 else
   exe 'syn match ledgerTags '.
