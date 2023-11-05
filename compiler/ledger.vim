@@ -32,5 +32,8 @@ if !b:is_hledger
 	CompilerSet errorformat+=%-G%.%#
 	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ ' . shellescape(expand(g:ledger_main))
 else
-	exe 'CompilerSet makeprg=('.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ print\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ >\ /dev/null)'
+	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ check\ '. substitute(g:ledger_extra_options, ' ', '\\ ', 'g')
+	CompilerSet errorformat=%Ehledger:\ %trror:\ %f:%l:%c%.%#:,%-C\ \ \|\\s%#,%-C\%l\ \|%.%#,%-C\ \ \|\\s%#,%-C\ \ \|%p^,%+C%m,%-Z\\s%#
+	" Skip all other lines:
+	CompilerSet errorformat+=%-G%.%#
 endif

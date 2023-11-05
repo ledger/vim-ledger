@@ -47,9 +47,13 @@ Tips and useful commands
 	:silent make | redraw! | cwindow
 
   It is recommended to set the value of `g:ledger_extra_options` (see below)
-  as follows:
+  as follows for ledger:
 
         let g:ledger_extra_options = '--pedantic --explicit --check-payees'
+
+  and as follows for hledger:
+
+        let g:ledger_extra_options = '--strict ordereddates payees uniqueleafnames'
 
   to catch most potential problems in your source file.
 
