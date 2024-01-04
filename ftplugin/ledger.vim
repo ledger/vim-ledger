@@ -400,12 +400,12 @@ function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
   if exists('g:ledger_accounts_cmd')
-    let accounts = systemlist(g:ledger_accounts_cmd)
+    let accounts = split(system(g:ledger_accounts_cmd), '\n')
   else
     let accounts = ledger#declared_accounts()
   endif
   if exists('g:ledger_descriptions_cmd')
-    let cache.descriptions = systemlist(g:ledger_descriptions_cmd)
+    let cache.descriptions = split(system(g:ledger_descriptions_cmd), '\n')
   endif
   for xact in transactions
     if !exists('g:ledger_descriptions_cmd')
@@ -494,10 +494,10 @@ endf "}}}
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
   return (a:argLead =~# '^@') ?
-        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'),
+        \ map(filter(split(system(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'), '\n'),
         \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
         \ :
-        \ map(filter(systemlist(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'),
+        \ map(filter(split(system(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'), '\n'),
         \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
 endf "}}}
 
