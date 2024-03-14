@@ -215,13 +215,18 @@ hi link LedgerTarget Statement
 hi link LedgerImproperPerc Special
 " }}}
 
-let s:rx_amount = '\('.
-                \   '\%([0-9]\+\)'.
-                \   '\%([,.][0-9]\+\)*'.
-                \ '\|'.
-                \   '[,.][0-9]\+'.
-                \ '\)'.
-                \ '\s*\%([[:alpha:]¢$€£]\+\s*\)\?'.
+let s:cursym = '[[:alpha:]¢$€£]\+'
+let s:valreg = '\('.
+             \   '\%([0-9]\+\)'.
+             \   '\%([,.][0-9]\+\)*'.
+             \ '\|'.
+             \   '[,.][0-9]\+'.
+             \ '\)'
+let s:optional_balance_assertion = '\(\s*=\s*'.s:cursym.'\s*'.s:valreg.'\)\?'
+
+let s:rx_amount = s:valreg.
+                \ s:optional_balance_assertion.
+                \ '\s*\%('.s:cursym.'\s*\)\?'.
                 \ '\%(\s*;.*\)\?$'
 
 function! LedgerFoldText() "{{{1
