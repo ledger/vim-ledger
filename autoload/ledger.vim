@@ -671,7 +671,7 @@ endf
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
 function! ledger#entry() abort
-  let l:output = systemlist(s:ledger_cmd(g:ledger_main, join(['entry', getline('.')])))
+  let l:output = split(system(s:ledger_cmd(g:ledger_main, join(['entry', getline('.')]))), '\n')
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
   " Errors may occur
@@ -695,7 +695,7 @@ endfunc
 " Returns:
 " Ledger's output as a String.
 function! ledger#report(file, args) abort
-  let l:output = systemlist(s:ledger_cmd(a:file, a:args))
+  let l:output = split(system(s:ledger_cmd(a:file, a:args)), '\n')
   if v:shell_error  " If there are errors, show them in a quickfix/location list.
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
@@ -742,7 +742,7 @@ function! ledger#register(file, args) abort
         \ "--prepend-format='%(filename):%(beg_line) '",
         \ a:args
         \ ]))
-  call s:quickfix_populate(systemlist(l:cmd))
+  call s:quickfix_populate(split(system(l:cmd), '\n'))
   call s:quickfix_toggle('Register report')
 endf
 
@@ -761,7 +761,7 @@ function! ledger#reconcile(file, account, target_amount) abort
         \ shellescape(a:account)
         \ ]))
   let l:file = expand(a:file) " Needed for #show_balance() later
-  call s:quickfix_populate(systemlist(l:cmd))
+  call s:quickfix_populate(split(system(l:cmd), '\n'))
   if s:quickfix_toggle('Reconcile ' . a:account, 'Nothing to reconcile')
     let g:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
@@ -805,7 +805,7 @@ function! ledger#show_balance(file, ...) abort
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
         \ (empty(g:ledger_default_commodity) ? '' : '-X ' . shellescape(g:ledger_default_commodity))
         \ ]))
-  let l:output = systemlist(l:cmd)
+  let l:output = split(system(l:cmd), '\n')
   " Errors may occur, for example,  when the account has multiple commodities
   " and g:ledger_default_commodity is empty.
   if v:shell_error
