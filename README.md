@@ -91,6 +91,10 @@ Include the following let-statements somewhere in your `.vimrc` to modify the be
 
         let g:ledger_detailed_first = 1
 
+* If you want account completion based on fuzzy matching instead of the default sub-level completion, include the following line:
+
+        let g:ledger_fuzzy_account_completion = 1
+
 * By default vim will fold ledger transactions, leaving surrounding blank lines unfolded.
   You can use `g:ledger_fold_blanks` to hide blank lines following a transaction.
 
@@ -107,7 +111,7 @@ Omni completion is implemented for transactions descriptions and posting account
 
 ### Accounts
 
-Account names are matched by the start of every sub-level.
+By default, account names are matched by the start of every sub-level.
 When you insert an account name like this:
 
     Asse<C-X><C-O>
@@ -119,6 +123,16 @@ Go ahead and try something like:
     As:Ban:Che<C-X><C-O>
 
 When you have an account like this, 'Assets:Bank:Checking' should show up.
+
+If fuzzy matching based account completion is enabled, the matches are
+loaded based on string similarity and without regard for the sub-levels.
+
+In the previous example, with fuzzy matching enabled, you could load up
+matches by doing something like:
+
+    Chec<C-X><C-O>
+
+Notice that we did not need to write the initial account components.
 
 When you want to complete on a virtual transaction, it's currently best to keep the cursor in front of the closing bracket.
 Of course you can insert the closing bracket after calling the completion, too.

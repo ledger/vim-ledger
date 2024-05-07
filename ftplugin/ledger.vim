@@ -354,7 +354,9 @@ function! LedgerComplete(findstart, base) "{{{1
 
       call map(results, 'v:val[0]')
 
-      if g:ledger_detailed_first
+      if get(g:, "ledger_fuzzy_account_completion", 0)
+        let results = matchfuzzy(b:compl_cache.flat_accounts, a:base, {'matchseq':1})
+      elseif g:ledger_detailed_first
         let results = reverse(sort(results, 's:sort_accounts_by_depth'))
       else
         let results = sort(results)
@@ -403,12 +405,13 @@ unlet s:old s:new s:fun
 
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
-  let cache = {'descriptions': [], 'tags': {}, 'accounts': {}}
+  let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
   if exists('g:ledger_accounts_cmd')
     let accounts = split(system(g:ledger_accounts_cmd), '\n')
   else
     let accounts = ledger#declared_accounts()
   endif
+  let cache.flat_accounts = accounts
   if exists('g:ledger_descriptions_cmd')
     let cache.descriptions = split(system(g:ledger_descriptions_cmd), '\n')
   endif
