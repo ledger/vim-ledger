@@ -466,7 +466,7 @@ Go ahead and try something like:
 When you have an account like this, 'Assets:Bank:Checking' should show up.
 
 If fuzzy matching based account completion is enabled, the matches are
-loaded based on string similarity and without regars for the sub-levels.
+loaded based on string similarity and without regard for the sub-levels.
 
 In the previous example, with fuzzy matching enabled, you could load up
 matches by doing something like:
