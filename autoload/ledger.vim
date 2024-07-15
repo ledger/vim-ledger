@@ -510,7 +510,10 @@ function! ledger#align_commodity() abort
     endif
     if pos < 0
       " Find the position after the first digits
-      let pos = matchend(rhs, '\m\d[^[:space:]]*')
+      let pos = matchend(rhs, '\m\d[^[:space:]]*') - 1
+      if pos >= 0
+        let pos = strchars(rhs[:pos])
+      endif
     endif
     " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
     if pos >= 0
