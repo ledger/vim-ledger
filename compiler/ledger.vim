@@ -30,7 +30,7 @@ if !b:is_hledger
 	CompilerSet errorformat+=%tarning:\ \"%f\"\\,\ line\ %l:\ %m
 	" Skip all other lines:
 	CompilerSet errorformat+=%-G%.%#
-	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ ' . shellescape(expand(g:ledger_main))
+	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ '.substitute(g:ledger_extra_options, ' ', '\\ ', 'g').'\ source\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g')
 else
 	exe 'CompilerSet makeprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ ' . substitute(shellescape(expand(g:ledger_main)), ' ', '\\ ', 'g') . '\ check\ '. substitute(g:ledger_extra_options, ' ', '\\ ', 'g')
 	CompilerSet errorformat=hledger:\ %trror:\ %f:%l:%c:
