@@ -917,7 +917,7 @@ endf
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
 function! ledger#entry() abort
-  let l:output = split(system(s:ledger_cmd(g:ledger_main, join(['entry', getline('.')]))), '\n')
+  let l:output = split(system(s:ledger_cmd(g:ledger_main, join(['entry', '--', getline('.')]))), '\n')
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
   " Errors may occur
