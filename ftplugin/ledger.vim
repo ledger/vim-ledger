@@ -222,7 +222,18 @@ let s:valreg = '\('.
              \ '\|'.
              \   '[,.][0-9]\+'.
              \ '\)'
-let s:optional_balance_assertion = '\(\s*=\s*'.s:cursym.'\s*'.s:valreg.'\)\?'
+let s:optsgn = '[+-]\?'
+let s:cursgn = '\('.
+             \   s:optsgn.
+             \   '\s*'.
+             \   s:cursym.
+             \ '\|'.
+             \   s:cursym.
+             \   '\s*'.
+             \   s:optsgn.
+             \ '\)'
+
+let s:optional_balance_assertion = '\(\s*=\s*'.s:cursgn.'\s*'.s:valreg.'\)\?'
 
 let s:rx_amount = s:valreg.
                 \ s:optional_balance_assertion.
