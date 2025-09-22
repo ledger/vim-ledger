@@ -50,7 +50,9 @@ if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
   let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
 endif
 
-if exists('g:ledger_bin')
+" Automatic formatting is disabled by default because it can cause data loss when run
+" on non-transaction blocks, see https://github.com/ledger/vim-ledger/issues/168.
+if exists('g:ledger_bin') && exists('g:ledger_dangerous_formatprg')
   exe 'setl formatprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
 endif
 
