@@ -5,6 +5,8 @@
 
 scriptencoding utf-8
 
+call ledger#init()
+
 if exists('b:did_ftplugin')
   finish
 endif
@@ -22,187 +24,11 @@ setl commentstring=;%s
 setl omnifunc=LedgerComplete
 setl formatexpr=ledger#align_formatexpr(v:lnum,v:count)
 
-if !exists('g:ledger_main')
-  let g:ledger_main = '%'
-endif
-
-if exists('g:ledger_no_bin') && g:ledger_no_bin
-	unlet! g:ledger_bin
-elseif !exists('g:ledger_bin') || empty(g:ledger_bin)
-  if executable('hledger')
-    let g:ledger_bin = 'hledger'
-  elseif executable('ledger')
-    let g:ledger_bin = 'ledger'
-  else
-    unlet! g:ledger_bin
-    echohl WarningMsg
-    echomsg 'No ledger command detected, set g:ledger_bin to enable more vim-ledger features.'
-    echohl None
-  endif
-elseif !executable(g:ledger_bin)
-	unlet! g:ledger_bin
-	echohl WarningMsg
-	echomsg 'Command set in g:ledger_bin is not executable, fix to to enable more vim-ledger features.'
-	echohl None
-endif
-
-if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
-  let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
-endif
-
 " Automatic formatting is disabled by default because it can cause data loss when run
 " on non-transaction blocks, see https://github.com/ledger/vim-ledger/issues/168.
-if exists('g:ledger_bin') && exists('g:ledger_dangerous_formatprg')
-  exe 'setl formatprg='.substitute(g:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
+if b:ledger_dangerous_formatprg
+  exe 'setl formatprg='.substitute(b:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
 endif
-
-if !exists('g:ledger_extra_options')
-  let g:ledger_extra_options = ''
-endif
-
-if !exists('g:ledger_date_format')
-  let g:ledger_date_format = '%Y/%m/%d'
-endif
-
-" You can set a maximal number of columns the fold text (excluding amount)
-" will use by overriding g:ledger_maxwidth in your .vimrc.
-" When maxwidth is zero, the amount will be displayed at the far right side
-" of the screen.
-if !exists('g:ledger_maxwidth')
-  let g:ledger_maxwidth = 0
-endif
-
-if !exists('g:ledger_fillstring')
-  let g:ledger_fillstring = ' '
-endif
-
-if !exists('g:ledger_accounts_cmd')
-  if exists('g:ledger_bin')
-    let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
-  endif
-endif
-
-if !exists('g:ledger_descriptions_cmd')
-  if exists('g:ledger_bin')
-    if g:ledger_is_hledger
-      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
-    else
-      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'
-    endif
-  endif
-endif
-
-if !exists('g:ledger_decimal_sep')
-  let g:ledger_decimal_sep = '.'
-endif
-
-if !exists('g:ledger_align_last')
-  let g:ledger_align_last = v:false
-endif
-
-if !exists('g:ledger_align_at')
-  let g:ledger_align_at = 60
-endif
-
-if !exists('g:ledger_align_commodity')
-  let g:ledger_align_commodity = 0
-endif
-
-if !exists('g:ledger_default_commodity')
-  let g:ledger_default_commodity = ''
-endif
-
-if !exists('g:ledger_commodity_before')
-  let g:ledger_commodity_before = 1
-endif
-
-if !exists('g:ledger_commodity_sep')
-  let g:ledger_commodity_sep = ''
-endif
-
-" If enabled this will list the most detailed matches at the top {{{
-" of the completion list.
-" For example when you have some accounts like this:
-"   A:Ba:Bu
-"   A:Bu:Bu
-" and you complete on A:B:B normal behaviour may be the following
-"   A:B:B
-"   A:Bu:Bu
-"   A:Bu
-"   A:Ba:Bu
-"   A:Ba
-"   A
-" with this option turned on it will be
-"   A:B:B
-"   A:Bu:Bu
-"   A:Ba:Bu
-"   A:Bu
-"   A:Ba
-"   A
-" }}}
-if !exists('g:ledger_detailed_first')
-  let g:ledger_detailed_first = 1
-endif
-
-" only display exact matches (no parent accounts etc.)
-if !exists('g:ledger_exact_only')
-  let g:ledger_exact_only = 0
-endif
-
-" display original text / account name as completion
-if !exists('g:ledger_include_original')
-  let g:ledger_include_original = 0
-endif
-
-" Settings for Ledger reports {{{
-if !exists('g:ledger_winpos')
-  let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
-endif
-
-if !exists('g:ledger_use_location_list')
-  let g:ledger_use_location_list = 0  " Use quickfix list by default
-endif
-
-if !exists('g:ledger_cleared_string')
-  let g:ledger_cleared_string = 'Cleared: '
-endif
-
-if !exists('g:ledger_pending_string')
-  let g:ledger_pending_string = 'Cleared or pending: '
-endif
-
-if !exists('g:ledger_target_string')
-  let g:ledger_target_string = 'Difference from target: '
-endif
-" }}}
-
-" Settings for the quickfix window {{{
-if !exists('g:ledger_qf_register_format')
-  let g:ledger_qf_register_format =
-				\ '%(date) %(justify(payee, 50)) '.
-				\	'%(justify(account, 30)) %(justify(amount, 15, -1, true)) '.
-				\	'%(justify(total, 15, -1, true))\n'
-endif
-
-if !exists('g:ledger_qf_reconcile_format')
-  let g:ledger_qf_reconcile_format =
-				\ '%(date) %(justify(code, 4)) '.
-				\ '%(justify(payee, 50)) %(justify(account, 30)) '.
-				\ '%(justify(amount, 15, -1, true))\n'
-endif
-
-if !exists('g:ledger_qf_size')
-  let g:ledger_qf_size = 10  " Size of the quickfix window
-endif
-
-if !exists('g:ledger_qf_vertical')
-  let g:ledger_qf_vertical = 0
-endif
-
-if !exists('g:ledger_qf_hide_file')
-  let g:ledger_qf_hide_file = 1
-endif
-" }}}
 
 if !exists('current_compiler')
   compiler ledger
@@ -267,8 +93,8 @@ function! LedgerFoldText() "{{{1
 
   " number of columns foldtext can use
   let columns = s:get_columns()
-  if g:ledger_maxwidth
-    let columns = min([columns, g:ledger_maxwidth])
+  if b:ledger_maxwidth
+    let columns = min([columns, b:ledger_maxwidth])
   endif
 
   let amount = printf(' %s ', amount)
@@ -293,8 +119,8 @@ function! LedgerFoldText() "{{{1
   endif
 
   " fill in the fillstring
-  if strlen(g:ledger_fillstring)
-    let fillstring = g:ledger_fillstring
+  if strlen(b:ledger_fillstring)
+    let fillstring = b:ledger_fillstring
   else
     let fillstring = ' '
   endif
@@ -361,15 +187,15 @@ function! LedgerComplete(findstart, base) "{{{1
         let update_cache = 1
       endif
 
-      if g:ledger_exact_only
+      if b:ledger_exact_only
         let results = exacts
       endif
 
       call map(results, 'v:val[0]')
 
-      if get(g:, "ledger_fuzzy_account_completion", 0)
+      if b:ledger_fuzzy_account_completion
         let results = matchfuzzy(b:compl_cache.flat_accounts, a:base, {'matchseq':1})
-      elseif g:ledger_detailed_first
+      elseif b:ledger_detailed_first
         let results = reverse(sort(results, 's:sort_accounts_by_depth'))
       else
         let results = sort(results)
@@ -381,11 +207,11 @@ function! LedgerComplete(findstart, base) "{{{1
         let update_cache = 1
       endif
     elseif b:compl_context ==# 'new' "{{{2 (new line)
-      return [strftime(g:ledger_date_format)]
+      return [strftime(b:ledger_date_format)]
     endif "}}}
 
 
-    if g:ledger_include_original
+    if b:ledger_include_original
       call insert(results, a:base)
     endif
 
@@ -419,17 +245,17 @@ unlet s:old s:new s:fun
 function! s:collect_completion_data() "{{{1
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
-  if exists('g:ledger_accounts_cmd')
-    let accounts = split(system(g:ledger_accounts_cmd), '\n')
+  if b:ledger_bin
+    let accounts = split(system(b:ledger_accounts_cmd), '\n')
   else
     let accounts = ledger#declared_accounts()
   endif
   let cache.flat_accounts = accounts
-  if exists('g:ledger_descriptions_cmd')
-    let cache.descriptions = split(system(g:ledger_descriptions_cmd), '\n')
+  if b:ledger_bin
+    let cache.descriptions = split(system(b:ledger_descriptions_cmd), '\n')
   endif
   for xact in transactions
-    if !exists('g:ledger_descriptions_cmd')
+    if !b:ledger_bin
       " collect descriptions
       if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
         call add(cache.descriptions, xact['description'])
@@ -439,7 +265,7 @@ function! s:collect_completion_data() "{{{1
     let tagdicts = [t]
 
 		" collect account names
-    if !exists('g:ledger_accounts_cmd')
+    if !b:ledger_bin
       for posting in postings
         if has_key(posting, 'tags')
           call add(tagdicts, posting.tags)
@@ -515,35 +341,34 @@ endf "}}}
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
   return (a:argLead =~# '^@') ?
-        \ map(filter(split(system(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'), '\n'),
+        \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' payees'), '\n'),
         \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
         \ :
-        \ map(filter(split(system(g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'), '\n'),
+        \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' accounts'), '\n'),
         \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
 endf "}}}
 
 function! s:reconcile(file, account) "{{{2
   " call inputsave()
-  let l:amount = input('Target amount' . (empty(g:ledger_default_commodity) ? ': ' : ' (' . g:ledger_default_commodity . '): '))
+  let l:amount = input('Target amount' . (empty(b:ledger_default_commodity) ? ': ' : ' (' . b:ledger_default_commodity . '): '))
   " call inputrestore()
   call ledger#reconcile(a:file, a:account, str2float(l:amount))
 endf "}}}
 
 " Commands {{{1
 command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
-      \ Balance call ledger#show_balance(g:ledger_main, <q-args>)
+      \ Balance call ledger#show_balance(b:ledger_main, <q-args>)
 
 command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
-      \ Ledger call ledger#output(ledger#report(g:ledger_main, <q-args>))
+      \ Ledger call ledger#output(ledger#report(b:ledger_main, <q-args>))
 
 command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
 command! -buffer LedgerAlignBuffer call ledger#align_commodity_buffer()
 
 command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
-      \ Reconcile call <sid>reconcile(g:ledger_main, <q-args>)
+      \ Reconcile call <sid>reconcile(b:ledger_main, <q-args>)
 
 command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
-      \ Register call ledger#register(g:ledger_main, <q-args>)
+      \ Register call ledger#register(b:ledger_main, <q-args>)
 " }}}
-

@@ -11,24 +11,22 @@ if exists('b:current_syntax')
   finish
 endif
 
-if !exists ('b:is_hledger')
-  let b:is_hledger = get(g:, ledger_is_hledger, 0)
-endif
+call ledger#init()
 
 " Force old regex engine (:help two-engines)
 let s:oe = '\%#=1'
 let s:lb1 = '\@1<='
 
-let s:line_comment_chars = b:is_hledger ? ';*#' : ';|*#%'
+let s:line_comment_chars = b:ledger_is_hledger ? ';*#' : ';|*#%'
 
-let s:fb = get(g:, 'ledger_fold_blanks', 0)
+let s:fb = b:ledger_fold_blanks
 let s:skip = s:fb > 0 ? '\|^\n' : ''
 if s:fb == 1
   let s:skip .= '\n\@!'
 endif
 
 let s:ledgerAmount_contains = ''
-if get(g:, 'ledger_commodity_spell', 0) == 0
+if b:ledger_commodity_spell == 0
     let s:ledgerAmount_contains .= '@NoSpell'
 endif
 
@@ -71,7 +69,7 @@ exe 'syn match ledgerComment /^['.s:line_comment_chars.'].*$/'
 
 " Tags (metadata) are handled a bit differntly in ledger-cli vs. hledger even
 " though they both nested in commens the same way.
-if b:is_hledger
+if b:ledger_is_hledger
   syn region ledgerTransactionMetadata start=/;/ end=/^/
         \ keepend contained contains=ledgerTags
   syn region ledgerPostingMetadata start=/;/ end=/^/
@@ -85,7 +83,7 @@ endif
 
 " https://hledger.org/tags-tutorial.html
 " https://www.ledger-cli.org/3.0/doc/ledger3.html#Metadata
-if b:is_hledger
+if b:ledger_is_hledger
   syn match ledgerTags /\v[[:alnum:]_-]+:[^,;]*/
       \ contained contains=ledgerTag
   syn match ledgerTag /\v[[:alnum:]_-]+/ contained nextgroup=ledgerTagDef
@@ -144,4 +142,4 @@ highlight default link ledgerTodo Todo
 syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
 
-let b:current_syntax = b:is_hledger ? 'hledger' : 'ledger'
+let b:current_syntax = b:ledger_is_hledger ? 'hledger' : 'ledger'

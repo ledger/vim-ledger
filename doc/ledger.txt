@@ -291,9 +291,9 @@ behaviour of the ledger filetype.
 
 	let g:ledger_is_hledger = v:true
 
-  A per-buffer variant of this can also be used as an ovrride:
+  A per-buffer variant of this can also be used as an override:
 
-	let b:is_hledger = v:true
+	let b:ledger_is_hledger = v:true
 
 * Additional default options for the `ledger` executable:
 

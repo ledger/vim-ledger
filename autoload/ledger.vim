@@ -1,8 +1,251 @@
 scriptencoding utf-8
 
-if !exists ('b:is_hledger')
-  let b:is_hledger = get(g:, 'ledger_is_hledger', 0)
+if exists("g:loaded_ledger")
+  finish
 endif
+
+let g:loaded_ledger = 1
+
+if exists('g:ledger_no_bin') && g:ledger_no_bin
+	unlet! g:ledger_bin
+elseif !exists('g:ledger_bin') || empty(g:ledger_bin)
+  if executable('hledger')
+    let g:ledger_bin = 'hledger'
+  elseif executable('ledger')
+    let g:ledger_bin = 'ledger'
+  else
+    unlet! g:ledger_bin
+    echohl WarningMsg
+    echomsg 'No ledger command detected, set g:ledger_bin to enable more vim-ledger features.'
+    echohl None
+  endif
+elseif !executable(g:ledger_bin)
+	unlet! g:ledger_bin
+	echohl WarningMsg
+	echomsg 'Command set in g:ledger_bin is not executable, fix to to enable more vim-ledger features.'
+	echohl None
+endif
+
+if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
+  let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
+else
+  let g:ledger_is_hledger = 0
+endif
+
+if !exists('g:ledger_main')
+  let g:ledger_main = '%'
+endif
+
+if !exists('g:ledger_dangerous_formatprg')
+  let g:ledger_dangerous_formatprg = 0
+endif
+
+if !exists('g:ledger_extra_options')
+  let g:ledger_extra_options = ''
+endif
+
+if !exists('g:ledger_date_format')
+  let g:ledger_date_format = '%Y/%m/%d'
+endif
+
+if !exists('g:ledger_fuzzy_account_completion')
+  let g:ledger_fuzzy_account_completion = 0
+endif
+
+" You can set a maximal number of columns the fold text (excluding amount)
+" will use by overriding g:ledger_maxwidth in your .vimrc.
+" When maxwidth is zero, the amount will be displayed at the far right side
+" of the screen.
+if !exists('g:ledger_maxwidth')
+  let g:ledger_maxwidth = 0
+endif
+
+if !exists('g:ledger_fillstring')
+  let g:ledger_fillstring = ' '
+endif
+
+if !exists('g:ledger_accounts_cmd')
+  if exists('g:ledger_bin')
+    let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
+  endif
+endif
+
+if !exists('g:ledger_descriptions_cmd')
+  if exists('g:ledger_bin')
+    if g:ledger_is_hledger
+      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' descriptions'
+    else
+      let g:ledger_descriptions_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' payees'
+    endif
+  endif
+endif
+
+if !exists('g:ledger_decimal_sep')
+  let g:ledger_decimal_sep = '.'
+endif
+
+if !exists('g:ledger_align_last')
+  let g:ledger_align_last = v:false
+endif
+
+if !exists('g:ledger_align_at')
+  let g:ledger_align_at = 60
+endif
+
+if !exists('g:ledger_align_commodity')
+  let g:ledger_align_commodity = 0
+endif
+
+if !exists('g:ledger_default_commodity')
+  let g:ledger_default_commodity = ''
+endif
+
+if !exists('g:ledger_commodity_before')
+  let g:ledger_commodity_before = 1
+endif
+
+if !exists('g:ledger_commodity_sep')
+  let g:ledger_commodity_sep = ''
+endif
+
+" If enabled this will list the most detailed matches at the top {{{
+" of the completion list.
+" For example when you have some accounts like this:
+"   A:Ba:Bu
+"   A:Bu:Bu
+" and you complete on A:B:B normal behaviour may be the following
+"   A:B:B
+"   A:Bu:Bu
+"   A:Bu
+"   A:Ba:Bu
+"   A:Ba
+"   A
+" with this option turned on it will be
+"   A:B:B
+"   A:Bu:Bu
+"   A:Ba:Bu
+"   A:Bu
+"   A:Ba
+"   A
+" }}}
+if !exists('g:ledger_detailed_first')
+  let g:ledger_detailed_first = 1
+endif
+
+" only display exact matches (no parent accounts etc.)
+if !exists('g:ledger_exact_only')
+  let g:ledger_exact_only = 0
+endif
+
+" display original text / account name as completion
+if !exists('g:ledger_include_original')
+  let g:ledger_include_original = 0
+endif
+
+" Settings for Ledger reports {{{
+if !exists('g:ledger_winpos')
+  let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
+endif
+
+if !exists('g:ledger_use_location_list')
+  let g:ledger_use_location_list = 0  " Use quickfix list by default
+endif
+
+if !exists('g:ledger_cleared_string')
+  let g:ledger_cleared_string = 'Cleared: '
+endif
+
+if !exists('g:ledger_pending_string')
+  let g:ledger_pending_string = 'Cleared or pending: '
+endif
+
+if !exists('g:ledger_target_string')
+  let g:ledger_target_string = 'Difference from target: '
+endif
+" }}}
+
+" Settings for the quickfix window {{{
+if !exists('g:ledger_qf_register_format')
+  let g:ledger_qf_register_format =
+				\ '%(date) %(justify(payee, 50)) '.
+				\	'%(justify(account, 30)) %(justify(amount, 15, -1, true)) '.
+				\	'%(justify(total, 15, -1, true))\n'
+endif
+
+if !exists('g:ledger_qf_reconcile_format')
+  let g:ledger_qf_reconcile_format =
+				\ '%(date) %(justify(code, 4)) '.
+				\ '%(justify(payee, 50)) %(justify(account, 30)) '.
+				\ '%(justify(amount, 15, -1, true))\n'
+endif
+
+if !exists('g:ledger_qf_size')
+  let g:ledger_qf_size = 10  " Size of the quickfix window
+endif
+
+if !exists('g:ledger_qf_vertical')
+  let g:ledger_qf_vertical = 0
+endif
+
+if !exists('g:ledger_qf_hide_file')
+  let g:ledger_qf_hide_file = 1
+endif
+" }}}
+
+" Make sure config options are initialized either with values from the user or
+" global defaults we detect, guess, or suggest.
+function! ledger#init() abort
+
+  if !exists('b:ledger_bin')
+    let b:ledger_bin = get(g:, 'ledger_bin', 0)
+  endif
+
+  let settings = [
+    \ 'ledger_accounts_cmd',
+    \ 'ledger_align_at',
+    \ 'ledger_align_commodity',
+    \ 'ledger_align_last',
+    \ 'ledger_cleared_string',
+    \ 'ledger_commodity_before',
+    \ 'ledger_commodity_spell',
+    \ 'ledger_dangerous_formatprg',
+    \ 'ledger_date_format',
+    \ 'ledger_decimal_sep',
+    \ 'ledger_default_commodity',
+    \ 'ledger_descriptions_cmd',
+    \ 'ledger_detailed_first',
+    \ 'ledger_exact_only',
+    \ 'ledger_extra_options',
+    \ 'ledger_fillstring',
+    \ 'ledger_fold_blanks',
+    \ 'ledger_fold_blanks',
+    \ 'ledger_fold_blanks',
+    \ 'ledger_fold_blanks',
+    \ 'ledger_fold_blanks',
+    \ 'ledger_fuzzy_account_completion',
+    \ 'ledger_include_original',
+    \ 'ledger_is_hledger',
+    \ 'ledger_main',
+    \ 'ledger_maxwidth',
+    \ 'ledger_pending_string',
+    \ 'ledger_qf_hide_file',
+    \ 'ledger_qf_reconcile_format',
+    \ 'ledger_qf_register_format',
+    \ 'ledger_qf_size',
+    \ 'ledger_qf_vertical',
+    \ 'ledger_qf_vertical',
+    \ 'ledger_target_string',
+    \ 'ledger_use_location_list',
+    \ 'ledger_winpos',
+    \ ]
+
+  for setting in settings
+    if !has_key(b:, setting)
+      let b:{setting} = get(g:, setting)
+    endif
+  endfor
+
+endfunction
 
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
 function! ledger#transaction_state_toggle(lnum, ...) abort
@@ -647,7 +890,7 @@ endf
 " Build a ledger command to process the given file.
 function! s:ledger_cmd(file, args) abort
   let l:options = g:ledger_extra_options
-  if len(g:ledger_date_format) > 0 && !b:is_hledger
+  if len(g:ledger_date_format) > 0 && !b:ledger_is_hledger
     let l:options = join([l:options, '--date-format', g:ledger_date_format,
       \ '--input-date-format', g:ledger_date_format])
   endif
