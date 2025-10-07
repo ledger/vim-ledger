@@ -6,7 +6,7 @@
 
 scriptencoding utf-8
 
-if exists("g:loaded_ledger")
+if exists('g:loaded_ledger')
   finish
 endif
 

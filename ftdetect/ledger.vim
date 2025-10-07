@@ -4,6 +4,8 @@
 " SPDX-FileCopyrightText: © 2005 Wolfgang Oertl
 " SPDX-License-Identifier: GPL-2.0-or-later
 
+scriptencoding utf-8
+
 " vint: -ProhibitAutocmdWithNoGroup
 
 " Semi-canonical or common file extensions
