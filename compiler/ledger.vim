@@ -18,6 +18,10 @@ if exists(':CompilerSet') != 2
   command -nargs=* CompilerSet setlocal <args>
 endif
 
+let s:escaped_bin = substitute(b:ledger_bin, ' ', '\\ ', 'g')
+let s:escaped_main = substitute(shellescape(expand(b:ledger_main)), ' ', '\\ ', 'g')
+let s:escaped_extra = substitute(b:ledger_extra_options, ' ', '\\ ', 'g')
+
 if !b:ledger_is_hledger
   " Capture Ledger errors (%-C ignores all lines between "While parsing..." and "Error:..."):
   CompilerSet errorformat=%EWhile\ parsing\ file\ \"%f\"\\,\ line\ %l:,%ZError:\ %m,%-C%.%#
@@ -26,15 +30,15 @@ if !b:ledger_is_hledger
   " Skip all other lines:
   CompilerSet errorformat+=%-G%.%#
   exe 'CompilerSet makeprg='
-        \.substitute(b:ledger_bin, ' ', '\\ ', 'g')
-        \.'\ -f\ '.substitute(shellescape(expand(b:ledger_main)), ' ', '\\ ', 'g')
-        \. '\ '.substitute(b:ledger_extra_options, ' ', '\\ ', 'g')
-        \.'\ source\ '.substitute(shellescape(expand(b:ledger_main)), ' ', '\\ ', 'g')
+        \.s:escaped_bin
+        \.'\ -f\ '.s:escaped_main
+        \.'\ '.s:escaped_extra
+        \.'\ source\ '.s:escaped_main
 else
   exe 'CompilerSet makeprg='
-        \.substitute(b:ledger_bin, ' ', '\\ ', 'g')
-        \.'\ -f\ '.substitute(shellescape(expand(b:ledger_main)), ' ', '\\ ', 'g')
-        \. '\ check\ '.substitute(b:ledger_extra_options, ' ', '\\ ', 'g')
+        \.s:escaped_bin
+        \.'\ -f\ '.s:escaped_main
+        \.'\ check\ '.s:escaped_extra
   CompilerSet errorformat=hledger:\ %trror:\ %f:%l:%c:
   CompilerSet errorformat+=hledger:\ %trror:\ %f:%l:
   CompilerSet errorformat+=hledger:\ %trror:\ %f:%l-%.%#:
