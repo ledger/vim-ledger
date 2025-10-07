@@ -16,7 +16,7 @@ let b:did_ftplugin = 1
 
 let b:undo_ftplugin = 'setlocal '.
                     \ 'foldtext< '.
-                    \ 'include< comments< commentstring< omnifunc< formatprg<'
+                    \ 'include< comments< commentstring< omnifunc< formatexpr< formatprg<'
 
 setlocal foldtext=LedgerFoldText()
 setlocal include=^!\\?include
