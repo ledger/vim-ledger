@@ -148,5 +148,3 @@ syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
 
 let b:current_syntax = b:ledger_is_hledger ? 'hledger' : 'ledger'
-
-" vim:ts=2:sw=2:sts=2:foldmethod=marker

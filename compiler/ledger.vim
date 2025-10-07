@@ -43,5 +43,3 @@ else
   CompilerSet errorformat+=hledger:\ %trror:\ %f:%l:
   CompilerSet errorformat+=hledger:\ %trror:\ %f:%l-%.%#:
 endif
-
-" vim:ts=2:sw=2:sts=2:foldmethod=marker

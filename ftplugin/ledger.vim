@@ -35,14 +35,13 @@ if !exists('current_compiler')
   compiler ledger
 endif
 
-" Highlight groups for Ledger reports {{{
+" Highlight groups for Ledger reports
 hi link LedgerNumber Number
 hi link LedgerNegativeNumber Special
 hi link LedgerCleared Constant
 hi link LedgerPending Todo
 hi link LedgerTarget Statement
 hi link LedgerImproperPerc Special
-" }}}
 
 let s:cursym = '[[:alpha:]¢$€£]\+'
 let s:valreg = '\('.
@@ -69,7 +68,7 @@ let s:rx_amount = s:valreg.
                 \ '\s*\%('.s:cursym.'\s*\)\?'.
                 \ '\%(\s*;.*\)\?$'
 
-function! LedgerFoldText() "{{{1
+function! LedgerFoldText()
   " find amount
   let amount = ''
   let lnum = v:foldstart + 1
@@ -140,14 +139,14 @@ function! LedgerFoldText() "{{{1
   let foldtext .= fillstring
 
   return foldtext . amount
-endfunction "}}}
+endfunction
 
-function! LedgerComplete(findstart, base) "{{{1
+function! LedgerComplete(findstart, base)
   if a:findstart
     let lnum = line('.')
     let line = getline('.')
     let b:compl_context = ''
-    if line =~# '^\s\+[^[:blank:];]' "{{{2 (account)
+    if line =~# '^\s\+[^[:blank:];]'
       " only allow completion when in or at end of account name
       if matchend(line, '^\s\+\%(\S \S\|\S\)\+') >= col('.') - 1
         " the start of the first non-blank character
@@ -156,15 +155,15 @@ function! LedgerComplete(findstart, base) "{{{1
         let b:compl_context = 'account'
         return matchend(line, '^\s\+[*!]\?\s*[\[(]\?')
       endif
-    elseif line =~# '^\d' "{{{2 (description)
+    elseif line =~# '^\d'
       let pre = matchend(line, '^\d\S\+\%(([^)]*)\|[*?!]\|\s\)\+')
       if pre < col('.') - 1
         let b:compl_context = 'description'
         return pre
       endif
-    elseif line =~# '^$' "{{{2 (new line)
+    elseif line =~# '^$'
       let b:compl_context = 'new'
-    endif "}}}
+    endif
     return -1
   else
     if ! exists('b:compl_cache')
@@ -174,7 +173,7 @@ function! LedgerComplete(findstart, base) "{{{1
     let update_cache = 0
 
     let results = []
-    if b:compl_context ==# 'account' "{{{2 (account)
+    if b:compl_context ==# 'account'
       let hierarchy = split(a:base, ':')
       if a:base =~# ':$'
         call add(hierarchy, '')
@@ -201,15 +200,15 @@ function! LedgerComplete(findstart, base) "{{{1
       else
         let results = sort(results)
       endif
-    elseif b:compl_context ==# 'description' "{{{2 (description)
+    elseif b:compl_context ==# 'description'
       let results = ledger#filter_items(b:compl_cache.descriptions, a:base)
 
       if len(results) < 1
         let update_cache = 1
       endif
-    elseif b:compl_context ==# 'new' "{{{2 (new line)
+    elseif b:compl_context ==# 'new'
       return [strftime(b:ledger_date_format)]
-    endif "}}}
+    endif
 
 
     if b:ledger_include_original
@@ -225,9 +224,9 @@ function! LedgerComplete(findstart, base) "{{{1
       return results
     endif
   endif
-endf "}}}
+endf
 
-" Deprecated functions {{{1
+" Deprecated functions
 let s:deprecated = {
   \ 'LedgerToggleTransactionState': 'ledger#transaction_state_toggle',
   \ 'LedgerSetTransactionState': 'ledger#transaction_state_set',
@@ -241,9 +240,8 @@ for [s:old, s:new] in items(s:deprecated)
   exe s:fun
 endfor
 unlet s:old s:new s:fun
-" }}}1
 
-function! s:collect_completion_data() "{{{1
+function! s:collect_completion_data()
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
   if b:ledger_bin
@@ -298,17 +296,17 @@ function! s:collect_completion_data() "{{{1
   endfor
 
   return cache
-endf "}}}
+endf
 
-" Helper functions {{{1
+" Helper functions
 
 " return length of string with fix for multibyte characters
-function! s:multibyte_strlen(text) "{{{2
+function! s:multibyte_strlen(text)
    return strlen(substitute(a:text, '.', 'x', 'g'))
-endfunction "}}}
+endfunction
 
 " get # of visible/usable columns in current window
-function! s:get_columns() " {{{2
+function! s:get_columns()
   " As long as vim doesn't provide a command natively,
   " we have to compute the available columns.
   " see :help todo.txt -> /Add argument to winwidth()/
@@ -328,35 +326,35 @@ function! s:get_columns() " {{{2
   endif
 
   return columns
-endf "}}}
+endf
 
-function! s:sort_accounts_by_depth(name1, name2) "{{{2
+function! s:sort_accounts_by_depth(name1, name2)
   let depth1 = s:count_expression(a:name1, ':')
   let depth2 = s:count_expression(a:name2, ':')
   return depth1 == depth2 ? 0 : depth1 > depth2 ? 1 : -1
-endf "}}}
+endf
 
-function! s:count_expression(text, expression) "{{{2
+function! s:count_expression(text, expression)
   return len(split(a:text, a:expression, 1))-1
-endf "}}}
+endf
 
-function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos) "{{{2
+function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos)
   return (a:argLead =~# '^@') ?
         \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' payees'), '\n'),
         \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
         \ :
         \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' accounts'), '\n'),
         \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
-endf "}}}
+endf
 
-function! s:reconcile(file, account) "{{{2
+function! s:reconcile(file, account)
   " call inputsave()
   let l:amount = input('Target amount' . (empty(b:ledger_default_commodity) ? ': ' : ' (' . b:ledger_default_commodity . '): '))
   " call inputrestore()
   call ledger#reconcile(a:file, a:account, str2float(l:amount))
-endf "}}}
+endf
 
-" Commands {{{1
+" Commands
 command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
       \ Balance call ledger#show_balance(b:ledger_main, <q-args>)
 
@@ -372,6 +370,3 @@ command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
 
 command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
       \ Register call ledger#register(b:ledger_main, <q-args>)
-" }}}
-
-" vim:ts=2:sw=2:sts=2:foldmethod=marker

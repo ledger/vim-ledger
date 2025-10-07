@@ -122,7 +122,7 @@ if !exists('g:ledger_accounts_spell')
   let g:ledger_accounts_spell = 1
 endif
 
-" If enabled this will list the most detailed matches at the top {{{
+" If enabled this will list the most detailed matches at the top
 " of the completion list.
 " For example when you have some accounts like this:
 "   A:Ba:Bu
@@ -141,7 +141,6 @@ endif
 "   A:Bu
 "   A:Ba
 "   A
-" }}}
 if !exists('g:ledger_detailed_first')
   let g:ledger_detailed_first = 1
 endif
@@ -156,7 +155,7 @@ if !exists('g:ledger_include_original')
   let g:ledger_include_original = 0
 endif
 
-" Settings for Ledger reports {{{
+" Settings for Ledger reports
 if !exists('g:ledger_winpos')
   let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
 endif
@@ -176,9 +175,8 @@ endif
 if !exists('g:ledger_target_string')
   let g:ledger_target_string = 'Difference from target: '
 endif
-" }}}
 
-" Settings for the quickfix window {{{
+" Settings for the quickfix window
 if !exists('g:ledger_qf_register_format')
   let g:ledger_qf_register_format =
 				\ '%(date) %(justify(payee, 50)) '.
@@ -200,7 +198,6 @@ endif
 if !exists('g:ledger_qf_vertical')
   let g:ledger_qf_vertical = 0
 endif
-" }}}
 
 " Make sure config options are initialized either with values from the user or
 " global defaults we detect, guess, or suggest.
@@ -440,12 +437,12 @@ endf
 
 " == transaction object implementation ==
 
-let s:transaction = {} "{{{1
+let s:transaction = {}
 function! s:transaction.new() abort dict
   return copy(s:transaction)
 endf
 
-function! s:transaction.from_lnum(lnum) abort dict "{{{2
+function! s:transaction.from_lnum(lnum) abort dict
   let [head, tail] = s:get_transaction_extents(a:lnum)
   if ! head
     return {}
@@ -493,9 +490,9 @@ function! s:transaction.from_lnum(lnum) abort dict "{{{2
 
   let trans['description'] = join(parts)
   return trans
-endf "}}}
+endf
 
-function! s:transaction.set_state(char) abort dict "{{{2
+function! s:transaction.set_state(char) abort dict
   if a:char =~# '^\s*$'
     if has_key(self, 'state')
       call remove(self, 'state')
@@ -503,9 +500,9 @@ function! s:transaction.set_state(char) abort dict "{{{2
   else
     let self['state'] = a:char
   endif
-endf "}}}
+endf
 
-function! s:transaction.parse_body(...) abort dict "{{{2
+function! s:transaction.parse_body(...) abort dict
   if a:0 == 2
     let head = a:1
     let tail = a:2
@@ -568,9 +565,9 @@ function! s:transaction.parse_body(...) abort dict "{{{2
     let lnum += 1
   endw
   return [tags, postings]
-endf "}}}
+endf
 
-function! s:transaction.format_head() abort dict "{{{2
+function! s:transaction.format_head() abort dict
   if has_key(self, 'expr')
     return '~ '.self['expr']
   elseif has_key(self, 'auto')
@@ -587,8 +584,7 @@ function! s:transaction.format_head() abort dict "{{{2
   if has_key(self, 'appendix') | let line .= self['appendix'] | endif
 
   return line
-endf "}}}
-"}}}
+endf
 
 " == helper functions ==
 
@@ -816,9 +812,9 @@ function! ledger#align_formatexpr(lnum, count) abort
   execute a:lnum . ',' . (a:lnum + a:count - 1) . 'call ledger#align_commodity()'
 endfunction
 
-" Report generation {{{1
+" Report generation
 
-" Helper functions and variables {{{2
+" Helper functions and variables
 " Position of report windows
 let s:winpos_map = {
       \ 'T': 'to new',  't': 'abo new', 'B': 'bo new',  'b': 'bel new',
@@ -907,7 +903,6 @@ function! s:ledger_cmd(file, args) abort
   endif
   return join([g:ledger_bin, l:options, '-f', shellescape(expand(a:file)), a:args])
 endf
-" }}}
 
 function! ledger#autocomplete_and_align() abort
   if pumvisible()
@@ -1091,4 +1086,3 @@ function! ledger#show_balance(file, ...) abort
     echohl NONE
   endif
 endf
-" }}}
