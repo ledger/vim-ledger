@@ -1,7 +1,7 @@
 scriptencoding utf-8
 
 if !exists ('b:is_hledger')
-  let b:is_hledger = g:ledger_is_hledger
+  let b:is_hledger = get(g:, 'ledger_is_hledger', 0)
 endif
 
 " vim:ts=2:sw=2:sts=2:foldmethod=marker
