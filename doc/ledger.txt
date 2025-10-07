@@ -484,7 +484,7 @@ LICENSE                                                       *ledger-license*
 
 https://github.com/ledger/vim-ledger
 
-Copyright 2019 Caleb Maclennan
+Copyright 2019–2025 Caleb Maclennan
 Copyright 2009–2017 Johann Klähn
 Copyright 2009 Stefan Karrmann
 Copyright 2005 Wolfgang Oertl

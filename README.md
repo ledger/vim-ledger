@@ -139,7 +139,7 @@ Of course you can insert the closing bracket after calling the completion, too.
 
 ## License
 
-Copyright 2019–2021 Caleb Maclennan  
+Copyright 2019–2025 Caleb Maclennan  
 Copyright 2009–2017 Johann Klähn  
 Copyright 2009 Stefan Karrmann  
 Copyright 2005 Wolfgang Oertl

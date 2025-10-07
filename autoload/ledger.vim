@@ -1,3 +1,9 @@
+" SPDX-FileCopyrightText: © 2019 Caleb Maclennan <caleb@alerque.com>
+" SPDX-FileCopyrightText: © 2009 Johann Klähn <kljohann@gmail.com>
+" SPDX-FileCopyrightText: © 2009 Stefan Karrmann
+" SPDX-FileCopyrightText: © 2005 Wolfgang Oertl
+" SPDX-License-Identifier: GPL-2.0-or-later
+
 scriptencoding utf-8
 
 if exists("g:loaded_ledger")

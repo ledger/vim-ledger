@@ -1,7 +1,8 @@
-" Vim filetype plugin file
-" filetype: ledger
-" by Johann Klähn; Use according to the terms of the GPL>=2.
-" vim:ts=2:sw=2:sts=2:foldmethod=marker
+" SPDX-FileCopyrightText: © 2019 Caleb Maclennan <caleb@alerque.com>
+" SPDX-FileCopyrightText: © 2009 Johann Klähn <kljohann@gmail.com>
+" SPDX-FileCopyrightText: © 2009 Stefan Karrmann
+" SPDX-FileCopyrightText: © 2005 Wolfgang Oertl
+" SPDX-License-Identifier: GPL-2.0-or-later
 
 scriptencoding utf-8
 
@@ -372,3 +373,5 @@ command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
 command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
       \ Register call ledger#register(b:ledger_main, <q-args>)
 " }}}
+
+" vim:ts=2:sw=2:sts=2:foldmethod=marker

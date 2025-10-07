@@ -1,9 +1,8 @@
-" Vim syntax file
-" filetype: ledger
-" by Johann Klähn; Use according to the terms of the GPL>=2.
-" by Stefan Karrmann; Use according to the terms of the GPL>=2.
-" by Wolfgang Oertl; Use according to the terms of the GPL>=2.
-" vim:ts=2:sw=2:sts=2:foldmethod=marker
+" SPDX-FileCopyrightText: © 2019 Caleb Maclennan <caleb@alerque.com>
+" SPDX-FileCopyrightText: © 2009 Johann Klähn <kljohann@gmail.com>
+" SPDX-FileCopyrightText: © 2009 Stefan Karrmann
+" SPDX-FileCopyrightText: © 2005 Wolfgang Oertl
+" SPDX-License-Identifier: GPL-2.0-or-later
 
 scriptencoding utf-8
 
@@ -149,3 +148,5 @@ syn sync clear
 syn sync match ledgerSync grouphere ledgerTransaction "^[[:digit:]~=]"
 
 let b:current_syntax = b:ledger_is_hledger ? 'hledger' : 'ledger'
+
+" vim:ts=2:sw=2:sts=2:foldmethod=marker
