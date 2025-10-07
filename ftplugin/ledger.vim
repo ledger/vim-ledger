@@ -226,21 +226,6 @@ function! LedgerComplete(findstart, base)
   endif
 endfunction
 
-" Deprecated functions
-let s:deprecated = {
-  \ 'LedgerToggleTransactionState': 'ledger#transaction_state_toggle',
-  \ 'LedgerSetTransactionState': 'ledger#transaction_state_set',
-  \ 'LedgerSetDate': 'ledger#transaction_date_set'
-  \ }
-
-for [s:old, s:new] in items(s:deprecated)
-  let s:fun = "function! {s:old}(...)\nechohl WarningMsg\necho '" . s:old .
-            \ ' is deprecated. Use '.s:new." instead!'\nechohl None\n" .
-            \ "call call('" . s:new . "', a:000)\nendfunction"
-  execute s:fun
-endfor
-unlet s:old s:new s:fun
-
 function! s:collect_completion_data()
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
