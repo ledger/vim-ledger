@@ -14,8 +14,8 @@ endif
 
 let b:did_indent = 1
 
-setl autoindent
-setl indentexpr=GetLedgerIndent()
+setlocal autoindent
+setlocal indentexpr=GetLedgerIndent()
 
 if exists('*GetLedgerIndent')
   finish
@@ -49,4 +49,4 @@ function GetLedgerIndent(...)
     " start of transactions, pre-declarations, apply/end-lines
     return 0
   endif
-endf
+endfunction

@@ -274,7 +274,7 @@ function! ledger#transaction_state_toggle(lnum, ...) abort
   call trans.set_state(new)
 
   call setline(trans['head'], trans.format_head())
-endf
+endfunction
 
 function! ledger#transaction_state_set(lnum, char) abort
   " modifies or sets the state of the transaction at the given line no.,
@@ -287,7 +287,7 @@ function! ledger#transaction_state_set(lnum, char) abort
   call trans.set_state(a:char)
 
   call setline(trans['head'], trans.format_head())
-endf
+endfunction
 
 function! ledger#transaction_date_set(lnum, type, ...) abort
   let time = a:0 == 1 ? a:1 : localtime()
@@ -329,7 +329,7 @@ function! ledger#transaction_date_set(lnum, type, ...) abort
   let trans['date'] = join(date[0:1], '=')
 
   call setline(trans['head'], trans.format_head())
-endf
+endfunction
 
 function! ledger#transaction_post_state_get(lnum) abort
   " safe view / position
@@ -351,7 +351,7 @@ function! ledger#transaction_post_state_get(lnum) abort
 
   call winrestview(view)
   return state
-endf
+endfunction
 
 function! ledger#transaction_post_state_toggle(lnum, ...) abort
   if a:0 == 1
@@ -370,7 +370,7 @@ function! ledger#transaction_post_state_toggle(lnum, ...) abort
   let new = chars[i >= len(chars) ? 0 : i]
 
   call ledger#transaction_post_state_set(a:lnum, new)
-endf
+endfunction
 
 function! ledger#transaction_post_state_set(lnum, char) abort
   let state = ledger#transaction_post_state_get(a:lnum)
@@ -392,13 +392,13 @@ function! ledger#transaction_post_state_set(lnum, char) abort
     let newline = substitute(line, '\V' . state, a:char, '')
   endif
   call setline(a:lnum, newline)
-endf
+endfunction
 
 " == get transactions ==
 
 function! ledger#transaction_from_lnum(lnum) abort
   return s:transaction.from_lnum(a:lnum)
-endf
+endfunction
 
 function! ledger#transactions(...) abort
   if a:0 == 2
@@ -426,21 +426,21 @@ function! ledger#transactions(...) abort
       call cursor(trans['tail'], 0)
     endif
     let lnum = search('^[~=[:digit:]]', 'cW')
-  endw
+  endwhile
 
   " restore view / position
   let &foldenable = fe
   call winrestview(view)
 
   return transactions
-endf
+endfunction
 
 " == transaction object implementation ==
 
 let s:transaction = {}
 function! s:transaction.new() abort dict
   return copy(s:transaction)
-endf
+endfunction
 
 function! s:transaction.from_lnum(lnum) abort dict
   let [head, tail] = s:get_transaction_extents(a:lnum)
@@ -490,7 +490,7 @@ function! s:transaction.from_lnum(lnum) abort dict
 
   let trans['description'] = join(parts)
   return trans
-endf
+endfunction
 
 function! s:transaction.set_state(char) abort dict
   if a:char =~# '^\s*$'
@@ -500,7 +500,7 @@ function! s:transaction.set_state(char) abort dict
   else
     let self['state'] = a:char
   endif
-endf
+endfunction
 
 function! s:transaction.parse_body(...) abort dict
   if a:0 == 2
@@ -534,7 +534,7 @@ function! s:transaction.parse_body(...) abort dict
         let account = matchstr(rest, '^\s*\zs.\{-}\ze\s*$')
       endif
       call add(postings, {'account': account, 'amount': amount, 'state': state})
-    end
+    endif
 
     " where are tags to be stored?
     if empty(postings)
@@ -563,9 +563,9 @@ function! s:transaction.parse_body(...) abort dict
       endif
     endif
     let lnum += 1
-  endw
+  endwhile
   return [tags, postings]
-endf
+endfunction
 
 function! s:transaction.format_head() abort dict
   if has_key(self, 'expr')
@@ -584,7 +584,7 @@ function! s:transaction.format_head() abort dict
   if has_key(self, 'appendix') | let line .= self['appendix'] | endif
 
   return line
-endf
+endfunction
 
 " == helper functions ==
 
@@ -623,14 +623,14 @@ function! ledger#declared_accounts(...) abort
     endif
 
     call cursor(lnum+1,0)
-  endw
+  endwhile
 
   " restore view / position
   let &foldenable = fe
   call winrestview(view)
 
   return accounts
-endf
+endfunction
 
 function! s:get_transaction_extents(lnum) abort
   if ! (indent(a:lnum) || getline(a:lnum) =~# '^[~=[:digit:]]')
@@ -653,7 +653,7 @@ function! s:get_transaction_extents(lnum) abort
   call winrestview(view)
 
   return head ? [head, tail] : [0, 0]
-endf
+endfunction
 
 function! ledger#find_in_tree(tree, levels) abort
   if empty(a:levels)
@@ -673,12 +673,12 @@ function! ledger#find_in_tree(tree, levels) abort
     endif
   endfor
   return results
-endf
+endfunction
 
 function! ledger#filter_items(list, keyword) abort
   " return only those items that start with a specified keyword
   return filter(copy(a:list), 'v:val =~ ''^\V'.substitute(a:keyword, '\\', '\\\\', 'g').'''')
-endf
+endfunction
 
 function! s:findall(text, rx) abort
   " returns all the matches in a string,
@@ -692,19 +692,19 @@ function! s:findall(text, rx) abort
     endif
 
     call add(matches, m)
-  endw
+  endwhile
 
   return matches
-endf
+endfunction
 
 " Move the cursor to the specified column, filling the line with spaces if necessary.
 " Ensure that at least min_spaces are added, and go to the end of the line if
 " the line is already too long
 function! s:goto_col(pos, min_spaces) abort
-  exec 'normal!' '$'
+  execute 'normal!' '$'
   let diff = max([a:min_spaces, a:pos - virtcol('.')])
-  if diff > 0 | exec 'normal!' diff . 'a ' | endif
-endf
+  if diff > 0 | execute 'normal!' diff . 'a ' | endif
+endfunction
 
 " Return character position of decimal separator (multibyte safe)
 function! s:decimalpos(expr) abort
@@ -721,9 +721,9 @@ function! s:decimalpos(expr) abort
     if pos > 0
       let pos = strchars(a:expr[:pos]) - 1
     endif
-  end
+  endif
   return pos
-endf
+endfunction
 
 " Align the amount expression after an account name at the decimal point.
 "
@@ -771,9 +771,9 @@ function! ledger#align_commodity() abort
     else
       call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2, 2)
     endif " Append the part of the line that was previously removed:
-    exe 'normal! a' . rhs
+    execute 'normal! a' . rhs
   endif
-endf
+endfunction
 
 " Align the commodity on the entire buffer
 function! ledger#align_commodity_buffer() abort
@@ -786,7 +786,7 @@ function! ledger#align_commodity_buffer() abort
   " Restore the viewport position
   call winrestview(view)
   unlet view
-endf
+endfunction
 
 " Align the amount under the cursor and append/prepend the default currency.
 function! ledger#align_amount_at_cursor() abort
@@ -800,13 +800,13 @@ function! ledger#align_amount_at_cursor() abort
   " Paste text at the correct column and append/prepend default commodity:
   if g:ledger_commodity_before
     call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1, 2)
-    exe 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
+    execute 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
     normal! p
   else
     call s:goto_col(g:ledger_align_at - pos - 1, 2)
-    exe 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
+    execute 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
   endif
-endf
+endfunction
 
 function! ledger#align_formatexpr(lnum, count) abort
   execute a:lnum . ',' . (a:lnum + a:count - 1) . 'call ledger#align_commodity()'
@@ -827,7 +827,7 @@ function! s:error_message(msg) abort
   echo "\r"
   echomsg a:msg
   echohl NONE
-endf
+endfunction
 
 function! s:warning_message(msg) abort
   redraw  " See h:echo-redraw
@@ -835,7 +835,7 @@ function! s:warning_message(msg) abort
   echo "\r"
   echomsg a:msg
   echohl NONE
-endf
+endfunction
 
 " Open the quickfix/location window when it is not empty,
 " closes it if it is empty.
@@ -862,8 +862,8 @@ function! s:quickfix_toggle(...) abort
     " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
     " See: https://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
     if g:ledger_qf_hide_file
-      setl conceallevel=2
-      setl concealcursor=nc
+      setlocal conceallevel=2
+      setlocal concealcursor=nc
       syntax match qfFile /^[^|]*/ transparent conceal
     endif
     if a:0 > 0
@@ -875,7 +875,7 @@ function! s:quickfix_toggle(...) abort
   execute l:list.'close'
   call s:warning_message((a:0 > 1) ? a:2 : 'No results')
   return 0
-endf
+endfunction
 
 " Populate a quickfix/location window with data. The argument must be a String
 " or a List.
@@ -892,7 +892,7 @@ function! s:quickfix_populate(data) abort
   execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
   let &errorformat = l:efm  " Restore global errorformat
   return
-endf
+endfunction
 
 " Build a ledger command to process the given file.
 function! s:ledger_cmd(file, args) abort
@@ -902,7 +902,7 @@ function! s:ledger_cmd(file, args) abort
       \ '--input-date-format', g:ledger_date_format])
   endif
   return join([g:ledger_bin, l:options, '-f', shellescape(expand(a:file)), a:args])
-endf
+endfunction
 
 function! ledger#autocomplete_and_align() abort
   if pumvisible()
@@ -918,7 +918,7 @@ function! ledger#autocomplete_and_align() abort
     return "\<c-o>A"
   endif
   return "\<c-x>\<c-o>"
-endf
+endfunction
 
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
@@ -934,7 +934,7 @@ function! ledger#entry() abort
   " Append output so we insert instead of overwrite, then delete line
   call append('.', l:output)
   normal! "_dd
-endfunc
+endfunction
 
 " Run an arbitrary ledger command and show the output in a new buffer. If
 " there are errors, no new buffer is opened: the errors are displayed in a
@@ -953,7 +953,7 @@ function! ledger#report(file, args) abort
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
   endif
   return l:output
-endf
+endfunction
 
 " Open the output of a Ledger's command in a new buffer.
 "
@@ -980,7 +980,7 @@ function! ledger#output(report) abort
   syntax match LedgerNegativeNumber /-\d\+\([,.]\d\+\)*/
   syntax match LedgerImproperPerc /\d\d\d\+%/
   return 1
-endf
+endfunction
 
 " Show an arbitrary register report in a quickfix list.
 "
@@ -996,7 +996,7 @@ function! ledger#register(file, args) abort
         \ ]))
   call s:quickfix_populate(split(system(l:cmd), '\n'))
   call s:quickfix_toggle('Register report')
-endf
+endfunction
 
 " Reconcile the given account.
 "
@@ -1027,7 +1027,7 @@ function! ledger#reconcile(file, account, target_amount) abort
           \ . l:file . "','" . a:account . "'," . string(a:target_amount) . ')<cr>'
     call ledger#show_balance(l:file, a:account)
   endif
-endf
+endfunction
 
 function! s:finish_reconciling() abort
   unlet g:ledger_target_amount
@@ -1035,7 +1035,7 @@ function! s:finish_reconciling() abort
     autocmd!
   augroup END
   augroup! reconcile
-endf
+endfunction
 
 " Show the pending/cleared balance of an account.
 " This function has an optional parameter:
@@ -1085,4 +1085,4 @@ function! ledger#show_balance(file, ...) abort
     echon printf('%.2f', (g:ledger_target_amount - str2float(l:amounts[2])))
     echohl NONE
   endif
-endf
+endfunction

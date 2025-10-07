@@ -18,17 +18,17 @@ let b:undo_ftplugin = 'setlocal '.
                     \ 'foldtext< '.
                     \ 'include< comments< commentstring< omnifunc< formatprg<'
 
-setl foldtext=LedgerFoldText()
-setl include=^!\\?include
-setl comments=b:;
-setl commentstring=;%s
-setl omnifunc=LedgerComplete
-setl formatexpr=ledger#align_formatexpr(v:lnum,v:count)
+setlocal foldtext=LedgerFoldText()
+setlocal include=^!\\?include
+setlocal comments=b:;
+setlocal commentstring=;%s
+setlocal omnifunc=LedgerComplete
+setlocal formatexpr=ledger#align_formatexpr(v:lnum,v:count)
 
 " Automatic formatting is disabled by default because it can cause data loss when run
 " on non-transaction blocks, see https://github.com/ledger/vim-ledger/issues/168.
 if b:ledger_dangerous_formatprg
-  exe 'setl formatprg='.substitute(b:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
+  execute 'setlocal formatprg='.substitute(b:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
 endif
 
 if !exists('current_compiler')
@@ -36,12 +36,12 @@ if !exists('current_compiler')
 endif
 
 " Highlight groups for Ledger reports
-hi link LedgerNumber Number
-hi link LedgerNegativeNumber Special
-hi link LedgerCleared Constant
-hi link LedgerPending Todo
-hi link LedgerTarget Statement
-hi link LedgerImproperPerc Special
+highlight default link LedgerNumber Number
+highlight default link LedgerNegativeNumber Special
+highlight default link LedgerCleared Constant
+highlight default link LedgerPending Todo
+highlight default link LedgerTarget Statement
+highlight default link LedgerImproperPerc Special
 
 let s:cursym = '[[:alpha:]¢$€£]\+'
 let s:valreg = '\('.
@@ -224,7 +224,7 @@ function! LedgerComplete(findstart, base)
       return results
     endif
   endif
-endf
+endfunction
 
 " Deprecated functions
 let s:deprecated = {
@@ -236,8 +236,8 @@ let s:deprecated = {
 for [s:old, s:new] in items(s:deprecated)
   let s:fun = "function! {s:old}(...)\nechohl WarningMsg\necho '" . s:old .
             \ ' is deprecated. Use '.s:new." instead!'\nechohl None\n" .
-            \ "call call('" . s:new . "', a:000)\nendf"
-  exe s:fun
+            \ "call call('" . s:new . "', a:000)\nendfunction"
+  execute s:fun
 endfor
 unlet s:old s:new s:fun
 
@@ -296,7 +296,7 @@ function! s:collect_completion_data()
   endfor
 
   return cache
-endf
+endfunction
 
 " Helper functions
 
@@ -326,17 +326,17 @@ function! s:get_columns()
   endif
 
   return columns
-endf
+endfunction
 
 function! s:sort_accounts_by_depth(name1, name2)
   let depth1 = s:count_expression(a:name1, ':')
   let depth2 = s:count_expression(a:name2, ':')
   return depth1 == depth2 ? 0 : depth1 > depth2 ? 1 : -1
-endf
+endfunction
 
 function! s:count_expression(text, expression)
   return len(split(a:text, a:expression, 1))-1
-endf
+endfunction
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos)
   return (a:argLead =~# '^@') ?
@@ -345,14 +345,14 @@ function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos)
         \ :
         \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' accounts'), '\n'),
         \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
-endf
+endfunction
 
 function! s:reconcile(file, account)
   " call inputsave()
   let l:amount = input('Target amount' . (empty(b:ledger_default_commodity) ? ': ' : ' (' . b:ledger_default_commodity . '): '))
   " call inputrestore()
   call ledger#reconcile(a:file, a:account, str2float(l:amount))
-endf
+endfunction
 
 " Commands
 command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
