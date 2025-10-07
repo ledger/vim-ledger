@@ -33,7 +33,7 @@ else
 endif
 
 if !exists('g:ledger_main')
-  let g:ledger_main = '%'
+  let g:ledger_main = '%:p'
 endif
 
 if !exists('g:ledger_dangerous_formatprg')

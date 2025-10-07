@@ -388,7 +388,7 @@ behaviour of the ledger filetype.
 
 * The file to be used to generate reports:
 
-        let g:ledger_main = '%'
+        let g:ledger_main = '%:p'
 
   The default is to use the current file.
 
