@@ -22,5 +22,5 @@ preview vimcmd *ARGS:
     {{ vimcmd }} \
     	-c {{ quote("let &runtimepath=\"" + justfile_directory() + ",\" . &runtimepath") }} \
     	-c {{ quote('runtime ftdetect/ledger.vim') }} \
-    	-c 'syntax enable' \
+    	-c 'filetype detect' \
     	{{ ARGS }}
