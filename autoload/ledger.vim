@@ -108,6 +108,14 @@ if !exists('g:ledger_commodity_sep')
   let g:ledger_commodity_sep = ''
 endif
 
+if !exists('g:ledger_commodity_spell')
+  let g:ledger_commodity_spell = 0
+endif
+
+if !exists('g:ledger_accounts_spell')
+  let g:ledger_accounts_spell = 1
+endif
+
 " If enabled this will list the most detailed matches at the top {{{
 " of the completion list.
 " For example when you have some accounts like this:
@@ -186,10 +194,6 @@ endif
 if !exists('g:ledger_qf_vertical')
   let g:ledger_qf_vertical = 0
 endif
-
-if !exists('g:ledger_qf_hide_file')
-  let g:ledger_qf_hide_file = 1
-endif
 " }}}
 
 " Make sure config options are initialized either with values from the user or
@@ -201,6 +205,7 @@ function! ledger#init() abort
   endif
 
   let settings = [
+    \ 'ledger_accounts_spell',
     \ 'ledger_accounts_cmd',
     \ 'ledger_align_at',
     \ 'ledger_align_commodity',

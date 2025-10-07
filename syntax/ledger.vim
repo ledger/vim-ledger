@@ -25,9 +25,15 @@ if s:fb == 1
   let s:skip .= '\n\@!'
 endif
 
-let s:ledgerAmount_contains = ''
+let s:ledgerAmounts_contains = ''
+let s:ledgerAccounts_contains = ''
+
 if b:ledger_commodity_spell == 0
-    let s:ledgerAmount_contains .= '@NoSpell'
+  let s:ledgerAmounts_contains .= '@NoSpell'
+endif
+
+if b:ledger_accounts_spell == 0
+  let s:ledgerAccounts_contains .= '@NoSpell'
 endif
 
 " for debugging
@@ -46,11 +52,11 @@ syn match ledgerPosting /^\s\+[^[:blank:];].*/
 " every space in an account name shall be surrounded by two non-spaces
 " every account name ends with a tab, two spaces or the end of the line
 exe 'syn match ledgerAccount '.
-      \ '/'.s:oe.'^\s\+\zs\%(\S'.s:lb1.' \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contained'
+      \ '/'.s:oe.'^\s\+\zs\%(\S'.s:lb1.' \S\|\S\)\+\ze\%(  \|\t\|\s*$\)/ contains='.s:ledgerAccounts_contains.' contained'
 exe 'syn match ledgerAmount '.
-      \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^();[:space:]]\|\s\+[^();[:space:]]\)\+/ contains='.s:ledgerAmount_contains.' contained'
+      \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs\%([^();[:space:]]\|\s\+[^();[:space:]]\)\+/ contains='.s:ledgerAmounts_contains.' contained'
 exe 'syn match ledgerValueExpression '.
-      \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs(\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+)/ contains='.s:ledgerAmount_contains.' contained'
+      \ '/'.s:oe.'\S'.s:lb1.'\%(  \|\t\)\s*\zs(\%([^;[:space:]]\|\s\+[^;[:space:]]\)\+)/ contains='.s:ledgerAmounts_contains.' contained'
 
 syn region ledgerPreDeclaration start=/^\(account\|payee\|commodity\|tag\)/ skip=/^\s/ end=/^/
     \ keepend transparent
