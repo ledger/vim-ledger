@@ -72,8 +72,8 @@ syntax region ledgerBlockComment start=/^comment/ end=/^end comment/
 syntax region ledgerBlockTest start=/^test/ end=/^end test/
 execute 'syntax match ledgerComment /^['.s:line_comment_chars.'].*$/'
 
-" Tags (metadata) are handled a bit differntly in ledger-cli vs. hledger even
-" though they both nested in commens the same way.
+" Tags (metadata) are handled a bit differently in ledger-cli vs. hledger even
+" though they both nested in comments the same way.
 if b:ledger_is_hledger
   syntax region ledgerTransactionMetadata start=/;/ end=/^/
         \ keepend contained contains=ledgerTags
