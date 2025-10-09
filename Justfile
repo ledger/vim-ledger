@@ -21,6 +21,5 @@ preview-nvim *ARGS: (preview nvim + ' --clean' ARGS)
 preview vimcmd *ARGS:
     {{ vimcmd }} \
     	-c {{ quote("let &runtimepath=\"" + justfile_directory() + ",\" . &runtimepath") }} \
-    	-c {{ quote('runtime ftdetect/ledger.vim') }} \
     	-c 'filetype detect' \
     	{{ ARGS }}
