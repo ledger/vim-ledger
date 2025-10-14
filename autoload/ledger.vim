@@ -168,13 +168,14 @@ function! ledger#init() abort
   endif
 
   let settings = [
-    \ 'ledger_accounts_spell',
     \ 'ledger_accounts_cmd',
+    \ 'ledger_accounts_spell',
     \ 'ledger_align_at',
     \ 'ledger_align_commodity',
     \ 'ledger_align_last',
     \ 'ledger_cleared_string',
     \ 'ledger_commodity_before',
+    \ 'ledger_commodity_sep',
     \ 'ledger_commodity_spell',
     \ 'ledger_dangerous_formatprg',
     \ 'ledger_date_format',
@@ -186,10 +187,6 @@ function! ledger#init() abort
     \ 'ledger_extra_options',
     \ 'ledger_fillstring',
     \ 'ledger_fold_blanks',
-    \ 'ledger_fold_blanks',
-    \ 'ledger_fold_blanks',
-    \ 'ledger_fold_blanks',
-    \ 'ledger_fold_blanks',
     \ 'ledger_fuzzy_account_completion',
     \ 'ledger_include_original',
     \ 'ledger_is_hledger',
@@ -200,7 +197,6 @@ function! ledger#init() abort
     \ 'ledger_qf_reconcile_format',
     \ 'ledger_qf_register_format',
     \ 'ledger_qf_size',
-    \ 'ledger_qf_vertical',
     \ 'ledger_qf_vertical',
     \ 'ledger_target_string',
     \ 'ledger_use_location_list',
@@ -975,7 +971,7 @@ function! ledger#reconcile(file, account, target_amount) abort
   let l:file = expand(a:file) " Needed for #show_balance() later
   call s:quickfix_populate(split(system(l:cmd), '\n'))
   if s:quickfix_toggle('Reconcile ' . a:account, 'Nothing to reconcile')
-    let b:ledger_target_amount = a:target_amount
+    let s:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
       autocmd!
@@ -990,7 +986,7 @@ function! ledger#reconcile(file, account, target_amount) abort
 endfunction
 
 function! s:finish_reconciling() abort
-  unlet b:ledger_target_amount
+  unlet s:ledger_target_amount
   augroup reconcile
     autocmd!
   augroup END
@@ -1039,10 +1035,10 @@ function! ledger#show_balance(file, ...) abort
   echohl LedgerCleared
   echon l:amounts[1]
   echohl NONE
-  if exists('b:ledger_target_amount')
+  if exists('s:ledger_target_amount')
     echon ' ' b:ledger_target_string
     echohl LedgerTarget
-    echon printf('%.2f', (b:ledger_target_amount - str2float(l:amounts[2])))
+    echon printf('%.2f', (s:ledger_target_amount - str2float(l:amounts[2])))
     echohl NONE
   endif
 endfunction
