@@ -256,7 +256,7 @@ function! ledger#transaction_date_set(lnum, type, ...) abort
     return
   endif
 
-  let formatted = strftime(g:ledger_date_format, time)
+  let formatted = strftime(b:ledger_date_format, time)
   if has_key(trans, 'date') && ! empty(trans['date'])
     let date = split(trans['date'], '=')
   else
@@ -671,13 +671,13 @@ function! s:decimalpos(expr) abort
   " Remove trailing comments
   let l:expr = substitute(a:expr, '\v +;.*$', '', '')
   " Find first or last possible decimal separator candidate
-  if g:ledger_align_last
-    let pos = matchend(l:expr, '\v.*[' . g:ledger_decimal_sep . ']')
+  if b:ledger_align_last
+    let pos = matchend(l:expr, '\v.*[' . b:ledger_decimal_sep . ']')
     if pos > 0
       let pos = strchars(a:expr[:pos]) + 1
     endif
   else
-    let pos = match(l:expr, '\v[' . g:ledger_decimal_sep . ']')
+    let pos = match(l:expr, '\v[' . b:ledger_decimal_sep . ']')
     if pos > 0
       let pos = strchars(a:expr[:pos]) - 1
     endif
@@ -688,7 +688,7 @@ endfunction
 " Align the amount expression after an account name at the decimal point.
 "
 " This function moves the amount expression of a posting so that the decimal
-" separator is aligned at the column specified by g:ledger_align_at.
+" separator is aligned at the column specified by b:ledger_align_at.
 "
 " For example, after selecting:
 "
@@ -712,9 +712,9 @@ function! ledger#align_commodity() abort
     " Remove everything after the account name (including spaces):
     call setline('.', substitute(l:line, '\m^\s\+[^[:space:]].\{-}\zs\(\t\|  \).*$', '', ''))
     let pos = -1
-    if g:ledger_align_commodity == 1
+    if b:ledger_align_commodity == 1
       let pos = 0
-    elseif g:ledger_decimal_sep !=# ''
+    elseif b:ledger_decimal_sep !=# ''
       " Find the position of the first decimal separator:
       let pos = s:decimalpos(rhs)
     endif
@@ -725,11 +725,11 @@ function! ledger#align_commodity() abort
         let pos = strchars(rhs[:pos])
       endif
     endif
-    " Go to the column that allows us to align the decimal separator at g:ledger_align_at:
+    " Go to the column that allows us to align the decimal separator at b:ledger_align_at:
     if pos >= 0
-      call s:goto_col(g:ledger_align_at - pos - 1, 2)
+      call s:goto_col(b:ledger_align_at - pos - 1, 2)
     else
-      call s:goto_col(g:ledger_align_at - strdisplaywidth(rhs) - 2, 2)
+      call s:goto_col(b:ledger_align_at - strdisplaywidth(rhs) - 2, 2)
     endif " Append the part of the line that was previously removed:
     execute 'normal! a' . rhs
   endif
@@ -758,13 +758,13 @@ function! ledger#align_amount_at_cursor() abort
     let pos = len(@")
   endif
   " Paste text at the correct column and append/prepend default commodity:
-  if g:ledger_commodity_before
-    call s:goto_col(g:ledger_align_at - pos - len(g:ledger_default_commodity) - len(g:ledger_commodity_sep) - 1, 2)
-    execute 'normal! a' . g:ledger_default_commodity . g:ledger_commodity_sep
+  if b:ledger_commodity_before
+    call s:goto_col(b:ledger_align_at - pos - len(b:ledger_default_commodity) - len(b:ledger_commodity_sep) - 1, 2)
+    execute 'normal! a' . b:ledger_default_commodity . b:ledger_commodity_sep
     normal! p
   else
-    call s:goto_col(g:ledger_align_at - pos - 1, 2)
-    execute 'normal! pa' . g:ledger_commodity_sep . g:ledger_default_commodity
+    call s:goto_col(b:ledger_align_at - pos - 1, 2)
+    execute 'normal! pa' . b:ledger_commodity_sep . b:ledger_default_commodity
   endif
 endfunction
 
@@ -806,7 +806,7 @@ endfunction
 "
 " Returns 0 if the quickfix window is empty, 1 otherwise.
 function! s:quickfix_toggle(...) abort
-  if g:ledger_use_location_list
+  if b:ledger_use_location_list
     let l:list = 'l'
     let l:open = (len(getloclist(winnr())) > 0)
   else
@@ -815,13 +815,13 @@ function! s:quickfix_toggle(...) abort
   endif
 
   if l:open
-    execute (g:ledger_qf_vertical ? 'vert' : 'botright') l:list.'open' g:ledger_qf_size
+    execute (b:ledger_qf_vertical ? 'vert' : 'botright') l:list.'open' b:ledger_qf_size
     " Set local mappings to quit the quickfix window  or lose focus.
     nnoremap <silent> <buffer> <tab> <c-w><c-w>
     execute 'nnoremap <silent> <buffer> q :' l:list.'close<CR>'
     " Note that the following settings do not persist (e.g., when you close and re-open the quickfix window).
     " See: https://superuser.com/questions/356912/how-do-i-change-the-quickix-title-status-bar-in-vim
-    if g:ledger_qf_hide_file
+    if b:ledger_qf_hide_file
       setlocal conceallevel=2
       setlocal concealcursor=nc
       syntax match qfFile /^[^|]*/ transparent conceal
@@ -849,19 +849,19 @@ function! s:quickfix_populate(data) abort
   " Format to parse reports:
   set errorformat+=%f:%l\ %m
   set errorformat+=%-G%.%#
-  execute (g:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
+  execute (b:ledger_use_location_list ? 'l' : 'c').'getexpr' 'a:data'
   let &errorformat = l:efm  " Restore global errorformat
   return
 endfunction
 
 " Build a ledger command to process the given file.
 function! s:ledger_cmd(file, args) abort
-  let l:options = g:ledger_extra_options
-  if len(g:ledger_date_format) > 0 && !b:ledger_is_hledger
-    let l:options = join([l:options, '--date-format', g:ledger_date_format,
-      \ '--input-date-format', g:ledger_date_format])
+  let l:options = b:ledger_extra_options
+  if len(b:ledger_date_format) > 0 && !b:ledger_is_hledger
+    let l:options = join([l:options, '--date-format', b:ledger_date_format,
+      \ '--input-date-format', b:ledger_date_format])
   endif
-  return join([g:ledger_bin, l:options, '-f', shellescape(expand(a:file)), a:args])
+  return join([b:ledger_bin, l:options, '-f', shellescape(expand(a:file)), a:args])
 endfunction
 
 function! ledger#autocomplete_and_align() abort
@@ -883,7 +883,7 @@ endfunction
 " Use current line as input to ledger entry and replace with output. If there
 " are errors, they are echoed instead.
 function! ledger#entry() abort
-  let l:output = split(system(s:ledger_cmd(g:ledger_main, join(['entry', '--', getline('.')]))), '\n')
+  let l:output = split(system(s:ledger_cmd(b:ledger_main, join(['entry', '--', getline('.')]))), '\n')
   " Filter out warnings
   let l:output = filter(l:output, "v:val !~? '^Warning: '")
   " Errors may occur
@@ -928,7 +928,7 @@ function! ledger#output(report) abort
     return 0
   endif
   " Open a new buffer to show Ledger's output.
-  execute get(s:winpos_map, g:ledger_winpos, 'bo new')
+  execute get(s:winpos_map, b:ledger_winpos, 'bo new')
   setlocal buftype=nofile bufhidden=wipe modifiable nobuflisted noswapfile nowrap
   call append(0, a:report)
   setlocal nomodifiable
@@ -950,7 +950,7 @@ endfunction
 function! ledger#register(file, args) abort
   let l:cmd = s:ledger_cmd(a:file, join([
         \ 'register',
-        \ "--format='" . g:ledger_qf_register_format . "'",
+        \ "--format='" . b:ledger_qf_register_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) '",
         \ a:args
         \ ]))
@@ -968,14 +968,14 @@ function! ledger#reconcile(file, account, target_amount) abort
   let l:cmd = s:ledger_cmd(a:file, join([
         \ 'register',
         \ '--uncleared',
-        \ "--format='" . g:ledger_qf_reconcile_format . "'",
+        \ "--format='" . b:ledger_qf_reconcile_format . "'",
         \ "--prepend-format='%(filename):%(beg_line) %(pending ? \"P\" : \"U\") '",
         \ shellescape(a:account)
         \ ]))
   let l:file = expand(a:file) " Needed for #show_balance() later
   call s:quickfix_populate(split(system(l:cmd), '\n'))
   if s:quickfix_toggle('Reconcile ' . a:account, 'Nothing to reconcile')
-    let g:ledger_target_amount = a:target_amount
+    let b:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
     augroup reconcile
       autocmd!
@@ -990,7 +990,7 @@ function! ledger#reconcile(file, account, target_amount) abort
 endfunction
 
 function! s:finish_reconciling() abort
-  unlet g:ledger_target_amount
+  unlet b:ledger_target_amount
   augroup reconcile
     autocmd!
   augroup END
@@ -1015,11 +1015,11 @@ function! ledger#show_balance(file, ...) abort
         \ '--empty',
         \ '--collapse',
         \ "--format='%(scrub(get_at(display_total, 0)))|%(scrub(get_at(display_total, 1)))|%(quantity(scrub(get_at(display_total, 1))))'",
-        \ (empty(g:ledger_default_commodity) ? '' : '-X ' . shellescape(g:ledger_default_commodity))
+        \ (empty(b:ledger_default_commodity) ? '' : '-X ' . shellescape(b:ledger_default_commodity))
         \ ]))
   let l:output = split(system(l:cmd), '\n')
   " Errors may occur, for example,  when the account has multiple commodities
-  " and g:ledger_default_commodity is empty.
+  " and b:ledger_default_commodity is empty.
   if v:shell_error
     call s:quickfix_populate(l:output)
     call s:quickfix_toggle('Errors', 'Unable to parse errors')
@@ -1031,18 +1031,18 @@ function! ledger#show_balance(file, ...) abort
     call s:error_message('Could not determine balance. Did you use a valid account?')
     return
   endif
-  echo g:ledger_pending_string
+  echo b:ledger_pending_string
   echohl LedgerPending
   echon l:amounts[0]
   echohl NONE
-  echon ' ' g:ledger_cleared_string
+  echon ' ' b:ledger_cleared_string
   echohl LedgerCleared
   echon l:amounts[1]
   echohl NONE
-  if exists('g:ledger_target_amount')
-    echon ' ' g:ledger_target_string
+  if exists('b:ledger_target_amount')
+    echon ' ' b:ledger_target_string
     echohl LedgerTarget
-    echon printf('%.2f', (g:ledger_target_amount - str2float(l:amounts[2])))
+    echon printf('%.2f', (b:ledger_target_amount - str2float(l:amounts[2])))
     echohl NONE
   endif
 endfunction
