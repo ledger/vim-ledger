@@ -42,28 +42,12 @@ if !exists('g:ledger_main')
   let g:ledger_main = '%:p'
 endif
 
-if !exists('g:ledger_dangerous_formatprg')
-  let g:ledger_dangerous_formatprg = 0
-endif
-
 if !exists('g:ledger_extra_options')
   let g:ledger_extra_options = ''
 endif
 
 if !exists('g:ledger_date_format')
   let g:ledger_date_format = '%Y/%m/%d'
-endif
-
-if !exists('g:ledger_fuzzy_account_completion')
-  let g:ledger_fuzzy_account_completion = 0
-endif
-
-" You can set a maximal number of columns the fold text (excluding amount)
-" will use by overriding g:ledger_maxwidth in your .vimrc.
-" When maxwidth is zero, the amount will be displayed at the far right side
-" of the screen.
-if !exists('g:ledger_maxwidth')
-  let g:ledger_maxwidth = 0
 endif
 
 if !exists('g:ledger_fillstring')
@@ -98,10 +82,6 @@ if !exists('g:ledger_align_at')
   let g:ledger_align_at = 60
 endif
 
-if !exists('g:ledger_align_commodity')
-  let g:ledger_align_commodity = 0
-endif
-
 if !exists('g:ledger_default_commodity')
   let g:ledger_default_commodity = ''
 endif
@@ -112,10 +92,6 @@ endif
 
 if !exists('g:ledger_commodity_sep')
   let g:ledger_commodity_sep = ''
-endif
-
-if !exists('g:ledger_commodity_spell')
-  let g:ledger_commodity_spell = 0
 endif
 
 if !exists('g:ledger_accounts_spell')
@@ -145,23 +121,9 @@ if !exists('g:ledger_detailed_first')
   let g:ledger_detailed_first = 1
 endif
 
-" only display exact matches (no parent accounts etc.)
-if !exists('g:ledger_exact_only')
-  let g:ledger_exact_only = 0
-endif
-
-" display original text / account name as completion
-if !exists('g:ledger_include_original')
-  let g:ledger_include_original = 0
-endif
-
 " Settings for Ledger reports
 if !exists('g:ledger_winpos')
   let g:ledger_winpos = 'B'  " Window position (see s:winpos_map)
-endif
-
-if !exists('g:ledger_use_location_list')
-  let g:ledger_use_location_list = 0  " Use quickfix list by default
 endif
 
 if !exists('g:ledger_cleared_string')
@@ -195,9 +157,7 @@ if !exists('g:ledger_qf_size')
   let g:ledger_qf_size = 10  " Size of the quickfix window
 endif
 
-if !exists('g:ledger_qf_vertical')
-  let g:ledger_qf_vertical = 0
-endif
+" Note all g:ledger_* variables that are not explicitly mentioned here will default to b:ledger_* = 0 on plugin load.
 
 " Make sure config options are initialized either with values from the user or
 " global defaults we detect, guess, or suggest.
@@ -249,7 +209,7 @@ function! ledger#init() abort
 
   for setting in settings
     if !has_key(b:, setting)
-      let b:{setting} = get(g:, setting)
+      let b:{setting} = get(g:, setting, 0)
     endif
   endfor
 
