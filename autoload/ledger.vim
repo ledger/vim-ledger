@@ -812,6 +812,7 @@ function! s:quickfix_toggle(...) abort
 
   if l:open
     execute (b:ledger_qf_vertical ? 'vert' : 'botright') l:list.'open' b:ledger_qf_size
+    call ledger#init()
     " Set local mappings to quit the quickfix window  or lose focus.
     nnoremap <silent> <buffer> <tab> <c-w><c-w>
     execute 'nnoremap <silent> <buffer> q :' l:list.'close<CR>'
