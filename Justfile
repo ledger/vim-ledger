@@ -1,14 +1,13 @@
-set ignore-comments := true
-set unstable := true
-
 git := which('git')
 just := just_executable()
 nvim := which('nvim')
 vim := which('vim')
 
+set unstable := true
+
 [default]
 [private]
-@help:
+@list:
     {{ just }} --list --unsorted
 
 [no-cd]
@@ -21,9 +20,9 @@ preview-nvim *ARGS: (preview nvim + ' --clean' ARGS)
 [private]
 preview vimcmd *ARGS:
     {{ vimcmd }} \
-    	-c {{ quote("let &runtimepath=\"" + justfile_directory() + ",\" . &runtimepath") }} \
-    	-c 'filetype detect' \
-    	{{ ARGS }}
+        -c {{ quote("let &runtimepath=\"" + justfile_directory() + ",\" . &runtimepath") }} \
+        -c 'filetype detect' \
+        {{ ARGS }}
 
 [no-cd]
 check-vim *ARGS: (check vim + ' --clean -N' ARGS)
@@ -36,8 +35,8 @@ check-nvim *ARGS: (check nvim + ' --clean --headless' ARGS)
 check vimcmd *ARGS:
     test -d vader.vim || {{ git }} clone --depth 1 https://github.com/junegunn/vader.vim.git
     {{ vimcmd }} \
-    	-c {{ quote("let &runtimepath=\"" + justfile_directory() + "/vader.vim," + justfile_directory() + ",\" . &runtimepath") }} \
-    	-c 'filetype detect' \
-    	-c 'source vader.vim/plugin/vader.vim' \
-    	{{ ARGS }} \
-    	'+Vader! spec/*'
+        -c {{ quote("let &runtimepath=\"" + justfile_directory() + "/vader.vim," + justfile_directory() + ",\" . &runtimepath") }} \
+        -c 'filetype detect' \
+        -c 'source vader.vim/plugin/vader.vim' \
+        {{ ARGS }} \
+        '+Vader! spec/*'
