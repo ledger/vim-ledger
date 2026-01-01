@@ -248,7 +248,7 @@ function! s:collect_completion_data()
     let [t, postings] = xact.parse_body()
     let tagdicts = [t]
 
-		" collect account names
+    " collect account names
     if !b:ledger_bin
       for posting in postings
         if has_key(posting, 'tags')

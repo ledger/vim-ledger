@@ -13,7 +13,7 @@ endif
 let g:loaded_ledger = 1
 
 if exists('g:ledger_no_bin') && g:ledger_no_bin
-	unlet! g:ledger_bin
+  unlet! g:ledger_bin
 elseif !exists('g:ledger_bin') || empty(g:ledger_bin)
   if executable('hledger')
     let g:ledger_bin = 'hledger'
@@ -26,10 +26,10 @@ elseif !exists('g:ledger_bin') || empty(g:ledger_bin)
     echohl None
   endif
 elseif !executable(g:ledger_bin)
-	unlet! g:ledger_bin
-	echohl WarningMsg
-	echomsg 'Command set in g:ledger_bin is not executable, fix to to enable more vim-ledger features.'
-	echohl None
+  unlet! g:ledger_bin
+  echohl WarningMsg
+  echomsg 'Command set in g:ledger_bin is not executable, fix to to enable more vim-ledger features.'
+  echohl None
 endif
 
 if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
@@ -141,16 +141,16 @@ endif
 " Settings for the quickfix window
 if !exists('g:ledger_qf_register_format')
   let g:ledger_qf_register_format =
-				\ '%(date) %(justify(payee, 50)) '.
-				\	'%(justify(account, 30)) %(justify(amount, 15, -1, true)) '.
-				\	'%(justify(total, 15, -1, true))\n'
+        \ '%(date) %(justify(payee, 50)) '.
+        \  '%(justify(account, 30)) %(justify(amount, 15, -1, true)) '.
+        \  '%(justify(total, 15, -1, true))\n'
 endif
 
 if !exists('g:ledger_qf_reconcile_format')
   let g:ledger_qf_reconcile_format =
-				\ '%(date) %(justify(code, 4)) '.
-				\ '%(justify(payee, 50)) %(justify(account, 30)) '.
-				\ '%(justify(amount, 15, -1, true))\n'
+        \ '%(date) %(justify(code, 4)) '.
+        \ '%(justify(payee, 50)) %(justify(account, 30)) '.
+        \ '%(justify(amount, 15, -1, true))\n'
 endif
 
 if !exists('g:ledger_qf_size')
