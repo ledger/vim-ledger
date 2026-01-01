@@ -5,6 +5,8 @@ vim := which('vim')
 
 set unstable := true
 
+ledger := "ledger"
+
 [default]
 [private]
 @list:
@@ -20,6 +22,7 @@ preview-nvim *ARGS: (preview nvim + ' --clean' ARGS)
 [private]
 preview vimcmd *ARGS:
     {{ vimcmd }} \
+        -c 'let g:ledger_bin = "{{ ledger }}"' \
         -c {{ quote("let &runtimepath=\"" + justfile_directory() + ",\" . &runtimepath") }} \
         -c 'filetype detect' \
         {{ ARGS }}
