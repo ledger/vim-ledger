@@ -237,17 +237,17 @@ endfunction
 function! s:collect_completion_data()
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
-  if b:ledger_bin !=# 0
+  if b:ledger_bin !=# v:false
     let accounts = split(system(b:ledger_accounts_cmd), '\n')
   else
     let accounts = ledger#declared_accounts()
   endif
   let cache.flat_accounts = accounts
-  if b:ledger_bin !=# 0
+  if b:ledger_bin !=# v:false
     let cache.descriptions = split(system(b:ledger_descriptions_cmd), '\n')
   endif
   for xact in transactions
-    if b:ledger_bin ==# 0
+    if b:ledger_bin ==# v:false
       " collect descriptions
       if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
         call add(cache.descriptions, xact['description'])
@@ -257,7 +257,7 @@ function! s:collect_completion_data()
     let tagdicts = [t]
 
     " collect account names
-    if b:ledger_bin ==# 0
+    if b:ledger_bin ==# v:false
       for posting in postings
         if has_key(posting, 'tags')
           call add(tagdicts, posting.tags)

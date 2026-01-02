@@ -164,7 +164,7 @@ endif
 function! ledger#init() abort
 
   if !exists('b:ledger_bin')
-    let b:ledger_bin = get(g:, 'ledger_bin', 0)
+    let b:ledger_bin = get(g:, 'ledger_bin', v:false)
   endif
 
   let settings = [
