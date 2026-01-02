@@ -241,26 +241,16 @@ endfunction
 function! s:collect_completion_data()
   let transactions = ledger#transactions()
   let cache = {'descriptions': [], 'tags': {}, 'accounts': {}, 'flat_accounts': []}
-  if b:ledger_bin !=# v:false
-    let accounts = split(system(b:ledger_accounts_cmd), '\n')
-  else
-    let accounts = ledger#declared_accounts()
-  endif
+
+  let accounts = s:get_accounts_list()
   let cache.flat_accounts = accounts
-  if b:ledger_bin !=# v:false
-    let cache.descriptions = split(system(b:ledger_descriptions_cmd), '\n')
-  endif
+  let cache.descriptions = s:get_descriptions_list()
+
   for xact in transactions
-    if b:ledger_bin ==# v:false
-      " collect descriptions
-      if has_key(xact, 'description') && index(cache.descriptions, xact['description']) < 0
-        call add(cache.descriptions, xact['description'])
-      endif
-    endif
     let [t, postings] = xact.parse_body()
     let tagdicts = [t]
 
-    " collect account names
+    " collect account names (only when not using ledger binary)
     if b:ledger_bin ==# v:false
       for posting in postings
         if has_key(posting, 'tags')
@@ -295,6 +285,29 @@ function! s:collect_completion_data()
   endfor
 
   return cache
+endfunction
+
+function! s:get_accounts_list()
+  if b:ledger_bin !=# v:false
+    return split(system(b:ledger_accounts_cmd), '\n')
+  else
+    return ledger#declared_accounts()
+  endif
+endfunction
+
+function! s:get_descriptions_list()
+  if b:ledger_bin !=# v:false
+    return split(system(b:ledger_descriptions_cmd), '\n')
+  else
+    let transactions = ledger#transactions()
+    let descriptions = []
+    for xact in transactions
+      if has_key(xact, 'description') && index(descriptions, xact['description']) < 0
+        call add(descriptions, xact['description'])
+      endif
+    endfor
+    return descriptions
+  endif
 endfunction
 
 " Helper functions
@@ -333,12 +346,16 @@ function! s:count_expression(text, expression)
 endfunction
 
 function! s:autocomplete_account_or_payee(argLead, cmdLine, cursorPos)
-  return (a:argLead =~# '^@') ?
-        \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' payees'), '\n'),
-        \ "v:val =~? '" . strpart(a:argLead, 1) . "' && v:val !~? '^Warning: '"), '"@" . escape(v:val, " ")')
-        \ :
-        \ map(filter(split(system(b:ledger_bin . ' -f ' . shellescape(expand(b:ledger_main)) . ' accounts'), '\n'),
-        \ "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"), 'escape(v:val, " ")')
+  if a:argLead =~# '^@'
+    let payees = s:get_descriptions_list()
+    let pattern = strpart(a:argLead, 1)
+    return map(filter(payees, "v:val =~? '" . pattern . "' && v:val !~? '^Warning: '"),
+             \ '"@" . escape(v:val, " ")')
+  else
+    let accounts = s:get_accounts_list()
+    return map(filter(accounts, "v:val =~? '" . a:argLead . "' && v:val !~? '^Warning: '"),
+             \ 'escape(v:val, " ")')
+  endif
 endfunction
 
 function! s:reconcile(file, account)
