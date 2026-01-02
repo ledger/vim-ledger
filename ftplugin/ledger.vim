@@ -156,15 +156,19 @@ function! LedgerComplete(findstart, base)
         return matchend(line, '^\s\+[*!]\?\s*[\[(]\?')
       endif
     elseif line =~# '^\d'
-      let pre = matchend(line, '^\d\S\+\%(([^)]*)\|[*?!]\|\s\)\+')
-      if pre < col('.') - 1
+      let pre = matchend(line, '^\d\S\+\%\(\s\(([^\)]*)\|[*?!]\)\)\?\s\+')
+      if pre <= col('.') - 1
         let b:compl_context = 'description'
+        if pre == -1
+          return -3
+        endif
         return pre
       endif
     elseif line =~# '^$'
       let b:compl_context = 'new'
+      return 0
     endif
-    return -1
+    return -3
   else
     if ! exists('b:compl_cache')
       let b:compl_cache = s:collect_completion_data()
