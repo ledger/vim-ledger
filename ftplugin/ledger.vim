@@ -267,7 +267,9 @@ function! s:collect_completion_data()
           call add(tagdicts, posting.tags)
         endif
         " remove virtual-transaction-marks
-        let name = substitute(posting.account, '\%(^\s*[\[(]\?\|[\])]\?\s*$\)', '', 'g')
+        let name = substitute(posting.account, '^\s*|\s*$', '', 'g')
+        let name = substitute(name, '^(.*)$', '\1', '')
+        let name = substitute(name, '^\[.*\]$', '\1', '')
         if index(accounts, name) < 0
           call add(accounts, name)
         endif
