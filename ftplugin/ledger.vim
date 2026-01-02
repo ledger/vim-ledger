@@ -155,6 +155,10 @@ function! LedgerComplete(findstart, base)
         let b:compl_context = 'account'
         return matchend(line, '^\s\+[*!]\?\s*[\[(]\?')
       endif
+    elseif b:ledger_is_hledger && line =~# '^payee '
+      let pre = matchend(line, '^payee ')
+      let b:compl_context = 'description'
+      return pre
     elseif line =~# '^\d'
       let pre = matchend(line, '^\d\S\+\%\(\s\(([^\)]*)\|[*?!]\)\)\?\s\+')
       if pre <= col('.') - 1
