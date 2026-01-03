@@ -979,7 +979,7 @@ function! ledger#reconcile(file, account, target_amount) abort
   if s:quickfix_toggle('Reconcile ' . a:account, 'Nothing to reconcile')
     let s:ledger_target_amount = a:target_amount
     " Show updated account balance upon saving, as long as the quickfix window is open
-    augroup reconcile
+    augroup ledger_reconcile
       autocmd!
       execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . l:file . "','" . a:account . "')"
       autocmd WinClosed <buffer> call <sid>finish_reconciling()
@@ -993,10 +993,10 @@ endfunction
 
 function! s:finish_reconciling() abort
   unlet s:ledger_target_amount
-  augroup reconcile
+  augroup ledger_reconcile
     autocmd!
   augroup END
-  augroup! reconcile
+  augroup! ledger_reconcile
 endfunction
 
 " Show the pending/cleared balance of an account.
