@@ -38,6 +38,7 @@ check-nvim *ARGS: (check nvim + ' --clean --headless' ARGS)
 check vimcmd *ARGS:
     test -d vader.vim || {{ git }} clone --depth 1 https://github.com/junegunn/vader.vim.git
     {{ vimcmd }} \
+        -c 'let g:ledger_bin = "{{ ledger }}"' \
         -c {{ quote("let &runtimepath=\"" + justfile_directory() + "/vader.vim," + justfile_directory() + ",\" . &runtimepath") }} \
         -c 'filetype detect' \
         -c 'source vader.vim/plugin/vader.vim' \
