@@ -364,18 +364,18 @@ function! s:reconcile(file, account)
 endfunction
 
 " Commands
-command! -buffer -nargs=? -complete=customlist,s:autocomplete_account_or_payee
+command! -buffer -nargs=? -complete=customlist,<SID>autocomplete_account_or_payee
       \ Balance call ledger#show_balance(b:ledger_main, <q-args>)
 
-command! -buffer -nargs=+ -complete=customlist,s:autocomplete_account_or_payee
+command! -buffer -nargs=+ -complete=customlist,<SID>autocomplete_account_or_payee
       \ Ledger call ledger#output(ledger#report(b:ledger_main, <q-args>))
 
 command! -buffer -range LedgerAlign <line1>,<line2>call ledger#align_commodity()
 
 command! -buffer LedgerAlignBuffer call ledger#align_commodity_buffer()
 
-command! -buffer -nargs=1 -complete=customlist,s:autocomplete_account_or_payee
-      \ Reconcile call <sid>reconcile(b:ledger_main, <q-args>)
+command! -buffer -nargs=1 -complete=customlist,<SID>autocomplete_account_or_payee
+      \ Reconcile call <SID>reconcile(b:ledger_main, <q-args>)
 
-command! -buffer -complete=customlist,s:autocomplete_account_or_payee -nargs=*
+command! -buffer -complete=customlist,<SID>autocomplete_account_or_payee -nargs=*
       \ Register call ledger#register(b:ledger_main, <q-args>)

@@ -982,7 +982,7 @@ function! ledger#reconcile(file, account, target_amount) abort
     augroup ledger_reconcile
       autocmd!
       execute "autocmd BufWritePost *.ldg,*.ledger call ledger#show_balance('" . l:file . "','" . a:account . "')"
-      autocmd WinClosed <buffer> call <sid>finish_reconciling()
+      autocmd WinClosed <buffer> call <SID>finish_reconciling()
     augroup END
     " Add refresh shortcut
     execute "nnoremap <silent> <buffer> <c-l> :<c-u>call ledger#reconcile('"
