@@ -478,11 +478,11 @@ function! s:transaction.parse_body(...) abort dict
     return []
   endif
 
-  let lnum = head
+  let line_number = head
   let tags = {}
   let postings = []
-  while lnum <= tail
-    let line = split(getline(lnum), '\s*\%(\t\|  \);', 1)
+  while line_number <= tail
+    let line = split(getline(line_number), '\s*\%(\t\|  \);', 1)
 
     if line[0] =~# '^\s\+[^[:blank:];]'
       " posting
@@ -511,18 +511,18 @@ function! s:transaction.parse_body(...) abort dict
     let comment = join(line[1:], '  ;')
     if comment =~# '^\s*:'
       " tags without values
-      for t in s:findall(comment, ':\zs[^:[:blank:]]\([^:]*[^:[:blank:]]\)\?\ze:')
-        let tag_container[t] = ''
+      for tag in s:findall(comment, ':\zs[^:[:blank:]]\([^:]*[^:[:blank:]]\)\?\ze:')
+        let tag_container[tag] = ''
       endfor
     elseif comment =~# '^\s*[^:[:blank:]][^:]\+:'
       " tag with value
       let key = matchstr(comment, '^\s*\zs[^:]\+\ze:')
       if ! empty(key)
-        let val = matchstr(comment, ':\s*\zs.*\ze\s*$')
-        let tag_container[key] = val
+        let value = matchstr(comment, ':\s*\zs.*\ze\s*$')
+        let tag_container[key] = value
       endif
     endif
-    let lnum += 1
+    let line_number += 1
   endwhile
   return [tags, postings]
 endfunction
@@ -667,19 +667,19 @@ function! s:goto_col(pos, min_spaces) abort
 endfunction
 
 " Return character position of decimal separator (multibyte safe)
-function! s:decimalpos(expr) abort
+function! s:decimal_position(expression) abort
   " Remove trailing comments
-  let l:expr = substitute(a:expr, '\v +;.*$', '', '')
+  let l:expr = substitute(a:expression, '\v +;.*$', '', '')
   " Find first or last possible decimal separator candidate
   if b:ledger_align_last
     let pos = matchend(l:expr, '\v.*[' . b:ledger_decimal_sep . ']')
     if pos > 0
-      let pos = strchars(a:expr[:pos]) + 1
+      let pos = strchars(a:expression[:pos]) + 1
     endif
   else
     let pos = match(l:expr, '\v[' . b:ledger_decimal_sep . ']')
     if pos > 0
-      let pos = strchars(a:expr[:pos]) - 1
+      let pos = strchars(a:expression[:pos]) - 1
     endif
   endif
   return pos
@@ -716,7 +716,7 @@ function! ledger#align_commodity() abort
       let pos = 0
     elseif b:ledger_decimal_sep !=# ''
       " Find the position of the first decimal separator:
-      let pos = s:decimalpos(rhs)
+      let pos = s:decimal_position(rhs)
     endif
     if pos < 0
       " Find the position after the first digits
@@ -753,7 +753,7 @@ function! ledger#align_amount_at_cursor() abort
   " Select and cut text:
   normal! viWd
   " Find the position of the decimal separator
-  let pos = s:decimalpos(@") " Returns zero when the separator is the empty string
+  let pos = s:decimal_position(@") " Returns zero when the separator is the empty string
   if pos <= 0
     let pos = len(@")
   endif
