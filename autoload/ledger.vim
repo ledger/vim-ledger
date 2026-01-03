@@ -56,7 +56,11 @@ endif
 
 if !exists('g:ledger_accounts_cmd')
   if exists('g:ledger_bin')
-    let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts'
+    if g:ledger_is_hledger
+      let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts --forecast'
+    else
+      let g:ledger_accounts_cmd = g:ledger_bin . ' -f ' . shellescape(expand(g:ledger_main)) . ' accounts --add-budget'
+    endif
   endif
 endif
 
