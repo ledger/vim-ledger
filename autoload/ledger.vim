@@ -32,10 +32,12 @@ elseif !executable(g:ledger_bin)
   echohl None
 endif
 
-if exists('g:ledger_bin') && !exists('g:ledger_is_hledger')
-  let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
-else
-  let g:ledger_is_hledger = 0
+if !exists('g:ledger_is_hledger')
+  if exists('g:ledger_bin')
+    let g:ledger_is_hledger = g:ledger_bin =~# '.*hledger'
+  else
+    let g:ledger_is_hledger = 0
+  endif
 endif
 
 if !exists('g:ledger_main')
