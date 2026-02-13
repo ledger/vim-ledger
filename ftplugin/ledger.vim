@@ -29,7 +29,7 @@ setlocal formatexpr=ledger#align_formatexpr(v:lnum,v:count)
 " on non-transaction blocks, see https://github.com/ledger/vim-ledger/issues/168.
 if b:ledger_dangerous_formatprg
   execute 'setlocal formatprg='.substitute(b:ledger_bin, ' ', '\\ ', 'g').'\ -f\ -\ print'
-  execute 'setlocal formatexpr='
+  setlocal formatexpr=
 endif
 
 if !exists('current_compiler')
