@@ -930,7 +930,7 @@ function! ledger#output(report) abort
   endif
   " Open a new buffer to show Ledger's output.
   execute get(s:winpos_map, b:ledger_winpos, 'bo new')
-  setlocal buftype=nofile bufhidden=wipe modifiable nobuflisted noswapfile nowrap
+  setlocal buftype=nofile bufhidden=wipe modifiable nobuflisted noswapfile nowrap nolist
   call ledger#init()
   call append(0, a:report)
   setlocal nomodifiable
