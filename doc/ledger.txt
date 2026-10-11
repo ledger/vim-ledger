@@ -5,8 +5,6 @@
 
 Contents:
 
-        Commands............|ledger-invoking|
-        Source................|ledger-source|
         Usage..................|ledger-usage|
         Tips....................|ledger-tips|
         Reports..............|ledger-reports|
